@@ -11,7 +11,7 @@ const HomePage = () => {
                 minHeight: '100vh',
                 display: 'flex',
                 flexDirection: 'column',
-                backgroundColor: '#7456FD',
+                backgroundColor: '#26282d',
             }}
         >
             <NavBar />

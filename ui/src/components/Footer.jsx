@@ -4,13 +4,13 @@ import { Box, Link, Typography, Grid } from '@mui/material';
 
 const Footer = () => {
     return (
-        <Box position="static" sx={{ backgroundColor: '#02032F', padding: 2 }}>
+        <Box position="static" sx={{ backgroundColor: '#1e2022', padding: 2 }}>
             <Grid container justifyContent="space-between" alignItems="center">
                 <Grid item>
                     <Link href="mailto:keeganthomaswhite@gmail.com.com" color="inherit">
                         <Box sx={{ display: 'flex', alignItems: 'center' }}>
                             <img src="./images/email.png" alt="Email" style={{ verticalAlign: 'middle', height: '22px' }} />
-                            <Typography variant="body_footer" component="span" sx={{ ml: 1 }}>info@taurinetech.com</Typography>
+                            <Typography variant="body_footer" component="span" sx={{ ml: 1 }}>keeganthomaswhite@gmail.com.com</Typography>
                         </Box>
                     </Link>
                 </Grid>
