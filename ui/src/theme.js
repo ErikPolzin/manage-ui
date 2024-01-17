@@ -53,7 +53,8 @@ const theme = createTheme({
         ].join(','),
         h1: {
             fontFamily: 'Arial, sans-serif',
-            fontSize: '2.5rem',
+            fontSize: '2',
+            color: '#ffffff',
         },
         body: {
             color: '#ffffff',

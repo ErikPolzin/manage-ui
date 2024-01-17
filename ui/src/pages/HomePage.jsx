@@ -2,8 +2,20 @@ import React from 'react';
 import NavBar from "../components/NavBar";
 import Box from "@mui/material/Box";
 import Footer from "../components/Footer";
-import {Typography} from "@mui/material";
+import {Typography, Card, CardContent, CardActions, Button, Grid, List} from "@mui/material";
+import {Link} from "react-router-dom";
+
 const HomePage = () => {
+
+    const handleFirstButtonClick = () => {
+        // Navigate to the devices page
+        window.location.href = '/devices'; // Adjust the URL as needed
+    };
+
+    const handleSecondButtonClick = () => {
+        // Open Grafana dashboard in a new tab
+        window.open('https://grafana.inethilocal.net', '_blank');
+    };
 
     return (
         <Box
@@ -19,19 +31,58 @@ const HomePage = () => {
                 sx={{
                     flexGrow: 1,
                     display: 'flex',
-                    flexDirection: 'column',
                     justifyContent: 'center',
-                    alignItems: 'center',
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center',
+                    alignItems: 'start',
+                    padding: 2,
+                    margin: 2,
                 }}
             >
-                <Typography>PLACEHOLDER</Typography>
+                <List>
 
+                    {/*FIRST CARD*/}
+                    <Grid container spacing={2}>
+                        <Grid item xs={12} sm={6}>
+                            <Card sx={{ bgcolor: '#1e2022', boxShadow: 3, display: 'flex', flexDirection: 'column', height: '100%' }}>
+                                <CardContent sx={{ flexGrow: 1 }}>
+                                    <Typography variant="h1" sx={{ marginBottom: 2 }} >
+                                        DEVICES
+                                    </Typography>
+                                    <Typography variant='body'>
+                                        Edit your networking devices.
+                                    </Typography>
+                                </CardContent>
+                                <CardActions sx={{ justifyContent: 'center', padding: 2 }}>
+                                    <Button variant='contained' component={Link} to="/devices" color="secondary">
+                                        VISIT
+                                    </Button>
+                                </CardActions>
+                            </Card>
+                        </Grid>
+
+                        {/* SECOND CARD*/}
+                        <Grid item xs={12} sm={6}>
+                            <Card sx={{ bgcolor: '#1e2022', boxShadow: 3, display: 'flex', flexDirection: 'column', height: '100%' }}>
+                                <CardContent sx={{ flexGrow: 1 }}>
+                                    <Typography variant="h1" sx={{ marginBottom: 2 }}>
+                                        MONITOR
+                                    </Typography>
+                                    <Typography variant='body'>
+                                        Open the iNethi monitoring system to view device online status and uptime statistics.
+                                    </Typography>
+                                </CardContent>
+                                <CardActions sx={{ justifyContent: 'center', padding: 2 }}>
+                                    <Button variant='contained' onClick={handleSecondButtonClick} color="secondary">
+                                        VISIT
+                                    </Button>
+                                </CardActions>
+                            </Card>
+                        </Grid>
+                    </Grid>
+                </List>
             </Box>
             <Footer />
         </Box>
     );
 }
 
-export default HomePage
+export default HomePage;
