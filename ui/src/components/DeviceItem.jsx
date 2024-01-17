@@ -12,7 +12,7 @@ function DeviceItem({ device, onDelete, onEdit}) {
         <Card sx={{
             margin: 2,
             maxWidth: 600,
-            bgcolor: 'background.paper',
+            bgcolor: '#1e2022',
             boxShadow: 3,
         }}>
             <CardContent>

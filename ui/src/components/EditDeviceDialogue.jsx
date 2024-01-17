@@ -49,7 +49,7 @@ function EditDeviceDialogue({ open, handleClose, device, handleUpdate }) {
             </DialogContent>
             <DialogActions>
                 <Button onClick={handleClose} color="button_red">Cancel</Button>
-                <Button onClick={handleSubmit} color="button">Update</Button>
+                <Button onClick={handleSubmit} color="button_green">Update</Button>
             </DialogActions>
         </Dialog>
     );

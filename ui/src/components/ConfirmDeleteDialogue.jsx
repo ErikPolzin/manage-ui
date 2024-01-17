@@ -14,7 +14,7 @@ function ConfirmDeleteDialogue({ open, handleClose, handleConfirm }) {
                 </DialogContentText>
             </DialogContent>
             <DialogActions>
-                <Button onClick={handleClose} color="button">
+                <Button onClick={handleClose} color="button_green">
                     Cancel
                 </Button>
                 <Button onClick={handleConfirm} color="button_red" autoFocus>
