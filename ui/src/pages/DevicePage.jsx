@@ -21,7 +21,7 @@ function DevicePage() {
 
     useEffect(() => {
         // Fetch devices from your API
-        fetch('http://localhost:8000/devices/')
+        fetch('https://manage-backend.inethilocal.net/devices/')
             .then(response => response.json())
             .then(data => setDevices(data))
             .catch(error => console.error('Error:', error));
@@ -39,7 +39,7 @@ function DevicePage() {
     const handleAddDevice = (newDevice) => {
         setOpenAddDialog(false);
 
-        fetch('http://localhost:8000/add/', {
+        fetch('https://manage-backend.inethilocal.net/add/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -63,7 +63,7 @@ function DevicePage() {
     };
 
     const fetchDevices = () => {
-        fetch('http://localhost:8000/devices/')
+        fetch('https://manage-backend.inethilocal.net/devices/')
             .then(response => response.json())
             .then(data => setDevices(data))
             .catch(error => console.error('Error:', error));
@@ -80,7 +80,7 @@ function DevicePage() {
 
     const handleUpdateDevice = (oldIpAddress, updatedDevice) => {
         setOpenEditDialog(false);
-        fetch(`http://localhost:8000/update/`, {
+        fetch(`https://manage-backend.inethilocal.net/update/`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -121,7 +121,7 @@ function DevicePage() {
         setOpenDeleteDialog(false);
         if (deviceToDelete) {
             // Perform API call to delete the device
-            fetch(`http://localhost:8000/delete/`, {
+            fetch(`https://manage-backend.inethilocal.net/delete/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
