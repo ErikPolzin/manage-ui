@@ -18,7 +18,7 @@ const NavBar = () => {
                 >
                     <Grid item>
                         <Link to="/">
-                            <img src="./logo192.png" alt="Logo" style={{height: '80px' }}/>
+                            <img src="./logo192.png" alt="Logo" style={{height: '50px' }}/>
                         </Link>
                     </Grid>
                     <Grid item>

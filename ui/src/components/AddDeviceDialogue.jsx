@@ -46,6 +46,10 @@ function AddDeviceDialog({ open, handleClose, handleAdd }) {
                     >
                         <MenuItem value="switch">Switch</MenuItem>
                         <MenuItem value="access_point">Access Point</MenuItem>
+                        <MenuItem value="firewall">Firewall</MenuItem>
+                        <MenuItem value="dns_server">DNS</MenuItem>
+                        <MenuItem value="global_server">Cloud Server</MenuItem>
+                        <MenuItem value="local_server">Local Server</MenuItem>
                     </Select>
                 </FormControl>
             </DialogContent>
