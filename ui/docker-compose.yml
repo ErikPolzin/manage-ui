@@ -1,0 +1,15 @@
+version: "3"
+services:
+  manage-frontend:
+    build:
+      context: .
+    container_name: inethi-management-frontend
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.manageFrontend.rule=Host(`manage.inethilocal.net`)"
+      - "traefik.http.routers.manageFrontend.entrypoints=websecure"
+      - "traefik.http.services.manageFrontend.loadbalancer.server.port=80"
+networks:
+  default:
+    external:
+      name: "inethi-bridge-traefik"
