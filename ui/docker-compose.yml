@@ -3,7 +3,7 @@ services:
   manage-frontend:
     build:
       context: .
-    container_name: inethi-management-frontend
+    container_name: inethi-manage-ui
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.manageFrontend.rule=Host(`manage.inethilocal.net`)"
