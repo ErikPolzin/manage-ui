@@ -4,6 +4,9 @@ import { AppBar, Toolbar, Button, Grid } from '@mui/material';
 
 
 const NavBar = () => {
+    const handleButtonClick = () => {
+        window.open('https://grafana.inethilocal.net', '_blank', 'noopener,noreferrer');
+    };
     return (
         <AppBar position="static" sx={{
 
@@ -24,8 +27,8 @@ const NavBar = () => {
                     <Grid item>
                         <Button color="inherit" component={Link} to="/">Home</Button>
                         <Button color="inherit" component={Link} to="/devices">Devices</Button>
-                        <Button color="inherit" component={Link} to="/">Options</Button>
-                        <Button color="inherit" component={Link} to="/">Faq</Button>
+                        {/*<Button color="inherit" component={Link} to="/">Options</Button>*/}
+                        <Button color="inherit" onClick={handleButtonClick}>Monitor</Button>
                         <Button color="inherit" component={Link} to="/">Sign Out</Button>
                     </Grid>
 
