@@ -9,7 +9,9 @@ import Alert from '@mui/material/Alert';
 import EditDeviceDialogue from "../components/EditDeviceDialogue";
 import AddDeviceDialogue from "../components/AddDeviceDialogue";
 import Footer from "../components/Footer";
+import { useKeycloak } from "@react-keycloak/web";
 function DevicePage() {
+    const { keycloak } = useKeycloak();
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
     const [deviceToDelete, setDeviceToDelete] = useState(null);
     const [devices, setDevices] = useState([]);
@@ -19,9 +21,32 @@ function DevicePage() {
     const [deviceToEdit, setDeviceToEdit] = useState({ name: '', ip_address: '', device_type: '' });
     const [openAddDialog, setOpenAddDialog] = useState(false);
 
+    const refreshTokenIfNeeded = async () => {
+        if (keycloak.isTokenExpired(5)) {
+            try {
+                const refreshed = await keycloak.updateToken(5);
+                if (refreshed) {
+                    console.log('Token refreshed');
+                } else {
+                    console.log('Token not refreshed, still valid');
+                }
+            } catch (error) {
+                console.error('Failed to refresh the token, or the session has expired');
+                keycloak.login()
+            }
+        }
+    };
+
+
     useEffect(() => {
+
         // Fetch devices from your API
-        fetch('https://manage-backend.inethilocal.net/devices/')
+        fetch('https://manage-backend.inethilocal.net/devices/',{ headers: {
+                    'Authorization': `Bearer ${keycloak.token}`,
+                },
+            }
+        )
+
             .then(response => response.json())
             .then(data => setDevices(data))
             .catch(error => console.error('Error:', error));
@@ -42,6 +67,7 @@ function DevicePage() {
         fetch('https://manage-backend.inethilocal.net/add/', {
             method: 'POST',
             headers: {
+                'Authorization': `Bearer ${keycloak.token}`,
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify(newDevice),
@@ -62,7 +88,8 @@ function DevicePage() {
             });
     };
 
-    const fetchDevices = () => {
+    const fetchDevices = async () => {
+        await refreshTokenIfNeeded();
         fetch('https://manage-backend.inethilocal.net/devices/')
             .then(response => response.json())
             .then(data => setDevices(data))
@@ -83,6 +110,7 @@ function DevicePage() {
         fetch(`https://manage-backend.inethilocal.net/update/`, {
             method: 'POST',
             headers: {
+                'Authorization': `Bearer ${keycloak.token}`,
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
@@ -124,6 +152,7 @@ function DevicePage() {
             fetch(`https://manage-backend.inethilocal.net/delete/`, {
                 method: 'POST',
                 headers: {
+                    'Authorization': `Bearer ${keycloak.token}`,
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({ ip_address: deviceToDelete.ip_address }),

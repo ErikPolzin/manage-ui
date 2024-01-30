@@ -18,6 +18,10 @@ function App() {
     if (!keycloak.authenticated) {
         keycloak.login();
     }
+    if (keycloak.authenticated) {
+        console.log('Authenticated');
+        // Log the token
+    }
   return (
       <ThemeProvider theme={theme}>
         <HashRouter>
