@@ -22,7 +22,7 @@ function DevicePage() {
     const [openAddDialog, setOpenAddDialog] = useState(false);
 
     const refreshTokenIfNeeded = async () => {
-        if (keycloak.isTokenExpired(5)) {
+        if (keycloak.isTokenExpired()) {
             try {
                 const refreshed = await keycloak.updateToken(5);
                 if (refreshed) {
@@ -34,6 +34,13 @@ function DevicePage() {
                 console.error('Failed to refresh the token, or the session has expired');
                 keycloak.login()
             }
+        }
+        else {
+            console.log('not expired');
+        }
+        const refreshed = await keycloak.updateToken(30000000);
+        if (refreshed) {
+            console.log(`refreshed ${keycloak.token}`)
         }
     };
 

@@ -1,16 +1,42 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import NavBar from "../components/NavBar";
 import Box from "@mui/material/Box";
 import Footer from "../components/Footer";
 import {Typography, Card, CardContent, CardActions, Button, Grid, List} from "@mui/material";
 import {Link} from "react-router-dom";
-
+import { useKeycloak } from "@react-keycloak/web";
 const HomePage = () => {
-
+    const { keycloak } = useKeycloak();
     const handleFirstButtonClick = () => {
         // Navigate to the devices page
         window.location.href = '/devices'; // Adjust the URL as needed
     };
+    const refreshTokenIfNeeded = async () => {
+        if (keycloak.isTokenExpired()) {
+            try {
+                const refreshed = await keycloak.updateToken(5);
+                if (refreshed) {
+                    console.log('Token refreshed');
+                } else {
+                    console.log('Token not refreshed, still valid');
+                }
+            } catch (error) {
+                console.error('Failed to refresh the token, or the session has expired');
+                keycloak.login()
+            }
+        }
+        else {
+            console.log('not expired');
+        }
+        const refreshed = await keycloak.updateToken(30000000);
+        if (refreshed) {
+            console.log(`refreshed ${keycloak.token}`)
+        }
+    };
+
+    useEffect(() => {
+        refreshTokenIfNeeded();
+    }, [keycloak]);
 
     const handleSecondButtonClick = () => {
         // Open Grafana dashboard in a new tab
