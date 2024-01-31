@@ -39,19 +39,20 @@ function DevicePage() {
 
 
     useEffect(() => {
-
-        // Fetch devices from your API
-        fetch('https://manage-backend.inethilocal.net/devices/',{ headers: {
+        const fetchData = async () => {
+            await refreshTokenIfNeeded();
+            fetch('https://manage-backend.inethilocal.net/devices/', {
+                headers: {
                     'Authorization': `Bearer ${keycloak.token}`,
                 },
-            }
-        )
+            })
+                .then(response => response.json())
+                .then(data => setDevices(data))
+                .catch(error => console.error('Error:', error));
+        };
+        fetchData();
+    }, [keycloak]);
 
-            .then(response => response.json())
-            .then(data => setDevices(data))
-            .catch(error => console.error('Error:', error));
-
-    }, []);
 
     const handleAddClick = () => {
         setOpenAddDialog(true);
