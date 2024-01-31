@@ -4,7 +4,7 @@ const keycloak = new Keycloak({
   onLoad: 'login-required',
   url: 'https://keycloak.inethilocal.net/auth',
   realm: 'master',
-  clientId: 'manage',
+  clientId: 'manage-ui',
 });
 
 export default keycloak;

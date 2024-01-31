@@ -20,6 +20,8 @@ function App() {
     }
     if (keycloak.authenticated) {
         console.log('Authenticated');
+
+        console.log(keycloak.token);
         // Log the token
     }
   return (
