@@ -22,6 +22,7 @@ function DevicePage() {
     const [openAddDialog, setOpenAddDialog] = useState(false);
 
     const refreshTokenIfNeeded = async () => {
+
         if (keycloak.isTokenExpired()) {
             try {
                 const refreshed = await keycloak.updateToken(5);
@@ -37,10 +38,6 @@ function DevicePage() {
         }
         else {
             console.log('not expired');
-        }
-        const refreshed = await keycloak.updateToken(30000000);
-        if (refreshed) {
-            console.log(`refreshed ${keycloak.token}`)
         }
     };
 
@@ -97,12 +94,19 @@ function DevicePage() {
     };
 
     const fetchDevices = async () => {
+        console.log('----keycloak token----')
+        console.log(`${keycloak.token}`)
         await refreshTokenIfNeeded();
-        fetch('https://manage-backend.inethilocal.net/devices/')
+        fetch('https://manage-backend.inethilocal.net/devices/', {
+            headers: {
+                'Authorization': `Bearer ${keycloak.token}`,
+            }
+        })
             .then(response => response.json())
             .then(data => setDevices(data))
             .catch(error => console.error('Error:', error));
     };
+
 
     const handleEditClick = (device) => {
         setDeviceToEdit(device);

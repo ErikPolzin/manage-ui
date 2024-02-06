@@ -28,7 +28,7 @@ const HomePage = () => {
         else {
             console.log('not expired');
         }
-        const refreshed = await keycloak.updateToken(30000000);
+        const refreshed = await keycloak.updateToken(3);
         if (refreshed) {
             console.log(`refreshed ${keycloak.token}`)
         }
