@@ -66,7 +66,7 @@ const HomePage = () => {
                 <List>
 
                     {/*FIRST CARD*/}
-                    <Grid container spacing={2}>
+                    <Grid container spacing={2} padding={2}>
                         <Grid item xs={12} sm={6}>
                             <Card sx={{ bgcolor: '#1e2022', boxShadow: 3, display: 'flex', flexDirection: 'column', height: '100%' }}>
                                 <CardContent sx={{ flexGrow: 1 }}>
@@ -94,6 +94,46 @@ const HomePage = () => {
                                     </Typography>
                                     <Typography variant='body'>
                                         Open the iNethi monitoring system to view device online status and uptime statistics.
+                                    </Typography>
+                                </CardContent>
+                                <CardActions sx={{ justifyContent: 'center', padding: 2 }}>
+                                    <Button variant='contained' onClick={handleSecondButtonClick} color="secondary">
+                                        VISIT
+                                    </Button>
+                                </CardActions>
+                            </Card>
+                        </Grid>
+                    </Grid>
+
+                    {/*SECOND ROW*/}
+                    <Grid container spacing={2} padding={2}>
+                        <Grid item xs={12} sm={6}>
+                            <Card sx={{ bgcolor: '#1e2022', boxShadow: 3, display: 'flex', flexDirection: 'column', height: '100%' }}>
+                                <CardContent sx={{ flexGrow: 1 }}>
+                                    <Typography variant="h1" sx={{ marginBottom: 2 }} >
+                                        SERVICES
+                                    </Typography>
+                                    <Typography variant='body'>
+                                        Edit your available services.
+                                    </Typography>
+                                </CardContent>
+                                <CardActions sx={{ justifyContent: 'center', padding: 2 }}>
+                                    <Button variant='contained' component={Link} to="/services" color="secondary">
+                                        VISIT
+                                    </Button>
+                                </CardActions>
+                            </Card>
+                        </Grid>
+
+                        {/* SECOND CARD*/}
+                        <Grid item xs={12} sm={6}>
+                            <Card sx={{ bgcolor: '#1e2022', boxShadow: 3, display: 'flex', flexDirection: 'column', height: '100%' }}>
+                                <CardContent sx={{ flexGrow: 1 }}>
+                                    <Typography variant="h1" sx={{ marginBottom: 2 }}>
+                                        LOREM IPSUM
+                                    </Typography>
+                                    <Typography variant='body'>
+                                        Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit.
                                     </Typography>
                                 </CardContent>
                                 <CardActions sx={{ justifyContent: 'center', padding: 2 }}>

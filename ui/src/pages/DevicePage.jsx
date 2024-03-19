@@ -138,7 +138,6 @@ function DevicePage() {
             })
             .then(() => {
                 setSuccessAlert({ show: true, message: "Device successfully updated." });
-                //  update state
                 fetchDevices();
 
             })
@@ -194,7 +193,6 @@ function DevicePage() {
     };
 
     return (
-
             <Box
                 sx={{
                     minHeight: '100vh',
@@ -220,10 +218,8 @@ function DevicePage() {
                         display: 'flex',
                         justifyContent: 'center',
                         alignItems: 'start',
-                        padding: 2, // Add some padding around the list
+                        padding: 2,
                         margin: 2,
-
-
                     }}
                 >
 
@@ -246,7 +242,7 @@ function DevicePage() {
                     aria-label="add"
                     sx={{
                         position: 'fixed',
-                        bottom: '95px', // adjust this value as needed
+                        bottom: '95px',
                         right: 10,
                     }}
                 >
@@ -260,9 +256,6 @@ function DevicePage() {
                 />
                 <Footer />
             </Box>
-
-
-
     );
 }
 

@@ -3,8 +3,6 @@ import DeviceItem from './DeviceItem';
 import {Grid, List} from '@mui/material';
 
 function DeviceList({ devices, onDelete,  onEdit}) {
-    // You can sort and separate devices here based on type and IP
-
     return (
         <List>
             <Grid container>

@@ -7,6 +7,7 @@ import theme from "./theme";
 import DevicePage from "./pages/DevicePage";
 import { useKeycloak } from "@react-keycloak/web";
 import LoginPage from "./pages/LoginPage";
+import ServicesPage from "./pages/ServicesPage";
 
 function App() {
     const { keycloak, initialized } = useKeycloak();
@@ -30,6 +31,7 @@ function App() {
           <Routes>
             <Route path="/" element={<HomePage/>}/>
             <Route path="/devices" element={<DevicePage/>}/>
+              <Route path="/services" element={<ServicesPage/>}/>
 
           </Routes>
         </HashRouter>
