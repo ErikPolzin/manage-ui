@@ -2,30 +2,21 @@ import React from 'react';
 import {ListItem, ListItemText, ListItemIcon, IconButton, CardContent, Card} from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import apIcon from '../images/wifi.png';  // Adjust the path according to your file structure
-import switchIcon from '../images/hub.png';  // Adjust the path as well
-import firewallIcon from '../images/firewall.png'
-import localServerIcon from '../images/local_server.png'
-import globalServerIcon from '../images/cloud_server.png'
-import dnsIcon from '../images/dns.png'
+import cloud from '../images/cloud.png'
+import local from '../images/local.png'
+
 
 function ServiceItem({ service, onDelete, onEdit}) {
     let serviceIcon;
-    switch (service.service_type) {
-        case 'utility':
-            serviceIcon = apIcon;
+    switch (service.api_location) {
+        case 'local':
+            serviceIcon = local;
             break;
-        case 'entertainment':
-            serviceIcon = switchIcon;
-            break;
-        case 'games':
-            serviceIcon = firewallIcon;
-            break;
-        case 'education':
-            serviceIcon = localServerIcon;
+        case 'cloud':
+            serviceIcon = cloud;
             break;
         default:
-            serviceIcon = switchIcon;  // default icon if type is not recognized
+            serviceIcon = cloud;  // default icon if type is not recognized
             break;
     }
 

@@ -2,8 +2,8 @@ import React from 'react';
 import {ListItem, ListItemText, ListItemIcon, IconButton, CardContent, Card} from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import apIcon from '../images/wifi.png';  // Adjust the path according to your file structure
-import switchIcon from '../images/hub.png';  // Adjust the path as well
+import apIcon from '../images/wifi.png';
+import switchIcon from '../images/hub.png';
 import firewallIcon from '../images/firewall.png'
 import localServerIcon from '../images/local_server.png'
 import globalServerIcon from '../images/cloud_server.png'

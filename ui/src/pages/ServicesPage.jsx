@@ -10,6 +10,7 @@ import ServiceList from "../components/ServiceList";
 import EditServiceDialogue from "../components/EditServiceDialogue";
 
 import { useKeycloak } from "@react-keycloak/web";
+import ConfirmDeleteDialogue from "../components/ConfirmDeleteDialogue";
 function ServicesPage(){
     const { keycloak } = useKeycloak();
     const [services, setServices] = useState([]);
@@ -19,6 +20,11 @@ function ServicesPage(){
     const apiUrl = `${process.env.REACT_APP_API_URL}`
     const [originalName, setOriginalName] = useState('')
     const [error, setError] = useState(null);
+    const [openDeleteDialogue, setOpenDeleteDialogue] = useState(false);
+    const [serviceToDelete, setServiceToDelete] = useState(null);
+    const [openEditDialogue, setOpenEditDialogue] = useState(false);
+    const [editingService, setEditingService] = useState(null);
+
     const fetchServices = () => {
         fetch(`${apiUrl}/service/list/`, {
             headers: {
@@ -47,9 +53,12 @@ function ServicesPage(){
         fetchServices();
     }, []); // Dependencies array is empty to indicate this effect runs once on mount.
 
-    const [openEditDialogue, setOpenEditDialogue] = useState(false);
-    const [editingService, setEditingService] = useState(null);
 
+
+    const handleDeleteClick = (service) => {
+        setServiceToDelete(service);
+        setOpenDeleteDialogue(true);
+    };
 
     const handleCloseAlert = () => {
         setAlert({ show: false, message: '' });
@@ -63,15 +72,38 @@ function ServicesPage(){
         setOriginalName(service.name);
         setOpenEditDialogue(true);
     };
+    const handleConfirmDelete = () => {
+        if (!serviceToDelete) return;
 
+        fetch(`${apiUrl}/service/delete/${serviceToDelete.name}/`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${keycloak.token}`,
+            },
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to delete the service');
+                }
+                // Directly proceed if response is 204, as there's no content to parse
+                if (response.status === 204) {
+                    setSuccessAlert({ show: true, message: "Service successfully deleted." });
+                    setOpenDeleteDialogue(false);
+                    fetchServices();
+                    return;
+                }
+                return response.json(); // return if not 204
+            })
+            .then(data => {
 
-    const handleDeleteClick = (service) => {
-        console.log('Delete clicked')
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                setAlert({ show: true, message: "Failed to delete the service." });
+            });
     };
 
-    const handleAddClick = (service) => {
-        console.log('Add clicked')
-    };
+
     const handleAddService = (newService) => {
         fetch(`${apiUrl}/service/add/`, {
 
@@ -223,6 +255,12 @@ function ServicesPage(){
                 handleClose={() => setOpenEditDialogue(false)}
                 service={editingService}
                 handleUpdate={handleUpdateService}
+            />
+            <ConfirmDeleteDialogue
+                open={openDeleteDialogue}
+                handleClose={() => setOpenDeleteDialogue(false)}
+                handleConfirm={handleConfirmDelete}
+                type="service"
             />
 
             <Footer />
