@@ -1,7 +1,7 @@
 import React from 'react';
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button } from '@mui/material';
 
-function ConfirmDeleteDialogue({ open, handleClose, handleConfirm }) {
+function ConfirmDeleteDialogue({ open, handleClose, handleConfirm, type }) {
     return (
         <Dialog
             open={open}
@@ -10,7 +10,7 @@ function ConfirmDeleteDialogue({ open, handleClose, handleConfirm }) {
             <DialogTitle>{"Confirm Deletion"}</DialogTitle>
             <DialogContent>
                 <DialogContentText>
-                    Are you sure you want to delete this device? This action is permanent.
+                    {`Are you sure you want to delete this ${type}? This action is permanent.`}
                 </DialogContentText>
             </DialogContent>
             <DialogActions>

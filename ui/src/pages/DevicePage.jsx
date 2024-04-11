@@ -287,11 +287,12 @@ function DevicePage() {
                     }}
                 >
 
-                    <DeviceList devices={devices} onDelete={handleDeleteClick} onEdit={handleEditClick}/>
+                    <DeviceList devices={devices} onDelete={handleDeleteClick} onEdit={handleEditClick} />
                     <ConfirmDeleteDialogue
                         open={openDeleteDialog}
                         handleClose={handleCloseDeleteDialog}
                         handleConfirm={handleConfirmDelete}
+                        type={'device'}
                     />
                     <EditDeviceDialogue
                         open={openEditDialog}
