@@ -2,16 +2,12 @@ import React, { useState, useEffect } from 'react';
 import Box from "@mui/material/Box";
 import NavBar from "../components/NavBar";
 import Alert from "@mui/material/Alert";
-import DeviceList from "../components/DeviceList";
-import ConfirmDeleteDialogue from "../components/ConfirmDeleteDialogue";
-import EditDeviceDialogue from "../components/EditDeviceDialogue";
 import AddServiceDialogue from "../components/AddServiceDialogue";
 import {Fab} from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
-import AddDeviceDialogue from "../components/AddDeviceDialogue";
 import Footer from "../components/Footer";
 import ServiceList from "../components/ServiceList";
-import HomePage from "./HomePage";
+import EditServiceDialogue from "../components/EditServiceDialogue";
 
 function ServicesPage(){
     const [services, setServices] = useState([]);
@@ -19,16 +15,26 @@ function ServicesPage(){
     const [openAddDialogue, setOpenAddDialogue] = useState(false);
     const [alert, setAlert] = useState({ show: false, message: '' });
     const apiUrl = `${process.env.REACT_APP_API_URL}`
-    useEffect(() => {
-        const fetchData = async () => {
-            fetch(`${apiUrl}/service/list/`, {
+    const [originalName, setOriginalName] = useState('')
+    const fetchServices = () => {
+        fetch(`${apiUrl}/service/list/`, {})
+            .then(response => response.json())
+            .then(data => {
+                setServices(data.data);
             })
-                .then(response => response.json())
-                .then(data => setServices(data.data))
-                .catch(error => console.error('Error:', error));
-        };
-        fetchData();
-    }, []);
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    };
+
+    useEffect(() => {
+        fetchServices();
+    }, []); // Dependencies array is empty to indicate this effect runs once on mount.
+
+    const [openEditDialogue, setOpenEditDialogue] = useState(false);
+    const [editingService, setEditingService] = useState(null);
+
+
     const handleCloseAlert = () => {
         setAlert({ show: false, message: '' });
     };
@@ -37,8 +43,11 @@ function ServicesPage(){
     };
 
     const handleEditClick = (service) => {
-        console.log('edit clicked')
+        setEditingService(service);
+        setOriginalName(service.name);
+        setOpenEditDialogue(true);
     };
+
 
     const handleDeleteClick = (service) => {
         console.log('Delete clicked')
@@ -60,7 +69,7 @@ function ServicesPage(){
                 if(data.status === "success") {
                     setSuccessAlert({ show: true, message: "Device successfully added." });
                     setOpenAddDialogue(false);
-                    // Optionally, fetch services list again to refresh the UI
+                    fetchServices()
                 } else {
                     setAlert({show: true, message: `Failed to add service: ${data.message}`});
                 }
@@ -70,6 +79,32 @@ function ServicesPage(){
                 setAlert({show: true, message: "An error occurred while adding the service."});
             });
     };
+
+    const handleUpdateService = (updatedService) => {
+        fetch(`${apiUrl}/service/edit/${originalName}/`, { // Assuming your service has an 'id' field
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(updatedService),
+        })
+            .then(response => response.json())
+            .then(data => {
+                if(data.status === "success") {
+                    setSuccessAlert({ show: true, message: "Service successfully updated." });
+                    setOpenEditDialogue(false);
+                    // Refresh the service list
+                    fetchServices()
+                } else {
+                    setAlert({show: true, message: `Failed to update service: ${data.message}`});
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                setAlert({show: true, message: "An error occurred while updating the service."});
+            });
+    };
+
 
 
     return (
@@ -123,8 +158,16 @@ function ServicesPage(){
                 handleClose={() => setOpenAddDialogue(false)}
                 handleAdd={handleAddService}
             />
+            <EditServiceDialogue
+                open={openEditDialogue}
+                handleClose={() => setOpenEditDialogue(false)}
+                service={editingService}
+                handleUpdate={handleUpdateService}
+            />
+
             <Footer />
         </Box>
+
     );
 }
 
