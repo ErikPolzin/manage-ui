@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Dialog, DialogActions, DialogContent, DialogTitle, Button, TextField, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
 
-function AddDeviceDialog({ open, handleClose, handleAdd }) {
+function AddDeviceDialogue({ open, handleClose, handleAdd }) {
     const [newDevice, setNewDevice] = useState({ name: '', ip_address: '', device_type: '' });
 
     const handleChange = (e) => {
@@ -61,4 +61,4 @@ function AddDeviceDialog({ open, handleClose, handleAdd }) {
     );
 }
 
-export default AddDeviceDialog;
+export default AddDeviceDialogue;
