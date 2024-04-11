@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {Container, ThemeProvider, Fab} from '@mui/material';
+import {Container, ThemeProvider, Fab, CardContent, Card, ListItemText} from '@mui/material';
 import DeviceList from "../components/DeviceList";
 import Box from "@mui/material/Box";
 import NavBar from "../components/NavBar";
@@ -20,7 +20,9 @@ function DevicePage() {
     const [openEditDialog, setOpenEditDialog] = useState(false);
     const [deviceToEdit, setDeviceToEdit] = useState({ name: '', ip_address: '', device_type: '' });
     const [openAddDialog, setOpenAddDialog] = useState(false);
-
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const apiUrl = `${process.env.REACT_APP_API_URL}`
     const refreshTokenIfNeeded = async () => {
 
         if (keycloak.isTokenExpired()) {
@@ -44,15 +46,31 @@ function DevicePage() {
 
     useEffect(() => {
         const fetchData = async () => {
+            setIsLoading(true); // Indicate that loading has started
+            setError(null); // Clear any existing errors
             await refreshTokenIfNeeded();
-            fetch('https://manage-backend.inethilocal.net/devices/', {
+            fetch(`${apiUrl}/devices/`, {
                 headers: {
                     'Authorization': `Bearer ${keycloak.token}`,
                 },
             })
-                .then(response => response.json())
-                .then(data => setDevices(data))
-                .catch(error => console.error('Error:', error));
+                .then(async response => {
+                    if (!response.ok) {
+
+                        const errorBody = await response.json();
+                        throw new Error(errorBody.detail || "An unknown error occurred");
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    setDevices(data);
+                    setIsLoading(false);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    setError(error.message);
+                    setIsLoading(false);
+                });
         };
         fetchData();
     }, [keycloak]);
@@ -69,7 +87,7 @@ function DevicePage() {
     const handleAddDevice = (newDevice) => {
         setOpenAddDialog(false);
 
-        fetch('https://manage-backend.inethilocal.net/add/', {
+        fetch(`${apiUrl}/add/`, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${keycloak.token}`,
@@ -97,7 +115,7 @@ function DevicePage() {
         console.log('----keycloak token----')
         console.log(`${keycloak.token}`)
         await refreshTokenIfNeeded();
-        fetch('https://manage-backend.inethilocal.net/devices/', {
+        fetch(`${apiUrl}/devices/`, {
             headers: {
                 'Authorization': `Bearer ${keycloak.token}`,
             }
@@ -119,7 +137,7 @@ function DevicePage() {
 
     const handleUpdateDevice = (oldIpAddress, updatedDevice) => {
         setOpenEditDialog(false);
-        fetch(`https://manage-backend.inethilocal.net/update/`, {
+        fetch(`${apiUrl}/update/`, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${keycloak.token}`,
@@ -160,7 +178,7 @@ function DevicePage() {
         setOpenDeleteDialog(false);
         if (deviceToDelete) {
             // Perform API call to delete the device
-            fetch(`https://manage-backend.inethilocal.net/delete/`, {
+            fetch(`${apiUrl}/delete/`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${keycloak.token}`,
@@ -191,6 +209,52 @@ function DevicePage() {
     const handleCloseSuccessAlert = () => {
         setSuccessAlert({ show: false, message: '' });
     };
+    if (isLoading) {
+        return <div>Loading...</div>;
+    }
+
+    if (error) {
+        return <div>Error: {error}</div>;
+    }
+
+    if (!devices.length) {
+        return (
+            <Box sx={{ minHeight: '100vh', backgroundColor: '#26282d', display: 'flex', flexDirection: 'column' }}>
+                <NavBar />
+                <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', padding: 2, margin: 2 }}>
+                    <Card sx={{
+                        margin: 2,
+                        maxWidth: 600,
+                        bgcolor: '#1e2022',
+                        boxShadow: 3,
+                    }}>
+                        <CardContent>
+                            <ListItemText primary={'There are no devices registered.'} />
+                        </CardContent>
+                    </Card>
+                </Box>
+                <Fab
+                    onClick={handleAddClick}
+                    color="button_green"
+                    aria-label="add"
+                    sx={{
+                        position: 'fixed',
+                        bottom: '95px',
+                        right: 10,
+                    }}
+                >
+                    <AddIcon />
+                </Fab>
+
+                <AddDeviceDialogue
+                    open={openAddDialog}
+                    handleClose={handleCloseAddDialog}
+                    handleAdd={handleAddDevice}
+                />
+                <Footer />
+            </Box>
+        );
+    }
 
     return (
             <Box
@@ -236,6 +300,7 @@ function DevicePage() {
                         handleUpdate={handleUpdateDevice}
                     />
                 </Box>
+
                 <Fab
                     onClick={handleAddClick}
                     color="button_green"
