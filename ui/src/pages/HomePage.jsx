@@ -6,6 +6,7 @@ import {Typography, Card, CardContent, CardActions, Button, Grid, List} from "@m
 import {Link} from "react-router-dom";
 import { useKeycloak } from "@react-keycloak/web";
 const HomePage = () => {
+    const monitorUrl = `${process.env.REACT_APP_MONITOR_URL}`
     const { keycloak } = useKeycloak();
     const handleFirstButtonClick = () => {
         // Navigate to the devices page
@@ -40,7 +41,7 @@ const HomePage = () => {
 
     const handleSecondButtonClick = () => {
         // Open Grafana dashboard in a new tab
-        window.open('https://grafana.inethilocal.net', '_blank');
+        window.open(`${monitorUrl}`, '_blank');
     };
 
     return (
