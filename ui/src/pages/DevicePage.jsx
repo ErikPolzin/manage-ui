@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {Container, ThemeProvider, Fab, CardContent, Card, ListItemText} from '@mui/material';
+import { Fab, CardContent, Card, ListItemText } from '@mui/material';
 import DeviceList from "../components/DeviceList";
 import Box from "@mui/material/Box";
 import NavBar from "../components/NavBar";
@@ -10,6 +10,8 @@ import EditDeviceDialogue from "../components/EditDeviceDialogue";
 import AddDeviceDialogue from "../components/AddDeviceDialogue";
 import Footer from "../components/Footer";
 import { useKeycloak } from "@react-keycloak/web";
+import { refreshTokenIfNeeded } from '../keycloak';
+
 function DevicePage() {
     const { keycloak } = useKeycloak();
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
@@ -18,38 +20,18 @@ function DevicePage() {
     const [alert, setAlert] = useState({ show: false, message: '' });
     const [successAlert, setSuccessAlert] = useState({ show: false, message: '' });
     const [openEditDialog, setOpenEditDialog] = useState(false);
-    const [deviceToEdit, setDeviceToEdit] = useState({ name: '', ip_address: '', device_type: '' });
+    const [deviceToEdit, setDeviceToEdit] = useState({ name: '', ip_address: '', device_type: '', id: -1 });
     const [openAddDialog, setOpenAddDialog] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
     const apiUrl = `${process.env.REACT_APP_API_URL}`
-    const refreshTokenIfNeeded = async () => {
-
-        if (keycloak.isTokenExpired()) {
-            try {
-                const refreshed = await keycloak.updateToken(5);
-                if (refreshed) {
-                    console.log('Token refreshed');
-                } else {
-                    console.log('Token not refreshed, still valid');
-                }
-            } catch (error) {
-                console.error('Failed to refresh the token, or the session has expired');
-                keycloak.login()
-            }
-        }
-        else {
-            console.log('not expired');
-        }
-    };
-
 
     useEffect(() => {
         const fetchData = async () => {
             setIsLoading(true); // Indicate that loading has started
             setError(null); // Clear any existing errors
             await refreshTokenIfNeeded();
-            fetch(`${apiUrl}/devices/`, {
+            fetch(`${apiUrl}/monitoring/devices/`, {
                 headers: {
                     'Authorization': `Bearer ${keycloak.token}`,
                 },
@@ -87,7 +69,7 @@ function DevicePage() {
     const handleAddDevice = (newDevice) => {
         setOpenAddDialog(false);
 
-        fetch(`${apiUrl}/add/`, {
+        fetch(`${apiUrl}/monitoring/devices/`, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${keycloak.token}`,
@@ -115,7 +97,7 @@ function DevicePage() {
         console.log('----keycloak token----')
         console.log(`${keycloak.token}`)
         await refreshTokenIfNeeded();
-        fetch(`${apiUrl}/devices/`, {
+        fetch(`${apiUrl}/monitoring/devices/`, {
             headers: {
                 'Authorization': `Bearer ${keycloak.token}`,
             }
@@ -135,18 +117,15 @@ function DevicePage() {
         setOpenEditDialog(false);
     };
 
-    const handleUpdateDevice = (oldIpAddress, updatedDevice) => {
+    const handleUpdateDevice = (updatedDevice) => {
         setOpenEditDialog(false);
-        fetch(`${apiUrl}/update/`, {
-            method: 'POST',
+        fetch(`${apiUrl}/monitoring/devices/${updatedDevice.id}/`, {
+            method: 'PUT',
             headers: {
                 'Authorization': `Bearer ${keycloak.token}`,
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({
-                old_ip_address: oldIpAddress,
-                new_device_data: updatedDevice
-            }),
+            body: JSON.stringify(updatedDevice),
         })
             .then(response => {
                 if (!response.ok) {
@@ -178,23 +157,15 @@ function DevicePage() {
         setOpenDeleteDialog(false);
         if (deviceToDelete) {
             // Perform API call to delete the device
-            fetch(`${apiUrl}/delete/`, {
-                method: 'POST',
+            fetch(`${apiUrl}/monitoring/devices/${deviceToDelete.id}/`, {
+                method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${keycloak.token}`,
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ ip_address: deviceToDelete.ip_address }),
+                }
             })
                 .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                })
-                .then(() => {
                     // Remove the deleted device from the state
-                    setDevices(devices.filter(device => device.ip_address !== deviceToDelete.ip_address));
+                    setDevices(devices.filter(device => device.id !== deviceToDelete.id));
                     setSuccessAlert({show: true, message: "Device successfully deleted."})
                 })
                 .catch(error => {

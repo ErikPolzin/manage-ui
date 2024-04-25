@@ -12,7 +12,7 @@ import {
 } from '@mui/material';
 
 function EditDeviceDialogue({ open, handleClose, device, handleUpdate }) {
-    const [editedDevice, setEditedDevice] = useState({ name: '', ip_address: '', device_type: '' });
+    const [editedDevice, setEditedDevice] = useState({ name: '', ip_address: '', device_type: '', id: -1 });
 
     useEffect(() => {
         if (device) {
@@ -25,7 +25,7 @@ function EditDeviceDialogue({ open, handleClose, device, handleUpdate }) {
     };
 
     const handleSubmit = () => {
-        handleUpdate(device.ip_address, editedDevice); // Passing old IP and new device data
+        handleUpdate(editedDevice); // Passing new device data
     };
 
     if (!device) {

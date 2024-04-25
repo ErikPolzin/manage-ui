@@ -4,7 +4,7 @@ import "./index.css";
 import App from "./App";
 import reportWebVitals from './reportWebVitals';
 import { ReactKeycloakProvider } from '@react-keycloak/web';
-import keycloak from './keycloak';
+import { keycloak } from './keycloak';
 
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
