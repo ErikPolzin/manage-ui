@@ -54,8 +54,8 @@ function AddDeviceDialogue({ open, handleClose, handleAdd }) {
                 </FormControl>
             </DialogContent>
             <DialogActions>
-                <Button color="button_red" onClick={handleClose}>Cancel</Button>
-                <Button color="button_green" onClick={handleSubmit}>Add</Button>
+                <Button onClick={handleClose}>Cancel</Button>
+                <Button onClick={handleSubmit}>Add</Button>
             </DialogActions>
         </Dialog>
     );

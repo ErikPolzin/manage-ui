@@ -1,60 +1,69 @@
-import React, {useState} from 'react';
-import { Link } from 'react-router-dom';
-import { AppBar, Toolbar, Button, Grid } from '@mui/material';
+import React, { useState } from "react";
+import { AppBar, Toolbar, Button } from "@mui/material";
 import LogoutDialogue from "./LogoutDialogue";
-import {useKeycloak} from "@react-keycloak/web";
+import { useKeycloak } from "@react-keycloak/web";
+import MenuIcon from "@mui/icons-material/Menu";
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import IconButton from "@mui/material/IconButton";
+import { styled } from "@mui/material/styles";
+import Box from "@mui/material/Box";
 
-const NavBar = () => {
-      const { keycloak } = useKeycloak();
-    const [openLogoutDialog, setOpenLogoutDialog] = useState(false);
+const StyledNavBar = styled(AppBar, {
+  shouldForwardProp: (prop) => prop !== "open",
+})(({ open, theme }) => ({
+  transition: theme.transitions.create(["margin", "width"], {
+    easing: theme.transitions.easing.sharp,
+    duration: theme.transitions.duration.leavingScreen,
+  }),
+  ...(open && {
+    width: `calc(100% - 240px)`,
+    marginLeft: `240px`,
+    transition: theme.transitions.create(["margin", "width"], {
+      easing: theme.transitions.easing.easeOut,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
+  }),
+}));
 
-    const handleLogout = () => {
-        // Call Keycloak logout logic here
-        keycloak.logout();
-        console.log('Logging out...');
-    };
-     const toggleLogoutDialog = () => {
-        setOpenLogoutDialog(!openLogoutDialog);
-    };
-    const handleButtonClick = () => {
-        window.open('https://grafana.inethilocal.net', '_blank', 'noopener,noreferrer');
-    };
-    return (
-        <AppBar position="static" sx={{
+const NavBar = ({ open, onMenuClick }) => {
+  const { keycloak } = useKeycloak();
+  const [openLogoutDialog, setOpenLogoutDialog] = useState(false);
 
-        }}>
-            <Toolbar>
-                <Grid
-                    container
-                    direction="row"
-                    justifyContent="space-between"
-                    alignItems="center"
-                    sx={{ padding: '0 20px' }} // Add padding here
-                >
-                    <Grid item>
-                        <Link to="/">
-                            <img src="./logo192.png" alt="Logo" style={{height: '50px' }}/>
-                        </Link>
-                    </Grid>
-                    <Grid item>
-                        <Button color="inherit" component={Link} to="/">Home</Button>
-                        <Button color="inherit" component={Link} to="/devices">Devices</Button>
-                        <Button color="inherit" component={Link} to="/services">Services</Button>
-                        {/*<Button color="inherit" component={Link} to="/">Options</Button>*/}
-                        <Button color="inherit" onClick={handleButtonClick}>Monitor</Button>
-                        <Button color="inherit" onClick={toggleLogoutDialog}>Sign Out</Button>
-                    </Grid>
-
-                </Grid>
-            </Toolbar>
-            <LogoutDialogue
-                open={openLogoutDialog}
-                handleClose={toggleLogoutDialog}
-                handleLogout={handleLogout}
-            />
-        </AppBar>
-    );
+  const handleLogout = () => {
+    console.log("Logging out...");
+    keycloak.logout();
+  };
+  const toggleLogoutDialog = () => {
+    setOpenLogoutDialog(!openLogoutDialog);
+  };
+  return (
+    <StyledNavBar position="fixed" open={open}>
+      <Toolbar>
+        <IconButton
+          color="inherit"
+          aria-label="open drawer"
+          onClick={onMenuClick}
+          edge="start"
+          sx={{ mr: 2 }}
+        >
+          {open ? <ChevronLeftIcon /> : <MenuIcon />}
+        </IconButton>
+        <Box sx={{ flexGrow: 1 }}>
+          <a href="/">
+            <img href="/" src="./logo192.png" alt="Logo" style={{ height: "50px" }} />
+          </a>
+        </Box>
+        <Button color="inherit" onClick={handleLogout}>
+          Log Out
+        </Button>
+      </Toolbar>
+      <LogoutDialogue
+        open={openLogoutDialog}
+        handleClose={toggleLogoutDialog}
+        handleLogout={handleLogout}
+      />
+    </StyledNavBar>
+  );
 };
-
 
 export default NavBar;
