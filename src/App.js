@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from "react";
-import { ThemeProvider } from "@mui/material/styles";
-import { styled } from "@mui/material/styles";
-import { Avatar, Typography } from "@mui/material";
-import Box from "@mui/material/Box";
-import Drawer from "@mui/material/Drawer";
-import CssBaseline from "@mui/material/CssBaseline";
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import ListItemButton from "@mui/material/ListItemButton";
-import ListItemText from "@mui/material/ListItemText";
-import Divider from "@mui/material/Divider";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { ThemeProvider, styled } from "@mui/material/styles";
+import { Avatar, Typography, ListItemIcon } from "@mui/material";
+import { Dashboard, Router, Public } from "@mui/icons-material";
+import {
+  Box,
+  Drawer,
+  CssBaseline,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemText,
+  Divider,
+} from "@mui/material";
+import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import theme from "./theme";
 import DevicePage from "./pages/DevicePage";
@@ -59,7 +61,7 @@ function App() {
     if (keycloak.authenticated) {
       let userData = keycloak.idTokenParsed;
       setUsername(userData.preferred_username);
-      setInitials(userData.given_name[0]+userData.family_name[0]);
+      setInitials(userData.given_name[0] + userData.family_name[0]);
     }
   }, [keycloak, keycloak.idTokenParsed]);
 
@@ -75,61 +77,71 @@ function App() {
 
   return (
     <ThemeProvider theme={theme}>
-      <Box sx={{ display: "flex" }}>
-        <CssBaseline />
-        <NavBar open={open} onMenuClick={toggleDrawer} />
-        <Drawer
-          sx={{
-            width: drawerWidth,
-            flexShrink: 0,
-            ".MuiDrawer-paper": {
+      <BrowserRouter>
+        <Box sx={{ display: "flex" }}>
+          <CssBaseline />
+          <NavBar open={open} onMenuClick={toggleDrawer} />
+          <Drawer
+            sx={{
               width: drawerWidth,
-              boxSizing: "border-box",
-            },
-          }}
-          variant="persistent"
-          anchor="left"
-          open={open}
-        >
-          <DrawerHeader>
-            <Avatar>{initials}</Avatar>
-            <Typography mx={2}>{username}</Typography>
-          </DrawerHeader>
-          <Divider />
-          <List>
-            <ListItem key="0" disablePadding>
-              <ListItemButton href="/">
-                <ListItemText primary="Dashboard" />
-              </ListItemButton>
-            </ListItem>
-            <ListItem key="1" disablePadding>
-              <ListItemButton href="/devices">
-                <ListItemText primary="Devices" />
-              </ListItemButton>
-            </ListItem>
-            <ListItem key="2" disablePadding>
-              <ListItemButton href="/services">
-                <ListItemText primary="Services" />
-              </ListItemButton>
-            </ListItem>
-          </List>
-        </Drawer>
-        <Main
-          open={open}
-          sx={{
-            minHeight: "calc(100vh - 64px)",
-          }}
-        >
-          <DrawerHeader />
-          <BrowserRouter>
+              flexShrink: 0,
+              ".MuiDrawer-paper": {
+                width: drawerWidth,
+                boxSizing: "border-box",
+              },
+            }}
+            variant="persistent"
+            anchor="left"
+            open={open}
+          >
+            <DrawerHeader>
+              <Avatar>{initials}</Avatar>
+              <Typography mx={2}>{username}</Typography>
+            </DrawerHeader>
+            <Divider />
+            <List>
+              <ListItem key="0" disablePadding component={Link} to="/">
+                <ListItemButton>
+                  <ListItemIcon>
+                    <Dashboard />
+                  </ListItemIcon>
+                  <ListItemText primary="Dashboard" />
+                </ListItemButton>
+              </ListItem>
+              <ListItem key="1" disablePadding component={Link} to="/devices">
+                <ListItemButton>
+                  <ListItemIcon>
+                    <Router />
+                  </ListItemIcon>
+                  <ListItemText primary="Devices" />
+                </ListItemButton>
+              </ListItem>
+              <ListItem key="2" disablePadding component={Link} to="/services">
+                <ListItemButton>
+                  <ListItemIcon>
+                    <Public />
+                  </ListItemIcon>
+                  <ListItemText primary="Services" />
+                </ListItemButton>
+              </ListItem>
+            </List>
+          </Drawer>
+          <Main
+            open={open}
+            sx={{
+              minHeight: "calc(100vh - 64px)",
+            }}
+          >
+            <DrawerHeader />
+
             <Routes>
               <Route path="/" element={<HomePage />} />
               <Route path="/devices" element={<DevicePage />} />
               <Route path="/services" element={<ServicesPage />} />
             </Routes>
-          </BrowserRouter>
-        </Main>
-      </Box>
+          </Main>
+        </Box>
+      </BrowserRouter>
     </ThemeProvider>
   );
 }
