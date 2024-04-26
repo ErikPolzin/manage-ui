@@ -189,50 +189,28 @@ function DevicePage() {
 
   if (!devices || !devices.length) {
     return (
-      <Box
-        sx={{
-          minHeight: "100vh",
-          backgroundColor: "#26282d",
-          display: "flex",
-          flexDirection: "column",
-        }}
-      >
-        <Box
+      <Box>
+        <Card
           sx={{
-            flexGrow: 1,
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            padding: 2,
-            margin: 2,
+            maxWidth: 600,
+            boxShadow: 3,
           }}
         >
-          <Card
-            sx={{
-              margin: 2,
-              maxWidth: 600,
-              bgcolor: "#1e2022",
-              boxShadow: 3,
-            }}
-          >
-            <CardContent>
-              <ListItemText primary={"There are no devices registered."} />
-            </CardContent>
-          </Card>
-        </Box>
+          <CardContent>
+            <ListItemText primary={"There are no devices registered."} />
+          </CardContent>
+        </Card>
         <Fab
           onClick={handleAddClick}
           aria-label="add"
           sx={{
             position: "fixed",
-            top: "36px",
+            bottom: 16,
             right: 16,
-            zIndex: 1200
           }}
         >
           <AddIcon />
         </Fab>
-
         <AddDeviceDialogue
           open={openAddDialog}
           handleClose={handleCloseAddDialog}
@@ -241,7 +219,6 @@ function DevicePage() {
       </Box>
     );
   }
-
   return (
     <Box>
       {alert.show && (
@@ -274,9 +251,8 @@ function DevicePage() {
         aria-label="add"
         sx={{
           position: "fixed",
-            top: "36px",
-            right: 16,
-            zIndex: 1200
+          bottom: 16,
+          right: 16,
         }}
       >
         <AddIcon />

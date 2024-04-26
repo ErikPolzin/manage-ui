@@ -159,9 +159,8 @@ function ServicesPage() {
           aria-label="add"
           sx={{
             position: "fixed",
-            top: "36px",
+            bottom: 16,
             right: 16,
-            zIndex: 1200,
           }}
         >
           <AddIcon />
@@ -193,9 +192,8 @@ function ServicesPage() {
         aria-label="add"
         sx={{
           position: "fixed",
-          top: "36px",
+          bottom: 16,
           right: 16,
-          zIndex: 1200,
         }}
       >
         <AddIcon />
