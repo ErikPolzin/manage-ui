@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { ThemeProvider, styled } from "@mui/material/styles";
-import { Avatar, Typography, ListItemIcon } from "@mui/material";
 import { Dashboard, Router, Public } from "@mui/icons-material";
 import {
+  Avatar,
+  Typography,
+  ListItemIcon,
   Box,
   Drawer,
   CssBaseline,
@@ -11,14 +13,15 @@ import {
   ListItemButton,
   ListItemText,
   Divider,
+  CircularProgress
 } from "@mui/material";
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
-import HomePage from "./pages/HomePage";
-import theme from "./theme";
-import DevicePage from "./pages/DevicePage";
 import { useKeycloak } from "@react-keycloak/web";
+import HomePage from "./pages/HomePage";
+import DevicePage from "./pages/DevicePage";
 import ServicesPage from "./pages/ServicesPage";
 import NavBar from "./components/NavBar";
+import theme from "./theme";
 
 const drawerWidth = 240;
 
@@ -54,9 +57,11 @@ function App() {
   const [open, setOpen] = useState(true);
   const [username, setUsername] = useState("");
   const [initials, setInitials] = useState("");
+
   const toggleDrawer = () => {
     setOpen(!open);
   };
+
   useEffect(() => {
     if (keycloak.authenticated) {
       let userData = keycloak.idTokenParsed;
@@ -65,15 +70,11 @@ function App() {
     }
   }, [keycloak, keycloak.idTokenParsed]);
 
-  if (!initialized) {
-    return <div>Loading...</div>;
-  }
-  if (!keycloak.authenticated) {
-    keycloak.login();
-  }
-  if (keycloak.authenticated) {
-    console.log("Authenticated");
-  }
+  useEffect(() => {
+    if (initialized && !keycloak.authenticated) {
+      keycloak.login();
+    }
+  }, [initialized, keycloak]);
 
   return (
     <ThemeProvider theme={theme}>
@@ -133,12 +134,15 @@ function App() {
             }}
           >
             <DrawerHeader />
-
-            <Routes>
-              <Route path="/" element={<HomePage />} />
-              <Route path="/devices" element={<DevicePage />} />
-              <Route path="/services" element={<ServicesPage />} />
-            </Routes>
+            {!initialized ? (
+              <CircularProgress />
+            ) : (
+              <Routes>
+                <Route path="/" element={<HomePage />} />
+                <Route path="/devices" element={<DevicePage />} />
+                <Route path="/services" element={<ServicesPage />} />
+              </Routes>
+            )}
           </Main>
         </Box>
       </BrowserRouter>
