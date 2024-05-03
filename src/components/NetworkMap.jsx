@@ -2,10 +2,9 @@ import React, { useRef } from "react";
 import { MapContainer, TileLayer } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 
-const NetworkMap = () => {
+const NetworkMap = ({ latitude, longitude }) => {
   const mapRef = useRef(null);
-  const latitude = 51.505;
-  const longitude = -0.09;
+  console.log(latitude, longitude);
 
   return (
     <MapContainer

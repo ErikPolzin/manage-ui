@@ -2,7 +2,7 @@ import NetworkMap from '../components/NetworkMap';
 
 const HomePage = () => {
     return (
-        <NetworkMap />
+        <NetworkMap latitude={-33.9221} longitude={18.4231} />
     );
 }
 
