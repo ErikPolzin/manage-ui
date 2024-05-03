@@ -1,12 +1,11 @@
 import React, { useState } from "react";
-import { AppBar, Toolbar, Button } from "@mui/material";
-import LogoutDialogue from "./LogoutDialogue";
 import { useKeycloak } from "@react-keycloak/web";
-import MenuIcon from "@mui/icons-material/Menu";
-import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
-import IconButton from "@mui/material/IconButton";
+import { AppBar, Toolbar, Button, Avatar, IconButton, Typography } from "@mui/material";
+import { Menu, ChevronLeft } from "@mui/icons-material";
+import { Link } from "react-router-dom";
 import { styled } from "@mui/material/styles";
-import Box from "@mui/material/Box";
+
+import LogoutDialogue from "./LogoutDialogue";
 
 const StyledNavBar = styled(AppBar, {
   shouldForwardProp: (prop) => prop !== "open",
@@ -46,13 +45,16 @@ const NavBar = ({ open, onMenuClick }) => {
           edge="start"
           sx={{ mr: 2 }}
         >
-          {open ? <ChevronLeftIcon /> : <MenuIcon />}
+          {open ? <ChevronLeft /> : <Menu />}
         </IconButton>
-        <Box sx={{ flexGrow: 1 }}>
-          <a href="/">
-            <img href="/" src="./logo192.png" alt="Logo" style={{ height: "50px" }} />
-          </a>
-        </Box>
+        <Link to="/">
+          <IconButton sx={{ p: 0 }}>
+            <Avatar alt="Logo" src="./logo192.png" sx={{ width: 56, height: 56 }} />
+          </IconButton>
+        </Link>
+        <Typography variant="h6" component="div" sx={{ flexGrow: 1, marginLeft: 2 }}>
+          CommuNethi
+        </Typography>
         <Button color="inherit" onClick={handleLogout}>
           Log Out
         </Button>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { ThemeProvider, styled } from "@mui/material/styles";
-import { Dashboard, Router, Public } from "@mui/icons-material";
+import { Dashboard, Router, Public, Map } from "@mui/icons-material";
 import {
   Avatar,
   Typography,
@@ -13,11 +13,12 @@ import {
   ListItemButton,
   ListItemText,
   Divider,
-  CircularProgress
+  CircularProgress,
 } from "@mui/material";
-import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
+import { Routes, Route, Link, useLocation } from "react-router-dom";
 import { useKeycloak } from "@react-keycloak/web";
 import HomePage from "./pages/HomePage";
+import MapPage from "./pages/MapPage";
 import DevicePage from "./pages/DevicePage";
 import ServicesPage from "./pages/ServicesPage";
 import NavBar from "./components/NavBar";
@@ -29,7 +30,6 @@ const Main = styled("main", {
   shouldForwardProp: (prop) => prop !== "open",
 })(({ theme, open }) => ({
   flexGrow: 1,
-  padding: theme.spacing(3),
   transition: theme.transitions.create("margin", {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,
@@ -57,6 +57,7 @@ function App() {
   const [open, setOpen] = useState(true);
   const [username, setUsername] = useState("");
   const [initials, setInitials] = useState("");
+  const location = useLocation();
 
   const toggleDrawer = () => {
     setOpen(!open);
@@ -78,74 +79,93 @@ function App() {
 
   return (
     <ThemeProvider theme={theme}>
-      <BrowserRouter>
-        <Box sx={{ display: "flex" }}>
-          <CssBaseline />
-          <NavBar open={open} onMenuClick={toggleDrawer} />
-          <Drawer
-            sx={{
+      <Box sx={{ display: "flex" }}>
+        <CssBaseline />
+        <NavBar open={open} onMenuClick={toggleDrawer} />
+        <Drawer
+          sx={{
+            width: drawerWidth,
+            flexShrink: 0,
+            ".MuiDrawer-paper": {
               width: drawerWidth,
-              flexShrink: 0,
-              ".MuiDrawer-paper": {
-                width: drawerWidth,
-                boxSizing: "border-box",
-              },
-            }}
-            variant="persistent"
-            anchor="left"
-            open={open}
-          >
-            <DrawerHeader>
-              <Avatar>{initials}</Avatar>
-              <Typography mx={2}>{username}</Typography>
-            </DrawerHeader>
-            <Divider />
-            <List>
-              <ListItem key="0" disablePadding component={Link} to="/">
-                <ListItemButton>
-                  <ListItemIcon>
-                    <Dashboard />
-                  </ListItemIcon>
-                  <ListItemText primary="Dashboard" />
-                </ListItemButton>
-              </ListItem>
-              <ListItem key="1" disablePadding component={Link} to="/devices">
-                <ListItemButton>
-                  <ListItemIcon>
-                    <Router />
-                  </ListItemIcon>
-                  <ListItemText primary="Devices" />
-                </ListItemButton>
-              </ListItem>
-              <ListItem key="2" disablePadding component={Link} to="/services">
-                <ListItemButton>
-                  <ListItemIcon>
-                    <Public />
-                  </ListItemIcon>
-                  <ListItemText primary="Services" />
-                </ListItemButton>
-              </ListItem>
-            </List>
-          </Drawer>
-          <Main
-            open={open}
-            sx={{
-              minHeight: "calc(100vh - 64px)",
-            }}
-          >
-            <DrawerHeader />
-            {!initialized ? (
-              <CircularProgress />
-            ) : (
-              <Routes>
-                <Route path="/" element={<HomePage />} />
-                <Route path="/devices" element={<DevicePage />} />
-                <Route path="/services" element={<ServicesPage />} />
-              </Routes>
-            )}
-          </Main>
-        </Box>
-      </BrowserRouter>
+              boxSizing: "border-box",
+            },
+          }}
+          variant="persistent"
+          anchor="left"
+          open={open}
+        >
+          <DrawerHeader>
+            <Avatar>{initials}</Avatar>
+            <Typography mx={2}>{username}</Typography>
+          </DrawerHeader>
+          <Divider />
+          <List>
+            <ListItemButton
+              key="0"
+              component={Link}
+              to="/"
+              selected={location.pathname === "/"}
+            >
+              <ListItemIcon>
+                <Dashboard />
+              </ListItemIcon>
+              <ListItemText primary="Dashboard" />
+            </ListItemButton>
+            <ListItemButton
+              key="1"
+              component={Link}
+              to="/map"
+              selected={location.pathname === "/map"}
+            >
+              <ListItemIcon>
+                <Map />
+              </ListItemIcon>
+              <ListItemText primary="Map" />
+            </ListItemButton>
+            <ListItemButton
+              key="2"
+              component={Link}
+              to="/devices"
+              selected={location.pathname === "/devices"}
+            >
+              <ListItemIcon>
+                <Router />
+              </ListItemIcon>
+              <ListItemText primary="Devices" />
+            </ListItemButton>
+            <ListItemButton
+              key="3"
+              component={Link}
+              to="/services"
+              selected={location.pathname === "/services"}
+            >
+              <ListItemIcon>
+                <Public />
+              </ListItemIcon>
+              <ListItemText primary="Services" />
+            </ListItemButton>
+          </List>
+        </Drawer>
+        <Main
+          open={open}
+          sx={{
+            minHeight: "calc(100vh - 64px)",
+          }}
+        >
+          <DrawerHeader />
+          {!initialized ? (
+            <CircularProgress />
+          ) : (
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/map" element={<MapPage />} />
+              <Route path="/devices" element={<DevicePage />} />
+              <Route path="/services" element={<ServicesPage />} />
+            </Routes>
+          )}
+        </Main>
+      </Box>
     </ThemeProvider>
   );
 }
