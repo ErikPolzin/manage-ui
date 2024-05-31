@@ -9,7 +9,6 @@ import {
   Drawer,
   CssBaseline,
   List,
-  ListItem,
   ListItemButton,
   ListItemText,
   Divider,
@@ -22,6 +21,7 @@ import MapPage from "./pages/MapPage";
 import DevicePage from "./pages/DevicePage";
 import ServicesPage from "./pages/ServicesPage";
 import NavBar from "./components/NavBar";
+import AlertsCard from "./components/AlertsCard";
 import theme from "./theme";
 
 const drawerWidth = 240;
@@ -165,6 +165,7 @@ function App() {
             </Routes>
           )}
         </Main>
+        { initialized ? <AlertsCard></AlertsCard> : null }
       </Box>
     </ThemeProvider>
   );
