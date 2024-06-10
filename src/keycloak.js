@@ -26,4 +26,22 @@ const refreshTokenIfNeeded = async () => {
   }
 };
 
-export { keycloak, refreshTokenIfNeeded };
+const fetchAPI = async (url, method="GET", data=null) => {
+  await refreshTokenIfNeeded();
+  return fetch(`${process.env.REACT_APP_API_URL}${url}`, {
+    method: method,
+    headers: {
+      Authorization: `Bearer ${keycloak.token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data) ? data : null
+  }).then(async (response) => {
+    if (!response.ok) {
+      const errorBody = await response.json();
+      throw new Error(errorBody.detail || "An unknown error occurred");
+    }
+    return response.json();
+  });
+};
+
+export { keycloak, refreshTokenIfNeeded, fetchAPI };

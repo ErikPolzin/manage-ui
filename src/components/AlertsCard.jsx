@@ -62,7 +62,7 @@ function AlertsCard() {
             .sort((a, b) => new Date(a[0]) - new Date(b[0]))
             .map(([day, alerts]) => {
               return (
-                <List component="div" disablePadding>
+                <List component="div" disablePadding key={day}>
                   <Divider></Divider>
                   <ListItemText>
                     <Typography variant="overline" display="block" gutterBottom>
