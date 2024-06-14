@@ -4,13 +4,14 @@ import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
 import LinearProgress from "@mui/material/LinearProgress";
 import DeleteIcon from "@mui/icons-material/Delete";
+import AddIcon from "@mui/icons-material/Add";
 import IconButton from "@mui/material/IconButton";
 import { alpha } from "@mui/material/styles";
 import { DataGrid } from "@mui/x-data-grid";
 
 import ConfirmDeleteDialogue from "../components/ConfirmDeleteDialogue";
 
-function DeviceList({ title, devices, isLoading, columns, onDelete }) {
+function DeviceList({ title, devices, isLoading, columns, onDelete, onAdd }) {
   const [selectedDevices, setSelectedDevices] = React.useState([]);
   const [openDeleteDialog, setOpenDeleteDialog] = React.useState(false);
   const [deviceToDelete, setDeviceToDelete] = React.useState(null);
@@ -30,7 +31,7 @@ function DeviceList({ title, devices, isLoading, columns, onDelete }) {
       onDelete(deviceToDelete);
     }
   };
-  
+
   function DataGridTitle() {
     return (
       <Box
@@ -39,20 +40,34 @@ function DeviceList({ title, devices, isLoading, columns, onDelete }) {
             alpha(theme.palette.primary.main, theme.palette.action.activatedOpacity),
         }}
       >
-        <Box sx={{ display: 'flex', flexDirection: 'row', padding: 1, paddingLeft: 2, alignItems: "center" }}>
-          <Typography variant="h6" sx={{ flex: '1 1 100%' }}>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "row",
+            padding: 1,
+            paddingLeft: 2,
+            alignItems: "center",
+          }}
+        >
+          <Typography variant="h6" sx={{ flex: "1 1 100%" }}>
             {title}
           </Typography>
-          {(selectedDevices.length > 0) ? <IconButton onClick={handleDeleteClick}>
-            <DeleteIcon />
-          </IconButton> : null}
+          {selectedDevices.length > 0 ? (
+            <IconButton onClick={handleDeleteClick}>
+              <DeleteIcon />
+            </IconButton>
+          ) : (
+            <IconButton onClick={onAdd}>
+              <AddIcon />
+            </IconButton>
+          )}
         </Box>
         {isLoading ? <LinearProgress /> : null}
       </Box>
     );
   }
   return (
-    <Box sx={{ width: "70%", padding: 3, paddingBottom: 0 }}>
+    <Box>
       <Paper sx={{ width: "100%", mb: 2 }}>
         <DataGrid
           slots={{ toolbar: DataGridTitle }}
