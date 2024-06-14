@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { ThemeProvider, styled } from "@mui/material/styles";
-import { Dashboard, Router, Public, Map } from "@mui/icons-material";
+import { Dashboard, Router, Public, Map, Error } from "@mui/icons-material";
 import {
   Avatar,
   Typography,
@@ -20,8 +20,9 @@ import HomePage from "./pages/HomePage";
 import MapPage from "./pages/MapPage";
 import DevicePage from "./pages/DevicePage";
 import ServicesPage from "./pages/ServicesPage";
+import AlertsPage from "./pages/AlertsPage";
 import NavBar from "./components/NavBar";
-import AlertsCard from "./components/AlertsCard";
+import AlertsCard from "./components/AlertList";
 import theme from "./theme";
 
 const drawerWidth = 240;
@@ -145,6 +146,17 @@ function App() {
               </ListItemIcon>
               <ListItemText primary="Services" />
             </ListItemButton>
+            <ListItemButton
+              key="4"
+              component={Link}
+              to="/alerts"
+              selected={location.pathname === "/alerts"}
+            >
+              <ListItemIcon>
+                <Error />
+              </ListItemIcon>
+              <ListItemText primary="Alerts" />
+            </ListItemButton>
           </List>
         </Drawer>
         <Main
@@ -162,6 +174,7 @@ function App() {
               <Route path="/map" element={<MapPage />} />
               <Route path="/devices" element={<DevicePage />} />
               <Route path="/services" element={<ServicesPage />} />
+              <Route path="/alerts" element={<AlertsPage />} />
             </Routes>
           )}
         </Main>
