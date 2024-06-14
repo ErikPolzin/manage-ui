@@ -14,15 +14,12 @@ const refreshTokenIfNeeded = async () => {
       if (refreshed) {
           console.log('Token refreshed');
       } else {
-          console.log('Token not refreshed, still valid');
+          console.debug('Token not refreshed, still valid');
       }
     } catch (error) {
       console.error('Failed to refresh the token, or the session has expired');
-      keycloak.login()
+      keycloak.login();
     }
-  }
-  else {
-    console.log('Token not expired');
   }
 };
 
@@ -34,8 +31,9 @@ const fetchAPI = async (url, method="GET", data=null) => {
       Authorization: `Bearer ${keycloak.token}`,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(data) ? data : null
+    body: data ? JSON.stringify(data) : null
   }).then(async (response) => {
+    if (method === "DELETE") return;
     if (!response.ok) {
       const errorBody = await response.json();
       throw new Error(errorBody.detail || "An unknown error occurred");
