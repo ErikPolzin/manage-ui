@@ -11,7 +11,7 @@ import { DataGrid } from "@mui/x-data-grid";
 
 import ConfirmDeleteDialogue from "../components/ConfirmDeleteDialogue";
 
-function DeviceList({ title, devices, isLoading, columns, onDelete, onAdd }) {
+function DeviceList({ title, devices, isLoading, columns, onDelete, onAdd, onSelect }) {
   const [selectedDevices, setSelectedDevices] = React.useState([]);
   const [openDeleteDialog, setOpenDeleteDialog] = React.useState(false);
   const [deviceToDelete, setDeviceToDelete] = React.useState(null);
@@ -31,6 +31,11 @@ function DeviceList({ title, devices, isLoading, columns, onDelete, onAdd }) {
       onDelete(deviceToDelete);
     }
   };
+
+  const handleSelectionChange = (model) => {
+    setSelectedDevices(model);
+    if (onSelect) onSelect(model[0]);
+  }
 
   function DataGridTitle() {
     return (
@@ -79,7 +84,7 @@ function DeviceList({ title, devices, isLoading, columns, onDelete, onAdd }) {
             },
           }}
           pageSizeOptions={[5, 10]}
-          onRowSelectionModelChange={setSelectedDevices}
+          onRowSelectionModelChange={handleSelectionChange}
           disableMultipleRowSelection
         />
       </Paper>

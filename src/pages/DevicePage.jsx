@@ -9,6 +9,7 @@ import humanizeDuration from "humanize-duration";
 
 import DeviceList from "../components/DeviceList";
 import AddDeviceDialogue from "../components/AddDeviceDialogue";
+import DataUsageGraph from "../components/DataUsageGraph";
 import { fetchAPI } from "../keycloak";
 
 const AP_COLUMNS = [
@@ -31,6 +32,7 @@ const AP_COLUMNS = [
 function DevicePage() {
   const [openAddDialog, setOpenAddDialog] = React.useState(false);
   const [devices, setDevices] = React.useState([]);
+  const [selectedDevice, setSelectedDevice] = React.useState(null);
   const [unknownDevices, setUnknownDevices] = React.useState([]);
   const [alert, setAlert] = React.useState({ show: false, message: "", type: "error" });
   const [loading, setLoading] = React.useState(false);
@@ -40,6 +42,15 @@ function DevicePage() {
     fetchUnknownDevices();
     fetchDevices();
   }, []);
+
+  const currentStationData = () => {
+    let data = [];
+    for (let d of devices) {
+      if (!selectedDevice || d.id === selectedDevice)
+        data = data.concat(d.nodestation_set || d.apstation_set);
+    }
+    return data;
+  }
 
   const fetchDevices = async () => {
     setError(null); // Clear any existing errors
@@ -98,7 +109,8 @@ function DevicePage() {
           Last contacted at {new Date(device.last_contact).toLocaleString()} from {device.from_ip}
         </Alert>
       ))}
-      <DeviceList title="Nodes" isLoading={loading} devices={devices} columns={AP_COLUMNS} />
+      <DataUsageGraph dataset={currentStationData()} />
+      <DeviceList title="Nodes" isLoading={loading} devices={devices} columns={AP_COLUMNS} onSelect={setSelectedDevice} />
       <Fab
         // onClick={handleAddClick}
         aria-label="add"
