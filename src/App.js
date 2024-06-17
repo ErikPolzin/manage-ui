@@ -22,7 +22,6 @@ import DevicePage from "./pages/DevicePage";
 import ServicesPage from "./pages/ServicesPage";
 import AlertsPage from "./pages/AlertsPage";
 import NavBar from "./components/NavBar";
-import AlertsCard from "./components/AlertList";
 import theme from "./theme";
 
 const drawerWidth = 240;
@@ -178,7 +177,6 @@ function App() {
             </Routes>
           )}
         </Main>
-        { initialized ? <AlertsCard></AlertsCard> : null }
       </Box>
     </ThemeProvider>
   );
