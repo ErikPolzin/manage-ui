@@ -14,7 +14,24 @@ const DataUsageGraph = ({ nodeName, dataset }) => {
         (item) =>
           maxDays === -1 || Math.abs(new Date() - new Date(item.created)) / 36e5 / 24 < maxDays,
       )
-      .map((item) => ({ ...item, rx_bytes: item.rx_bytes / 1048576, tx_bytes: item.tx_bytes / 1048576 }));
+      .map((item) => ({
+        ...item,
+        rx_bytes: Math.abs(item.rx_bytes / 1048576),
+        tx_bytes: Math.abs(item.tx_bytes / 1048576),
+        created: new Date(item.created),
+      }));
+  }
+
+  function summedData() {
+    let timeGranularity = (maxDays === 1) ? 1000 * 3600 : 1000 * 3600 * 24;
+    let grouped = Object.groupBy(data(), (d) => Math.floor(d.created.getTime() / timeGranularity));
+    return Object.entries(grouped).map(([date, values]) => {
+      return {
+        rx_bytes: values.reduce((s, a) => s + a.rx_bytes, 0),
+        tx_bytes: values.reduce((s, a) => s + a.tx_bytes, 0),
+        created: new Date(date * timeGranularity).toString(),
+      };
+    });
   }
 
   const changeMaxDays = (event, newMaxDays) => {
@@ -23,13 +40,13 @@ const DataUsageGraph = ({ nodeName, dataset }) => {
 
   const valueFormatter = (value) => `${Math.round(value)}Mb`;
   const keyFormatter = (key) => {
-    switch(maxDays) {
+    switch (maxDays) {
       case 1:
-        return new Date(key).toLocaleTimeString()
+        return new Date(key).toLocaleTimeString();
       default:
-        return new Date(key).toLocaleDateString()
+        return new Date(key).toLocaleDateString();
     }
-  }
+  };
   return (
     <Box
       sx={{
@@ -37,12 +54,12 @@ const DataUsageGraph = ({ nodeName, dataset }) => {
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-        marginBottom: 2
+        marginBottom: 2,
       }}
     >
       <BarChart
         title="Data Usage"
-        dataset={data()}
+        dataset={summedData()}
         xAxis={[
           {
             id: "Time",
@@ -59,8 +76,8 @@ const DataUsageGraph = ({ nodeName, dataset }) => {
         height={300}
         margin={{ top: 5, right: 5, bottom: 30, left: 100 }}
         series={[
-          { dataKey: "tx_bytes", stack: 'A', label: "Sent Data", valueFormatter },
-          { dataKey: "rx_bytes", stack: 'A', label: "Received Data", valueFormatter },
+          { dataKey: "tx_bytes", stack: "A", label: "Sent Data", valueFormatter },
+          { dataKey: "rx_bytes", stack: "A", label: "Received Data", valueFormatter },
         ]}
         sx={{
           [`.${axisClasses.left} .${axisClasses.label}`]: {
