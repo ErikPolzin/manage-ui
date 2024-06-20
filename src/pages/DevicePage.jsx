@@ -1,22 +1,20 @@
 import React from "react";
-import Fab from "@mui/material/Fab";
 import Alert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
 import AlertTitle from "@mui/material/AlertTitle";
 import Box from "@mui/material/Box";
-import AddIcon from "@mui/icons-material/Add";
 import humanizeDuration from "humanize-duration";
 
 import DeviceList from "../components/DeviceList";
-import AddDeviceDialogue from "../components/AddDeviceDialogue";
 import DataUsageGraph from "../components/DataUsageGraph";
+import ConfirmDeleteDialogue from "../components/ConfirmDeleteDialogue";
+import AddDeviceDialogue from "../components/AddDeviceDialogue";
 import { fetchAPI } from "../keycloak";
 
 const AP_COLUMNS = [
   { field: "name", headerName: "Name" },
-  { field: "type", headerName: "Type" },
   { field: "mac", headerName: "MAC Address", width: 150 },
-  { field: "last_contact_from_ip", headerName: "Last IP", width: 150 },
+  { field: "last_contact_from_ip", headerName: "IP Address", width: 150 },
   {
     field: "last_contact",
     headerName: "Last Seen",
@@ -30,40 +28,69 @@ const AP_COLUMNS = [
 ];
 
 function DevicePage() {
-  const [openAddDialog, setOpenAddDialog] = React.useState(false);
   const [devices, setDevices] = React.useState([]);
   const [selectedDevice, setSelectedDevice] = React.useState(null);
   const [unknownDevices, setUnknownDevices] = React.useState([]);
   const [alert, setAlert] = React.useState({ show: false, message: "", type: "error" });
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState(null);
+  const [openDeleteDialog, setOpenDeleteDialog] = React.useState(false);
+  const [openAddDialog, setOpenAddDialog] = React.useState(false);
+  const [deviceToDelete, setDeviceToDelete] = React.useState(null);
+  const [deviceToAdd, setDeviceToAdd] = React.useState(null);
 
   React.useEffect(() => {
     fetchUnknownDevices();
     fetchDevices();
   }, []);
 
+  const handleDeleteClick = (device) => {
+    setDeviceToDelete(device);
+    setOpenDeleteDialog(true);
+  };
+
+  const handleCloseDeleteDialog = () => {
+    setOpenDeleteDialog(false);
+  };
+
+  const handleConfirmDelete = () => {
+    setOpenDeleteDialog(false);
+    if (deviceToDelete) {
+      deleteDevice(deviceToDelete);
+    }
+  };
+
+  const handleAddClick = (device) => {
+    setDeviceToAdd(device);
+    setOpenAddDialog(true);
+  };
+
+  const handleCloseAddDialog = () => {
+    setOpenAddDialog(false);
+  };
+
+  const handleAddDevice = () => {};
+
+  const handleCloseAlert = () => {
+    setAlert({ show: false, message: "", type: "success" });
+  };
+
   const currentStationData = () => {
     let data = [];
     for (let d of devices) {
-      if (!selectedDevice || d.id === selectedDevice)
-        data = data.concat(d.nodestation_set || d.apstation_set);
+      if (!selectedDevice || d.mac === selectedDevice)
+        data = data.concat(d.stations);
     }
     return data;
-  }
+  };
 
   const fetchDevices = async () => {
     setError(null); // Clear any existing errors
     // Fetch list of mesh nodes
     setLoading(true);
-    fetchAPI("/rd/nodes")
-      .then((nodes) => {
-        nodes = nodes.map((n) => ({ ...n, type: "MESH" }));
-        // Fetch list of access points
-        fetchAPI("/rd/aps").then((aps) => {
-          aps = aps.map((n) => ({ ...n, type: "AP" }));
-          setDevices(aps.concat(nodes));
-        });
+    fetchAPI("/monitoring/devices/")
+      .then((data) => {
+        setDevices(data);
       })
       .catch((error) => {
         setError(error.message);
@@ -74,7 +101,7 @@ function DevicePage() {
   };
 
   const fetchUnknownDevices = async () => {
-    fetchAPI("/rd/unknown_nodes/")
+    fetchAPI("/monitoring/unknown_nodes/")
       .then((data) => {
         setUnknownDevices(data);
       })
@@ -83,8 +110,10 @@ function DevicePage() {
       });
   };
 
-  const handleCloseAlert = () => {
-    setAlert({ show: false, message: "", type: "success" });
+  const deleteDevice = async (device) => {
+    fetchAPI(`/monitoring/devices/${device.mac}/`, "DELETE").then(() => {
+      setDevices(devices.map((d) => d.mac !== device.mac));
+    });
   };
 
   return (
@@ -96,10 +125,11 @@ function DevicePage() {
       )}
       {unknownDevices.map((device) => (
         <Alert
+          key={device.id}
           variant="outlined"
           severity="info"
           action={
-            <Button color="inherit">
+            <Button color="inherit" onClick={() => handleAddClick(device)}>
               Register
             </Button>
           }
@@ -109,23 +139,27 @@ function DevicePage() {
           Last contacted at {new Date(device.last_contact).toLocaleString()} from {device.from_ip}
         </Alert>
       ))}
-      <DataUsageGraph dataset={currentStationData()} />
-      <DeviceList title="Nodes" isLoading={loading} devices={devices} columns={AP_COLUMNS} onSelect={setSelectedDevice} />
-      <Fab
-        // onClick={handleAddClick}
-        aria-label="add"
-        sx={{
-          position: "fixed",
-          bottom: 16,
-          right: 16,
-        }}
-      >
-        <AddIcon />
-      </Fab>
+      <DataUsageGraph dataset={currentStationData()} loading={loading} />
+      <DeviceList
+        title="Nodes"
+        isLoading={loading}
+        devices={devices}
+        columns={AP_COLUMNS}
+        onSelect={setSelectedDevice}
+        onAdd={handleAddClick}
+        onDelete={handleDeleteClick}
+      />
+      <ConfirmDeleteDialogue
+        open={openDeleteDialog}
+        handleClose={handleCloseDeleteDialog}
+        handleConfirm={handleConfirmDelete}
+        type={"device"}
+      />
       <AddDeviceDialogue
         open={openAddDialog}
-        // handleClose={handleCloseAddDialog}
-        // handleAdd={handleAddDevice}
+        handleClose={handleCloseAddDialog}
+        handleAdd={handleAddDevice}
+        device={deviceToAdd}
       />
     </Box>
   );

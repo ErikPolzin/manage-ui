@@ -33,8 +33,7 @@ function DraggableMarker({ node, defaultPos }) {
         if (marker != null) {
           let pos = marker.getLatLng();
           setPosition(pos);
-          let url = node.type === "MESH" ? `/rd/nodes/${node.id}/` : `/rd/aps/${node.id}/`;
-          fetchAPI(url, "PATCH", { lat: pos.lat, lon: pos.lng });
+          fetchAPI(`/monitoring/devices/${node.mac}/`, "PATCH", { lat: pos.lat, lon: pos.lng });
         }
       },
     }),
@@ -61,19 +60,13 @@ const NetworkMap = ({ latitude, longitude }) => {
 
   const fetchNodes = async () => {
     setLoading(true);
-    fetchAPI("/rd/nodes/?fields=lat&fields=lon&fields=name&fields=id")
-      .then((nodes) => {
-        nodes = nodes.map((n) => ({ ...n, type: "MESH" }));
-        // Fetch list of access points
-        fetchAPI("/rd/aps/?fields=lat&fields=lon&fields=name&fields=id").then((aps) => {
-          aps = aps.map((n) => ({ ...n, type: "AP" }));
-          let _nodes = aps.concat(nodes)
-          setNodes(_nodes);
-          let validNodes = _nodes.filter(n => n.lat && n.lon);
-          let avgLat = validNodes.reduce((s, n) => s + n.lat / validNodes.length, 0);
-          let avgLon = validNodes.reduce((s, n) => s + n.lon / validNodes.length, 0);
-          setCenter([avgLat, avgLon]);
-        });
+    fetchAPI("/monitoring/devices/?fields=lat&fields=lon&fields=name&fields=mac")
+      .then((data) => {
+        setNodes(data);
+        let validNodes = data.filter(n => n.lat && n.lon);
+        let avgLat = validNodes.reduce((s, n) => s + n.lat / validNodes.length, 0);
+        let avgLon = validNodes.reduce((s, n) => s + n.lon / validNodes.length, 0);
+        setCenter([avgLat, avgLon]);
       })
       .catch((error) => {
         setError(error.message);

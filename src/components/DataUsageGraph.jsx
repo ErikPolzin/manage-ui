@@ -5,7 +5,7 @@ import Box from "@mui/material/Box";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import ToggleButton from "@mui/material/ToggleButton";
 
-const DataUsageGraph = ({ nodeName, dataset }) => {
+const DataUsageGraph = ({ dataset, loading }) => {
   const [maxDays, setMaxDays] = React.useState(31);
 
   function data() {
@@ -23,7 +23,7 @@ const DataUsageGraph = ({ nodeName, dataset }) => {
   }
 
   function summedData() {
-    let timeGranularity = (maxDays === 1) ? 1000 * 3600 : 1000 * 3600 * 24;
+    let timeGranularity = maxDays === 1 ? 1000 * 3600 : 1000 * 3600 * 24;
     let grouped = Object.groupBy(data(), (d) => Math.floor(d.created.getTime() / timeGranularity));
     return Object.entries(grouped).map(([date, values]) => {
       return {
@@ -60,6 +60,7 @@ const DataUsageGraph = ({ nodeName, dataset }) => {
       <BarChart
         title="Data Usage"
         dataset={summedData()}
+        loading={loading}
         xAxis={[
           {
             id: "Time",

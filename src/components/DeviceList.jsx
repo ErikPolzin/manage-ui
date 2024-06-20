@@ -1,5 +1,6 @@
 import React from "react";
 import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
 import LinearProgress from "@mui/material/LinearProgress";
@@ -9,33 +10,13 @@ import IconButton from "@mui/material/IconButton";
 import { alpha } from "@mui/material/styles";
 import { DataGrid } from "@mui/x-data-grid";
 
-import ConfirmDeleteDialogue from "../components/ConfirmDeleteDialogue";
-
 function DeviceList({ title, devices, isLoading, columns, onDelete, onAdd, onSelect }) {
   const [selectedDevices, setSelectedDevices] = React.useState([]);
-  const [openDeleteDialog, setOpenDeleteDialog] = React.useState(false);
-  const [deviceToDelete, setDeviceToDelete] = React.useState(null);
-
-  const handleDeleteClick = (device) => {
-    setDeviceToDelete(device);
-    setOpenDeleteDialog(true);
-  };
-
-  const handleCloseDeleteDialog = () => {
-    setOpenDeleteDialog(false);
-  };
-
-  const handleConfirmDelete = () => {
-    setOpenDeleteDialog(false);
-    if (deviceToDelete) {
-      onDelete(deviceToDelete);
-    }
-  };
 
   const handleSelectionChange = (model) => {
     setSelectedDevices(model);
     if (onSelect) onSelect(model[0]);
-  }
+  };
 
   function DataGridTitle() {
     return (
@@ -54,18 +35,21 @@ function DeviceList({ title, devices, isLoading, columns, onDelete, onAdd, onSel
             alignItems: "center",
           }}
         >
-          <Typography variant="h6" sx={{ flex: "1 1 100%" }}>
-            {title}
-          </Typography>
-          {selectedDevices.length > 0 ? (
-            <IconButton onClick={handleDeleteClick}>
-              <DeleteIcon />
-            </IconButton>
-          ) : (
-            <IconButton onClick={onAdd}>
-              <AddIcon />
-            </IconButton>
-          )}
+          <Typography variant="h6">{title}</Typography>
+          <Box sx={{ display: "flex", flexGrow: 1, flexDirection: "row-reverse" }}>
+            {selectedDevices.length > 0 ? (
+              <Box sx={{ display: "inline-flex", flexDirection: "row" }}>
+                <Button onClick={() => setSelectedDevices([])}>Clear Selection</Button>
+                <IconButton onClick={() => onDelete(selectedDevices)}>
+                  <DeleteIcon />
+                </IconButton>
+              </Box>
+            ) : (
+              <IconButton onClick={onAdd}>
+                <AddIcon />
+              </IconButton>
+            )}
+          </Box>
         </Box>
         {isLoading ? <LinearProgress /> : null}
       </Box>
@@ -78,6 +62,7 @@ function DeviceList({ title, devices, isLoading, columns, onDelete, onAdd, onSel
           slots={{ toolbar: DataGridTitle }}
           rows={devices}
           columns={columns}
+          getRowId={(d) => d.mac}
           initialState={{
             pagination: {
               paginationModel: { page: 0, pageSize: 5 },
@@ -85,15 +70,10 @@ function DeviceList({ title, devices, isLoading, columns, onDelete, onAdd, onSel
           }}
           pageSizeOptions={[5, 10]}
           onRowSelectionModelChange={handleSelectionChange}
+          rowSelectionModel={selectedDevices}
           disableMultipleRowSelection
         />
       </Paper>
-      <ConfirmDeleteDialogue
-        open={openDeleteDialog}
-        handleClose={handleCloseDeleteDialog}
-        handleConfirm={handleConfirmDelete}
-        type={"device"}
-      />
     </Box>
   );
 }
