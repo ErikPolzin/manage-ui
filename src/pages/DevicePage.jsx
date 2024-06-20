@@ -1,12 +1,18 @@
 import React from "react";
+import PropTypes from 'prop-types';
 import Alert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
 import AlertTitle from "@mui/material/AlertTitle";
 import Box from "@mui/material/Box";
+import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
+import ToggleButton from "@mui/material/ToggleButton";
+import Tabs from '@mui/material/Tabs';
+import Tab from '@mui/material/Tab';
 import humanizeDuration from "humanize-duration";
 
 import DeviceList from "../components/DeviceList";
 import DataUsageGraph from "../components/DataUsageGraph";
+import RTTGraph from "../components/RTTGraph";
 import ConfirmDeleteDialogue from "../components/ConfirmDeleteDialogue";
 import AddDeviceDialogue from "../components/AddDeviceDialogue";
 import { fetchAPI } from "../keycloak";
@@ -27,6 +33,35 @@ const AP_COLUMNS = [
   },
 ];
 
+function CustomTabPanel(props) {
+  const { children, value, index, ...other } = props;
+
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`simple-tabpanel-${index}`}
+      aria-labelledby={`simple-tab-${index}`}
+      {...other}
+    >
+      {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
+    </div>
+  );
+}
+
+CustomTabPanel.propTypes = {
+  children: PropTypes.node,
+  index: PropTypes.number.isRequired,
+  value: PropTypes.number.isRequired,
+};
+
+function a11yProps(index) {
+  return {
+    id: `simple-tab-${index}`,
+    'aria-controls': `simple-tabpanel-${index}`,
+  };
+}
+
 function DevicePage() {
   const [devices, setDevices] = React.useState([]);
   const [selectedDevice, setSelectedDevice] = React.useState(null);
@@ -38,6 +73,8 @@ function DevicePage() {
   const [openAddDialog, setOpenAddDialog] = React.useState(false);
   const [deviceToDelete, setDeviceToDelete] = React.useState(null);
   const [deviceToAdd, setDeviceToAdd] = React.useState(null);
+  const [showDays, setShowDays] = React.useState(31);
+  const [tabValue, setTabValue] = React.useState(0);
 
   React.useEffect(() => {
     fetchUnknownDevices();
@@ -78,8 +115,15 @@ function DevicePage() {
   const currentStationData = () => {
     let data = [];
     for (let d of devices) {
-      if (!selectedDevice || d.mac === selectedDevice)
-        data = data.concat(d.stations);
+      if (!selectedDevice || d.mac === selectedDevice) data = data.concat(d.stations);
+    }
+    return data;
+  };
+
+  const currentUptimeData = () => {
+    let data = [];
+    for (let d of devices) {
+      if (!selectedDevice || d.mac === selectedDevice) data = data.concat(d.uptime_metrics);
     }
     return data;
   };
@@ -117,12 +161,46 @@ function DevicePage() {
   };
 
   return (
-    <Box sx={{ padding: 3 }}>
+    <Box sx={{ padding: 3, marginTop: -3 }}>
       {alert.show && (
         <Alert severity={alert.type} onClose={handleCloseAlert}>
           {alert.message}
         </Alert>
       )}
+      <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+        <Tabs value={tabValue} onChange={(e, v) => setTabValue(v)} aria-label="basic tabs example">
+          <Tab label="Data Usage" {...a11yProps(0)} />
+          <Tab label="RTT" {...a11yProps(1)} />
+        </Tabs>
+      </Box>
+      <CustomTabPanel value={tabValue} index={0}>
+      <DataUsageGraph dataset={currentStationData()} loading={loading} showDays={showDays} />
+      </CustomTabPanel>
+      <CustomTabPanel value={tabValue} index={1}>
+      <RTTGraph dataset={currentUptimeData()} loading={loading} showDays={showDays} />
+      </CustomTabPanel>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          marginBottom: 2,
+        }}
+      >
+        <ToggleButtonGroup
+          color="primary"
+          value={showDays}
+          onChange={(e, v) => setShowDays(v)}
+          exclusive
+          size="small"
+          aria-label="Date Range"
+        >
+          <ToggleButton value={1}>24 Hours</ToggleButton>
+          <ToggleButton value={7}>Week</ToggleButton>
+          <ToggleButton value={31}>Month</ToggleButton>
+        </ToggleButtonGroup>
+      </Box>
       {unknownDevices.map((device) => (
         <Alert
           key={device.id}
@@ -139,7 +217,6 @@ function DevicePage() {
           Last contacted at {new Date(device.last_contact).toLocaleString()} from {device.from_ip}
         </Alert>
       ))}
-      <DataUsageGraph dataset={currentStationData()} loading={loading} />
       <DeviceList
         title="Nodes"
         isLoading={loading}
