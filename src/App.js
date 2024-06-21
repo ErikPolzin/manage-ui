@@ -30,19 +30,30 @@ const Main = styled("main", {
   shouldForwardProp: (prop) => prop !== "open",
 })(({ theme, open }) => ({
   flexGrow: 1,
-  transition: theme.transitions.create("margin", {
+  minHeight: "calc(100vh - 64px)",
+  maxWidth: open ? `calc(100vw - ${drawerWidth}px)` : "calc(100vw - 65px)"
+}));
+
+const openedMixin = (theme) => ({
+  width: drawerWidth,
+  transition: theme.transitions.create("width", {
+    easing: theme.transitions.easing.sharp,
+    duration: theme.transitions.duration.enteringScreen,
+  }),
+  overflowX: "hidden",
+});
+
+const closedMixin = (theme) => ({
+  transition: theme.transitions.create("width", {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,
   }),
-  marginLeft: `-${drawerWidth}px`,
-  ...(open && {
-    transition: theme.transitions.create("margin", {
-      easing: theme.transitions.easing.easeOut,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
-    marginLeft: 0,
-  }),
-}));
+  overflowX: "hidden",
+  width: `calc(${theme.spacing(7)} + 1px)`,
+  [theme.breakpoints.up("sm")]: {
+    width: `calc(${theme.spacing(8)} + 1px)`,
+  },
+});
 
 const DrawerHeader = styled("div")(({ theme }) => ({
   display: "flex",
@@ -51,6 +62,23 @@ const DrawerHeader = styled("div")(({ theme }) => ({
   // necessary for content to be below app bar
   ...theme.mixins.toolbar,
 }));
+
+const StyledDrawer = styled(Drawer, { shouldForwardProp: (prop) => prop !== "open" })(
+  ({ theme, open }) => ({
+    width: drawerWidth,
+    flexShrink: 0,
+    whiteSpace: "nowrap",
+    boxSizing: "border-box",
+    ...(open && {
+      ...openedMixin(theme),
+      "& .MuiDrawer-paper": openedMixin(theme),
+    }),
+    ...(!open && {
+      ...closedMixin(theme),
+      "& .MuiDrawer-paper": closedMixin(theme),
+    }),
+  }),
+);
 
 function App() {
   const { keycloak, initialized } = useKeycloak();
@@ -82,31 +110,14 @@ function App() {
       <Box sx={{ display: "flex" }}>
         <CssBaseline />
         <NavBar open={open} onMenuClick={toggleDrawer} />
-        <Drawer
-          sx={{
-            width: drawerWidth,
-            flexShrink: 0,
-            ".MuiDrawer-paper": {
-              width: drawerWidth,
-              boxSizing: "border-box",
-            },
-          }}
-          variant="persistent"
-          anchor="left"
-          open={open}
-        >
+        <StyledDrawer variant="permanent" open={open}>
           <DrawerHeader>
             <Avatar>{initials}</Avatar>
             <Typography mx={2}>{username}</Typography>
           </DrawerHeader>
           <Divider />
           <List>
-            <ListItemButton
-              key="0"
-              component={Link}
-              to="/"
-              selected={location.pathname === "/"}
-            >
+            <ListItemButton key="0" component={Link} to="/" selected={location.pathname === "/"}>
               <ListItemIcon>
                 <Dashboard />
               </ListItemIcon>
@@ -157,12 +168,9 @@ function App() {
               <ListItemText primary="Alerts" />
             </ListItemButton>
           </List>
-        </Drawer>
+        </StyledDrawer>
         <Main
           open={open}
-          sx={{
-            minHeight: "calc(100vh - 64px)",
-          }}
         >
           <DrawerHeader />
           {!initialized ? (
