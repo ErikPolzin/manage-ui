@@ -11,9 +11,9 @@ import Tab from "@mui/material/Tab";
 import humanizeDuration from "humanize-duration";
 
 import DeviceList from "../components/DeviceList";
-import DataUsageGraph from "../components/DataUsageGraph";
-import RTTGraph from "../components/RTTGraph";
-import UptimeGraph from "../components/UptimeGraph";
+import DataUsageGraph from "../components/graphs/DataUsageGraph";
+import RTTGraph from "../components/graphs/RTTGraph";
+import UptimeGraph from "../components/graphs/UptimeGraph";
 import ConfirmDeleteDialogue from "../components/ConfirmDeleteDialogue";
 import AddDeviceDialogue from "../components/AddDeviceDialogue";
 import { fetchAPI } from "../keycloak";
@@ -84,7 +84,7 @@ function DevicePage() {
   const [deviceToDelete, setDeviceToDelete] = React.useState(null);
   const [deviceToAdd, setDeviceToAdd] = React.useState(null);
   const [deviceErrors, setDeviceErrors] = React.useState({});
-  const [showDays, setShowDays] = React.useState(31);
+  const [showDays, setShowDays] = React.useState("month");
   const [tabValue, setTabValue] = React.useState(0);
 
   React.useEffect(() => {
@@ -222,9 +222,9 @@ function DevicePage() {
           size="small"
           aria-label="Date Range"
         >
-          <ToggleButton value={1}>24 Hours</ToggleButton>
-          <ToggleButton value={7}>Week</ToggleButton>
-          <ToggleButton value={31}>Month</ToggleButton>
+          <ToggleButton value={"day"}>24 Hours</ToggleButton>
+          <ToggleButton value={"week"}>Week</ToggleButton>
+          <ToggleButton value={"month"}>Month</ToggleButton>
         </ToggleButtonGroup>
       </Box>
       {unknownDevices.map((device) => (
