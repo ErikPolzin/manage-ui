@@ -1,7 +1,6 @@
 import React, { useRef } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import L from "leaflet";
-import { fetchAPI } from "../keycloak";
 import "leaflet/dist/leaflet.css";
 
 import icon from "leaflet/dist/images/marker-icon.png";
@@ -20,11 +19,11 @@ function ChangeView({ center, zoom }) {
   return null;
 }
 
-function DraggableMarker({ node, defaultPos }) {
-  const [position, setPosition] = React.useState({
-    lat: node.lat || defaultPos.lat,
-    lon: node.lon || defaultPos.lon,
-  });
+function DraggableMarker({ node, defaultPos, handlePositionChange }) {
+  const [position, setPosition] = React.useState([
+    node.lat || defaultPos[0],
+    node.lon || defaultPos[1],
+  ]);
   const markerRef = useRef(null);
   const eventHandlers = React.useMemo(
     () => ({
@@ -33,7 +32,7 @@ function DraggableMarker({ node, defaultPos }) {
         if (marker != null) {
           let pos = marker.getLatLng();
           setPosition(pos);
-          fetchAPI(`/monitoring/devices/${node.mac}/`, "PATCH", { lat: pos.lat, lon: pos.lng });
+          handlePositionChange(node, pos.lat, pos.lng);
         }
       },
     }),
@@ -46,35 +45,8 @@ function DraggableMarker({ node, defaultPos }) {
   );
 }
 
-const NetworkMap = ({ latitude, longitude }) => {
+const NetworkMap = ({ center, zoom, nodes, handlePositionChange }) => {
   const mapRef = useRef(null);
-  const [center, setCenter] = React.useState([latitude, longitude]);
-  const [zoom, changeZoom] = React.useState(13);
-  const [nodes, setNodes] = React.useState([]);
-  const [loading, setLoading] = React.useState(false);
-  const [error, setError] = React.useState(null);
-
-  React.useEffect(() => {
-    fetchNodes();
-  }, []);
-
-  const fetchNodes = async () => {
-    setLoading(true);
-    fetchAPI("/monitoring/devices/?fields=lat&fields=lon&fields=name&fields=mac")
-      .then((data) => {
-        setNodes(data);
-        let validNodes = data.filter(n => n.lat && n.lon);
-        let avgLat = validNodes.reduce((s, n) => s + n.lat / validNodes.length, 0);
-        let avgLon = validNodes.reduce((s, n) => s + n.lon / validNodes.length, 0);
-        setCenter([avgLat, avgLon]);
-      })
-      .catch((error) => {
-        setError(error.message);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  };
 
   return (
     <MapContainer
@@ -90,7 +62,12 @@ const NetworkMap = ({ latitude, longitude }) => {
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
       {nodes.map((node) => (
-        <DraggableMarker key={node.id} node={node} defaultPos={{lat: latitude, lon: longitude}} />
+        <DraggableMarker
+          key={node.id}
+          node={node}
+          defaultPos={center}
+          handlePositionChange={handlePositionChange}
+        />
       ))}
     </MapContainer>
   );
