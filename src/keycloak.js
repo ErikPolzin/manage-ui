@@ -35,8 +35,8 @@ const fetchAPI = async (url, method="GET", data=null) => {
   }).then(async (response) => {
     if (method === "DELETE") return;
     if (!response.ok) {
-      const errorBody = await response.json();
-      throw new Error(errorBody.detail || "An unknown error occurred");
+      let errorBody = await response.json();
+      return Promise.reject(errorBody.detail || errorBody || "An unknown error occurred");
     }
     return response.json();
   });

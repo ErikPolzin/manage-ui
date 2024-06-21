@@ -73,6 +73,7 @@ function DevicePage() {
   const [openAddDialog, setOpenAddDialog] = React.useState(false);
   const [deviceToDelete, setDeviceToDelete] = React.useState(null);
   const [deviceToAdd, setDeviceToAdd] = React.useState(null);
+  const [deviceErrors, setDeviceErrors] = React.useState({});
   const [showDays, setShowDays] = React.useState(31);
   const [tabValue, setTabValue] = React.useState(0);
 
@@ -81,8 +82,8 @@ function DevicePage() {
     fetchDevices();
   }, []);
 
-  const handleDeleteClick = (device) => {
-    setDeviceToDelete(device);
+  const handleDeleteClick = (devices) => {
+    setDeviceToDelete(devices[0]);
     setOpenDeleteDialog(true);
   };
 
@@ -97,7 +98,7 @@ function DevicePage() {
     }
   };
 
-  const handleAddClick = (device) => {
+  const handleAddClick = (event, device) => {
     setDeviceToAdd(device);
     setOpenAddDialog(true);
   };
@@ -106,7 +107,18 @@ function DevicePage() {
     setOpenAddDialog(false);
   };
 
-  const handleAddDevice = () => {};
+  const handleAddDevice = (newDevice) => {
+    fetchAPI("/monitoring/devices/", "POST", newDevice)
+    .then((data) => {
+      setOpenAddDialog(false);
+      setAlert({ show: true, message: `Added device ${newDevice.mac}`, type: "success" });
+      fetchUnknownDevices();
+      fetchDevices();
+    })
+    .catch((error) => {
+      setDeviceErrors(error);
+    });
+  };
 
   const handleCloseAlert = () => {
     setAlert({ show: false, message: "", type: "success" });
@@ -154,9 +166,9 @@ function DevicePage() {
       });
   };
 
-  const deleteDevice = async (device) => {
-    fetchAPI(`/monitoring/devices/${device.mac}/`, "DELETE").then(() => {
-      setDevices(devices.map((d) => d.mac !== device.mac));
+  const deleteDevice = async (deviceMac) => {
+    fetchAPI(`/monitoring/devices/${deviceMac}/`, "DELETE").then(() => {
+      fetchDevices();
     });
   };
 
@@ -203,11 +215,11 @@ function DevicePage() {
       </Box>
       {unknownDevices.map((device) => (
         <Alert
-          key={device.id}
+          key={device.mac}
           variant="outlined"
           severity="info"
           action={
-            <Button color="inherit" onClick={() => handleAddClick(device)}>
+            <Button color="inherit" onClick={(e) => handleAddClick(e, device)}>
               Register
             </Button>
           }
@@ -223,7 +235,7 @@ function DevicePage() {
         devices={devices}
         columns={AP_COLUMNS}
         onSelect={setSelectedDevice}
-        onAdd={handleAddClick}
+        onAdd={(e) => handleAddClick(e, null)}
         onDelete={handleDeleteClick}
       />
       <ConfirmDeleteDialogue
@@ -234,9 +246,10 @@ function DevicePage() {
       />
       <AddDeviceDialogue
         open={openAddDialog}
-        handleClose={handleCloseAddDialog}
-        handleAdd={handleAddDevice}
-        device={deviceToAdd}
+        onClose={handleCloseAddDialog}
+        onAdd={handleAddDevice}
+        defaults={deviceToAdd}
+        errors={deviceErrors}
       />
     </Box>
   );

@@ -12,20 +12,49 @@ import {
   MenuItem,
 } from "@mui/material";
 
-function AddDeviceDialogue({ open, handleClose, handleAdd }) {
-  const [newDevice, setNewDevice] = useState({ name: "", ip_address: "", device_type: "" });
+const DEFAULT_DEVICE = {
+  name: "",
+  mac: "",
+  ip: "",
+  hardware: "tl_eap225_3_o",
+  description: "",
+  last_contact_from_ip: "",
+  created: (new Date()).toISOString(),
+};
+
+function AddDeviceDialogue({ open, defaults, onClose, onAdd, errors }) {
+  const [newDevice, setNewDevice] = useState(Object.assign({}, DEFAULT_DEVICE));
+
+  React.useEffect(() => {
+    if (defaults) {
+      setNewDevice({
+        ...DEFAULT_DEVICE,
+        name: defaults.name,
+        mac: defaults.mac,
+        ip: defaults.from_ip,
+      });
+    }
+  }, [defaults]);
 
   const handleChange = (e) => {
     setNewDevice({ ...newDevice, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = () => {
-    handleAdd(newDevice);
-    setNewDevice({ name: "", ip_address: "", device_type: "" }); // Reset form
+    onAdd(newDevice);
   };
 
+  const handleClose = () => {
+    resetForm();
+    onClose();
+  }
+
+  const resetForm = () => {
+    setNewDevice(Object.assign({}, DEFAULT_DEVICE));
+  }
+
   return (
-    <Dialog open={open} onClose={handleClose}>
+    <Dialog open={open} onClose={handleClose} onAbort={resetForm}>
       <DialogTitle>Add New Device</DialogTitle>
       <DialogContent>
         <TextField
@@ -37,30 +66,41 @@ function AddDeviceDialogue({ open, handleClose, handleAdd }) {
           fullWidth
           value={newDevice.name}
           onChange={handleChange}
+          error={Boolean(errors.name)}
+          helperText={errors.name ? errors.name.join("\n") : null}
         />
         <TextField
           margin="dense"
-          name="ip_address"
+          name="mac"
+          label="MAC Address"
+          type="text"
+          fullWidth
+          value={newDevice.mac}
+          onChange={handleChange}
+          error={Boolean(errors.mac)}
+          helperText={errors.mac ? errors.mac.join("\n") : null}
+        />
+        <TextField
+          margin="dense"
+          name="ip"
           label="IP Address"
           type="text"
           fullWidth
-          value={newDevice.ip_address}
+          value={newDevice.ip}
           onChange={handleChange}
+          error={Boolean(errors.ip)}
+          helperText={errors.ip ? errors.ip.join("\n") : null}
         />
         <FormControl fullWidth margin="normal">
           <InputLabel>Device Type</InputLabel>
           <Select
-            name="device_type"
-            value={newDevice.device_type}
-            label="Device Type"
+            name="hardware"
+            value={newDevice.hardware}
+            label="Hardware"
             onChange={handleChange}
           >
-            <MenuItem value="switch">Switch</MenuItem>
-            <MenuItem value="access_point">Access Point</MenuItem>
-            <MenuItem value="firewall">Firewall</MenuItem>
-            <MenuItem value="dns_server">DNS</MenuItem>
-            <MenuItem value="global_server">Cloud Server</MenuItem>
-            <MenuItem value="local_server">Local Server</MenuItem>
+            <MenuItem value="tl_eap225_3_o">TPLink EAP</MenuItem>
+            <MenuItem value="ubnt_ac_mesh">Ubiquiti AC Mesh</MenuItem>
           </Select>
         </FormControl>
       </DialogContent>
