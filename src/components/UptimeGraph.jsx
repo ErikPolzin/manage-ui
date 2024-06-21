@@ -2,47 +2,69 @@ import * as React from "react";
 import { BarChart } from "@mui/x-charts/BarChart";
 import { axisClasses } from "@mui/x-charts/ChartsAxis";
 
-const DataUsageGraph = ({ dataset, loading, showDays }) => {
+const COLOR_MAP = [
+  [10, "#FF0000"],
+  [20, "#c02600"],
+  [30, "#d45500"],
+  [40, "#e28800"],
+  [50, "#d6ae0d"],
+  [60, "#a8a81c"],
+  [70, "#a7c726"],
+  [80, "#67971f"],
+  [90, "#42910d"],
+  [100, "#28970c"],
+];
+
+const colorForUptime = (uptime) => {
+  for (const [maxValue, color] of COLOR_MAP) {
+    if (uptime <= maxValue) return color;
+  }
+  return COLOR_MAP.slice(-1)[1]; // Last color
+};
+
+const UptimeGraph = ({ dataset, loading, showDays }) => {
   const [data, setData] = React.useState([]);
 
   React.useEffect(() => {
     setData(histogram(filteredData(dataset)));
   }, [dataset]);
 
-  function filteredData(_data) {
-    return _data
+  function filteredData(dset) {
+    return dset
       .filter((item) => Math.abs(new Date() - new Date(item.created)) / 36e5 / 24 < showDays)
       .map((item) => ({
-        rx_bytes: Math.abs(item.rx_bytes / 1048576),
-        tx_bytes: Math.abs(item.tx_bytes / 1048576),
+        uptime: item.reachable ? 100 : 0,
         created: new Date(item.created).getTime(),
       }))
       .sort((a, b) => a.created - b.created);
   }
 
-  function histogram(_data) {
+  function histogram(data) {
     let output = [];
     let maxTime = new Date().getTime();
-    let minTime = maxTime - (36e5 * 24 * showDays);
+    let minTime = maxTime - 36e5 * 24 * showDays;
     let bucketWidth = bucketSize();
     let bucketStart = roundDownTo(minTime, bucketWidth);
     let i = 0;
     while (bucketStart < maxTime) {
-      let sumOverBucket = {
-        rx_bytes: 0,
-        tx_bytes: 0,
+      let avgOverBucket = {
+        uptime: 0,
         created: bucketStart,
       };
+      let numInBucket = 0;
       while (
-        _data[i] &&
-        bucketStart <= _data[i].created &&
-        _data[i].created < bucketStart + bucketWidth
+        data[i] &&
+        bucketStart <= data[i].created &&
+        data[i].created < bucketStart + bucketWidth
       ) {
-        sumOverBucket.rx_bytes += _data[i].rx_bytes;
-        sumOverBucket.tx_bytes += _data[i].tx_bytes;
+        avgOverBucket.uptime += data[i].uptime;
         i++;
+        numInBucket++;
       }
-      output.push(sumOverBucket);
+      if (numInBucket > 1) {
+        avgOverBucket.uptime /= numInBucket;
+      }
+      output.push(avgOverBucket);
       bucketStart += bucketWidth;
     }
     return output;
@@ -63,7 +85,7 @@ const DataUsageGraph = ({ dataset, loading, showDays }) => {
     return multiple * Math.floor(n / multiple);
   };
 
-  const valueFormatter = (value) => `${Math.round(value)}Mb`;
+  const valueFormatter = (value) => `${Math.round(value)}%`;
   const keyFormatter = (key) => {
     switch (showDays) {
       case 1:
@@ -76,7 +98,7 @@ const DataUsageGraph = ({ dataset, loading, showDays }) => {
   };
   return (
     <BarChart
-      title="Data Usage"
+      title="Uptime"
       dataset={data}
       loading={loading}
       xAxis={[
@@ -85,19 +107,20 @@ const DataUsageGraph = ({ dataset, loading, showDays }) => {
           scaleType: "band",
           dataKey: "created",
           valueFormatter: keyFormatter,
+          colorMap: {
+            type: "ordinal",
+            colors: data.map((d) => d.uptime).map(colorForUptime),
+          },
         },
       ]}
       yAxis={[
         {
-          label: "Data (Mb)",
+          label: "Uptime (%)",
         },
       ]}
       height={300}
       margin={{ top: 5, right: 5, bottom: 30, left: 100 }}
-      series={[
-        { dataKey: "tx_bytes", stack: "A", label: "Sent Data", valueFormatter },
-        { dataKey: "rx_bytes", stack: "A", label: "Received Data", valueFormatter },
-      ]}
+      series={[{ dataKey: "uptime", label: "Uptime", area: true, valueFormatter }]}
       sx={{
         [`.${axisClasses.left} .${axisClasses.label}`]: {
           transform: "translateX(-50px)",
@@ -107,4 +130,4 @@ const DataUsageGraph = ({ dataset, loading, showDays }) => {
   );
 };
 
-export default DataUsageGraph;
+export default UptimeGraph;

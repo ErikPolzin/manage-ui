@@ -1,18 +1,19 @@
 import React from "react";
-import PropTypes from 'prop-types';
+import PropTypes from "prop-types";
 import Alert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
 import AlertTitle from "@mui/material/AlertTitle";
 import Box from "@mui/material/Box";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import ToggleButton from "@mui/material/ToggleButton";
-import Tabs from '@mui/material/Tabs';
-import Tab from '@mui/material/Tab';
+import Tabs from "@mui/material/Tabs";
+import Tab from "@mui/material/Tab";
 import humanizeDuration from "humanize-duration";
 
 import DeviceList from "../components/DeviceList";
 import DataUsageGraph from "../components/DataUsageGraph";
 import RTTGraph from "../components/RTTGraph";
+import UptimeGraph from "../components/UptimeGraph";
 import ConfirmDeleteDialogue from "../components/ConfirmDeleteDialogue";
 import AddDeviceDialogue from "../components/AddDeviceDialogue";
 import { fetchAPI } from "../keycloak";
@@ -20,24 +21,25 @@ import { fetchAPI } from "../keycloak";
 const AP_COLUMNS = [
   { field: "name", headerName: "Name" },
   { field: "mac", headerName: "MAC Address", width: 150 },
-  { 
+  {
     field: "last_contact_from_ip",
     headerName: "IP Address",
     width: 150,
-    valueGetter: (value, row) => (value) ? value : "Unknown",
-    cellClassName: (params) => (params.value === "Unknown") ? "disabled" : "",
+    valueGetter: (value, row) => (value ? value : "Unknown"),
+    cellClassName: (params) => (params.value === "Unknown" ? "disabled" : ""),
   },
   {
     field: "last_contact",
     headerName: "Last Seen",
-    valueGetter: (value, row) => (value) ? humanizeDuration(new Date() - new Date(value), { round: true }) : "Never",
-    cellClassName: (params) => (params.value === "Never") ? "disabled" : "",
+    valueGetter: (value, row) =>
+      value ? humanizeDuration(new Date() - new Date(value), { round: true }) : "Never",
+    cellClassName: (params) => (params.value === "Never" ? "disabled" : ""),
   },
   {
     field: "memory_usage",
     headerName: "Memory Usage",
-    valueGetter: (value, row) => (value !== -1) ? `${Math.round(value * 100)}%` : "--",
-    cellClassName: (params) => (params.value === "--") ? "disabled" : "",
+    valueGetter: (value, row) => (value !== -1 ? `${Math.round(value * 100)}%` : "--"),
+    cellClassName: (params) => (params.value === "--" ? "disabled" : ""),
   },
 ];
 
@@ -66,7 +68,7 @@ CustomTabPanel.propTypes = {
 function a11yProps(index) {
   return {
     id: `simple-tab-${index}`,
-    'aria-controls': `simple-tabpanel-${index}`,
+    "aria-controls": `simple-tabpanel-${index}`,
   };
 }
 
@@ -117,15 +119,15 @@ function DevicePage() {
 
   const handleAddDevice = (newDevice) => {
     fetchAPI("/monitoring/devices/", "POST", newDevice)
-    .then((data) => {
-      setOpenAddDialog(false);
-      setAlert({ show: true, message: `Added device ${newDevice.mac}`, type: "success" });
-      fetchUnknownDevices();
-      fetchDevices();
-    })
-    .catch((error) => {
-      setDeviceErrors(error);
-    });
+      .then((data) => {
+        setOpenAddDialog(false);
+        setAlert({ show: true, message: `Added device ${newDevice.mac}`, type: "success" });
+        fetchUnknownDevices();
+        fetchDevices();
+      })
+      .catch((error) => {
+        setDeviceErrors(error);
+      });
   };
 
   const handleCloseAlert = () => {
@@ -191,13 +193,17 @@ function DevicePage() {
         <Tabs value={tabValue} onChange={(e, v) => setTabValue(v)} aria-label="basic tabs example">
           <Tab label="Data Usage" {...a11yProps(0)} />
           <Tab label="RTT" {...a11yProps(1)} />
+          <Tab label="Uptime" {...a11yProps(2)} />
         </Tabs>
       </Box>
       <CustomTabPanel value={tabValue} index={0}>
-      <DataUsageGraph dataset={currentStationData()} loading={loading} showDays={showDays} />
+        <DataUsageGraph dataset={currentStationData()} loading={loading} showDays={showDays} />
       </CustomTabPanel>
       <CustomTabPanel value={tabValue} index={1}>
-      <RTTGraph dataset={currentUptimeData()} loading={loading} showDays={showDays} />
+        <RTTGraph dataset={currentUptimeData()} loading={loading} showDays={showDays} />
+      </CustomTabPanel>
+      <CustomTabPanel value={tabValue} index={2}>
+        <UptimeGraph dataset={currentUptimeData()} loading={loading} showDays={showDays} />
       </CustomTabPanel>
       <Box
         sx={{
