@@ -8,7 +8,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import IconButton from "@mui/material/IconButton";
 import { alpha } from "@mui/material/styles";
-import { DataGrid } from "@mui/x-data-grid";
+import { DataGrid, gridClasses } from "@mui/x-data-grid";
 
 function DeviceList({ title, devices, isLoading, columns, onDelete, onAdd, onSelect }) {
   const [selectedDevices, setSelectedDevices] = React.useState([]);
@@ -60,6 +60,11 @@ function DeviceList({ title, devices, isLoading, columns, onDelete, onAdd, onSel
       <Paper sx={{ width: "100%", mb: 2 }}>
         <DataGrid
           slots={{ toolbar: DataGridTitle }}
+          sx={{
+            [`.${gridClasses.cell}.disabled`]: {
+              color: 'grey',
+            },
+          }}
           rows={devices}
           columns={columns}
           getRowId={(d) => d.mac}

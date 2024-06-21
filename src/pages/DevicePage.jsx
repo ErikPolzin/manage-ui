@@ -20,16 +20,24 @@ import { fetchAPI } from "../keycloak";
 const AP_COLUMNS = [
   { field: "name", headerName: "Name" },
   { field: "mac", headerName: "MAC Address", width: 150 },
-  { field: "last_contact_from_ip", headerName: "IP Address", width: 150 },
+  { 
+    field: "last_contact_from_ip",
+    headerName: "IP Address",
+    width: 150,
+    valueGetter: (value, row) => (value) ? value : "Unknown",
+    cellClassName: (params) => (params.value === "Unknown") ? "disabled" : "",
+  },
   {
     field: "last_contact",
     headerName: "Last Seen",
-    valueGetter: (value, row) => humanizeDuration(new Date() - new Date(value), { round: true }),
+    valueGetter: (value, row) => (value) ? humanizeDuration(new Date() - new Date(value), { round: true }) : "Never",
+    cellClassName: (params) => (params.value === "Never") ? "disabled" : "",
   },
   {
     field: "memory_usage",
     headerName: "Memory Usage",
-    valueGetter: (value, row) => `${Math.round(value * 100)}%`,
+    valueGetter: (value, row) => (value !== -1) ? `${Math.round(value * 100)}%` : "--",
+    cellClassName: (params) => (params.value === "--") ? "disabled" : "",
   },
 ];
 
