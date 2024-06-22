@@ -2,6 +2,7 @@ import React, { useRef } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import './NetworkMap.css';
 
 import icon from "leaflet/dist/images/marker-icon.png";
 import iconShadow from "leaflet/dist/images/marker-shadow.png";
@@ -20,26 +21,50 @@ function ChangeView({ center, zoom }) {
 }
 
 function DraggableMarker({ node, defaultPos, handlePositionChange }) {
-  const [position, setPosition] = React.useState([
-    node.lat || defaultPos[0],
-    node.lon || defaultPos[1],
-  ]);
   const markerRef = useRef(null);
+
+  React.useEffect(() => {
+    updateMarkerClass();
+  }, [node]);
+
+  const isPositioned = () => node.lat && node.lon;
+  const position = () => (isPositioned() ? [node.lat, node.lon] : defaultPos);
+  const updateMarkerClass = () => {
+    const marker = markerRef.current;
+    if (marker != null) {
+      if (isPositioned()) {
+        marker._icon.classList.remove("unpositioned");
+        marker._icon.classList.add("positioned");
+      } else {
+        marker._icon.classList.remove("positioned");
+        marker._icon.classList.add("unpositioned");
+      }
+    }
+  }
+
   const eventHandlers = React.useMemo(
     () => ({
       dragend() {
         const marker = markerRef.current;
         if (marker != null) {
           let pos = marker.getLatLng();
-          setPosition(pos);
-          handlePositionChange(node, pos.lat, pos.lng);
+          handlePositionChange(node, pos.lat, pos.lng).then(() => {
+            node.lat = pos.lat;
+            node.lon = pos.lng;
+            updateMarkerClass();
+          });
         }
       },
     }),
     [],
   );
   return (
-    <Marker draggable eventHandlers={eventHandlers} position={position} ref={markerRef}>
+    <Marker
+      draggable
+      eventHandlers={eventHandlers}
+      position={position()}
+      ref={markerRef}
+    >
       <Popup>{node.name}</Popup>
     </Marker>
   );
@@ -63,7 +88,7 @@ const NetworkMap = ({ center, zoom, nodes, handlePositionChange }) => {
       />
       {nodes.map((node) => (
         <DraggableMarker
-          key={node.id}
+          key={node.mac}
           node={node}
           defaultPos={center}
           handlePositionChange={handlePositionChange}

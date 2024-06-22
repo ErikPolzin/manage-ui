@@ -1,0 +1,7 @@
+.leaflet-marker-icon.positioned {
+    filter: none;
+}
+
+.leaflet-marker-icon.unpositioned {
+    filter: grayscale(100%);
+}

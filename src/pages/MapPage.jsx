@@ -14,7 +14,7 @@ const MapPage = () => {
   }, []);
 
   const handleNodePositionChange = (node, lat, lon) => {
-    fetchAPI(`/monitoring/devices/${node.mac}/`, "PATCH", { lat, lon });
+    return fetchAPI(`/monitoring/devices/${node.mac}/`, "PATCH", { lat, lon });
   };
 
   const fetchNodes = async () => {
@@ -25,6 +25,8 @@ const MapPage = () => {
         let validNodes = data.filter((n) => n.lat && n.lon);
         let avgLat = validNodes.reduce((s, n) => s + n.lat / validNodes.length, 0);
         let avgLon = validNodes.reduce((s, n) => s + n.lon / validNodes.length, 0);
+        // Shift the marker if there's only one other, we don't want overlapping nodes
+        if (validNodes.length === 1) avgLon += 0.1 / zoom;
         setCenter([avgLat, avgLon]);
       })
       .catch((error) => {
