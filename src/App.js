@@ -30,7 +30,7 @@ const Main = styled("main", {
 })(({ theme, open }) => ({
   flexGrow: 1,
   minHeight: "calc(100vh - 64px)",
-  maxWidth: open ? `calc(100vw - ${drawerWidth}px)` : "calc(100vw - 65px)"
+  maxWidth: open ? `calc(100vw - ${drawerWidth}px)` : "calc(100vw - 65px)",
 }));
 
 const openedMixin = (theme) => ({
@@ -157,12 +157,22 @@ function App() {
             </ListItemButton>
           </List>
         </StyledDrawer>
-        <Main
-          open={open}
-        >
+        <Main open={open}>
           <DrawerHeader />
           {!initialized ? (
-            <CircularProgress />
+            <Box
+              sx={{
+                width: "100%",
+                height: "100%",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center"
+              }}
+            >
+              <CircularProgress />
+              <Typography sx={{ marginTop: 1 }}>Checking Keycloak credentials...</Typography>
+            </Box>
           ) : (
             <Routes>
               <Route path="/" element={<HomePage />} />
