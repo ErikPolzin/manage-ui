@@ -1,10 +1,13 @@
 import React from "react";
 import { Gauge, gaugeClasses } from "@mui/x-charts/Gauge";
 import { fetchAPI } from "../keycloak";
-import { Divider, Typography, Card, CardContent, CardHeader } from "@mui/material";
+import { Divider, Card, CardContent, CardHeader } from "@mui/material";
 import Stack from "@mui/material/Stack";
+import Box from "@mui/material/Box";
+import NetworkMap from "../components/NetworkMap";
 
 const HomePage = () => {
+  const [nodes, setNodes] = React.useState([]);
   const [loading, setLoading] = React.useState(0);
   const [nNodes, setNNodes] = React.useState(0);
   const [nPositionedNodes, setNPositionedNodes] = React.useState(0);
@@ -13,6 +16,7 @@ const HomePage = () => {
 
   React.useEffect(() => {
     fetchOverview();
+    fetchNodes();
   }, []);
 
   const fetchOverview = () => {
@@ -28,72 +32,88 @@ const HomePage = () => {
         setLoading(false);
       });
   };
+  const fetchNodes = () => {
+    fetchAPI("/monitoring/devices/?fields=lat&fields=lon&fields=name&fields=mac").then((data) => {
+      setNodes(data);
+    });
+  };
+  const handleNodePositionChange = (node, lat, lon) => {
+    return fetchAPI(`/monitoring/devices/${node.mac}/`, "PATCH", { lat, lon });
+  };
   return (
-    <Stack
-      direction={{ xs: "column", md: "row" }}
-      spacing={{ xs: 3, md: 6 }}
-      alignItems="center"
-      justifyContent="center"
-      sx={{ flexGrow: 1, marginTop: 3 }}
-    >
-      <Card variant="outlined">
-        <CardContent sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-          <Gauge
-            width={200}
-            height={200}
-            value={(nPositionedNodes / nNodes) * 100}
-            sx={{
-              [`& .${gaugeClasses.valueText}`]: {
-                fontSize: 20,
-                transform: "translate(0px, 0px)",
-              },
-            }}
-            text={({ value, valueMax }) => `${nPositionedNodes} / ${nNodes}`}
-          />
-        </CardContent>
-        <Divider></Divider>
-        <CardHeader subheader={"Geopositioned Nodes"} sx={{ textAlign: "center" }} />
-      </Card>
-      <Card sx={{ borderRadius: 3 }}>
-        <CardContent sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-          <Gauge
-            width={300}
-            height={250}
-            value={(nOkNodes / nNodes) * 100}
-            startAngle={-110}
-            endAngle={110}
-            sx={{
-              [`& .${gaugeClasses.valueText}`]: {
-                fontSize: 30,
-                transform: "translate(0px, 0px)",
-              },
-            }}
-            text={({ value, valueMax }) => `${nOkNodes} / ${nNodes}`}
-          />
-          
-        </CardContent>
-        <Divider></Divider>
-        <CardHeader title={"OK Nodes"} sx={{ textAlign: "center" }} />
-      </Card>
-      <Card variant="outlined">
-        <CardContent sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-          <Gauge
-            width={200}
-            height={200}
-            value={(nNodes / (nNodes + nUnknownNodes)) * 100}
-            sx={{
-              [`& .${gaugeClasses.valueText}`]: {
-                fontSize: 20,
-                transform: "translate(0px, 0px)",
-              },
-            }}
-            text={({ value, valueMax }) => `${nNodes} / ${nNodes + nUnknownNodes}`}
-          />
-        </CardContent>
-        <Divider></Divider>
-        <CardHeader subheader={"Registered Nodes"} sx={{ textAlign: "center" }} />
-      </Card>
-    </Stack>
+    <Box>
+      <Box>
+        <NetworkMap
+          handlePositionChange={handleNodePositionChange}
+          nodes={nodes}
+          style={{ position: "sticky", top: "-150px", height: "600px" }}
+        />
+        <Stack
+          direction={{ xs: "column", md: "row" }}
+          spacing={{ xs: 3, md: 6 }}
+          alignItems="center"
+          justifyContent="center"
+          sx={{ flexGrow: 1, marginTop: "-100px", paddingBottom: 3 }}
+        >
+          <Card variant="outlined" style={{ zIndex: 1000 }}>
+            <CardContent sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+              <Gauge
+                width={200}
+                height={200}
+                value={(nPositionedNodes / nNodes) * 100}
+                sx={{
+                  [`& .${gaugeClasses.valueText}`]: {
+                    fontSize: 20,
+                    transform: "translate(0px, 0px)",
+                  },
+                }}
+                text={() => `${nPositionedNodes} / ${nNodes}`}
+              />
+            </CardContent>
+            <Divider></Divider>
+            <CardHeader subheader={"Geopositioned Nodes"} sx={{ textAlign: "center" }} />
+          </Card>
+          <Card sx={{ borderRadius: 3, zIndex: 1000 }}>
+            <CardContent sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+              <Gauge
+                width={300}
+                height={250}
+                value={(nOkNodes / nNodes) * 100}
+                startAngle={-110}
+                endAngle={110}
+                sx={{
+                  [`& .${gaugeClasses.valueText}`]: {
+                    fontSize: 30,
+                    transform: "translate(0px, 0px)",
+                  },
+                }}
+                text={() => `${nOkNodes} / ${nNodes}`}
+              />
+            </CardContent>
+            <Divider></Divider>
+            <CardHeader title={"OK Nodes"} sx={{ textAlign: "center" }} />
+          </Card>
+          <Card variant="outlined" style={{ zIndex: 1000 }}>
+            <CardContent sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+              <Gauge
+                width={200}
+                height={200}
+                value={(nNodes / (nNodes + nUnknownNodes)) * 100}
+                sx={{
+                  [`& .${gaugeClasses.valueText}`]: {
+                    fontSize: 20,
+                    transform: "translate(0px, 0px)",
+                  },
+                }}
+                text={() => `${nNodes} / ${nNodes + nUnknownNodes}`}
+              />
+            </CardContent>
+            <Divider></Divider>
+            <CardHeader subheader={"Registered Nodes"} sx={{ textAlign: "center" }} />
+          </Card>
+        </Stack>
+      </Box>
+    </Box>
   );
 };
 

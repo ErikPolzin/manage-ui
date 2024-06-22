@@ -2,7 +2,7 @@ import React, { useRef } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import './NetworkMap.css';
+import "./NetworkMap.css";
 
 import icon from "leaflet/dist/images/marker-icon.png";
 import iconShadow from "leaflet/dist/images/marker-shadow.png";
@@ -40,7 +40,7 @@ function DraggableMarker({ node, defaultPos, handlePositionChange }) {
         marker._icon.classList.add("unpositioned");
       }
     }
-  }
+  };
 
   const eventHandlers = React.useMemo(
     () => ({
@@ -59,19 +59,25 @@ function DraggableMarker({ node, defaultPos, handlePositionChange }) {
     [],
   );
   return (
-    <Marker
-      draggable
-      eventHandlers={eventHandlers}
-      position={position()}
-      ref={markerRef}
-    >
+    <Marker draggable eventHandlers={eventHandlers} position={position()} ref={markerRef}>
       <Popup>{node.name}</Popup>
     </Marker>
   );
 }
 
-const NetworkMap = ({ center, zoom, nodes, handlePositionChange }) => {
+const NetworkMap = ({ nodes, handlePositionChange, style }) => {
   const mapRef = useRef(null);
+  const [center, setCenter] = React.useState([-33.9221, 18.4231]);
+  const [zoom, setZoom] = React.useState(13);
+
+  React.useEffect(() => {
+    let validNodes = nodes.filter((n) => n.lat && n.lon);
+    let avgLat = validNodes.reduce((s, n) => s + n.lat / validNodes.length, 0);
+    let avgLon = validNodes.reduce((s, n) => s + n.lon / validNodes.length, 0);
+    // Shift the marker if there's only one other, we don't want overlapping nodes
+    if (validNodes.length === 1) avgLon += 0.1 / zoom;
+    setCenter([avgLat, avgLon]);
+  }, [nodes]);
 
   return (
     <MapContainer
@@ -79,7 +85,7 @@ const NetworkMap = ({ center, zoom, nodes, handlePositionChange }) => {
       zoom={zoom}
       scrollWheelZoom={false}
       ref={mapRef}
-      style={{ height: "100%", width: "100%" }}
+      style={{ height: "100%", width: "100%", ...style }}
     >
       <ChangeView center={center} zoom={zoom} />
       <TileLayer

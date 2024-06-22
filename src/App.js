@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { ThemeProvider, styled } from "@mui/material/styles";
-import { Dashboard, Router, Public, Map, Error } from "@mui/icons-material";
+import { Dashboard, Router, Public, Error } from "@mui/icons-material";
 import {
   Avatar,
   Typography,
@@ -17,7 +17,6 @@ import {
 import { Routes, Route, Link, useLocation } from "react-router-dom";
 import { useKeycloak } from "@react-keycloak/web";
 import HomePage from "./pages/HomePage";
-import MapPage from "./pages/MapPage";
 import DevicePage from "./pages/DevicePage";
 import ServicesPage from "./pages/ServicesPage";
 import AlertsPage from "./pages/AlertsPage";
@@ -124,17 +123,6 @@ function App() {
               <ListItemText primary="Dashboard" />
             </ListItemButton>
             <ListItemButton
-              key="1"
-              component={Link}
-              to="/map"
-              selected={location.pathname === "/map"}
-            >
-              <ListItemIcon>
-                <Map />
-              </ListItemIcon>
-              <ListItemText primary="Map" />
-            </ListItemButton>
-            <ListItemButton
               key="2"
               component={Link}
               to="/devices"
@@ -178,7 +166,6 @@ function App() {
           ) : (
             <Routes>
               <Route path="/" element={<HomePage />} />
-              <Route path="/map" element={<MapPage />} />
               <Route path="/devices" element={<DevicePage />} />
               <Route path="/services" element={<ServicesPage />} />
               <Route path="/alerts" element={<AlertsPage />} />
