@@ -32,6 +32,7 @@ function DraggableMarker({ node, defaultPos, handlePositionChange }) {
   const updateMarkerClass = () => {
     const marker = markerRef.current;
     if (marker != null) {
+      marker._icon.classList.remove("dirty");
       if (isPositioned()) {
         marker._icon.classList.remove("unpositioned");
         marker._icon.classList.add("positioned");
@@ -44,6 +45,14 @@ function DraggableMarker({ node, defaultPos, handlePositionChange }) {
 
   const eventHandlers = React.useMemo(
     () => ({
+      dragstart() {
+        const marker = markerRef.current;
+        if (marker != null) {
+          marker._icon.classList.remove("unpositioned");
+          marker._icon.classList.remove("positioned");
+          marker._icon.classList.add("dirty");
+        }
+      },
       dragend() {
         const marker = markerRef.current;
         if (marker != null) {

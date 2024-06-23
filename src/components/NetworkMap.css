@@ -2,6 +2,10 @@
     filter: none;
 }
 
+.leaflet-marker-icon.dirty {
+    filter: hue-rotate(100deg);
+}
+
 .leaflet-marker-icon.unpositioned {
     filter: grayscale(100%);
 }
