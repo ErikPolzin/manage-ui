@@ -1,9 +1,12 @@
 import React from "react";
 import { Gauge, gaugeClasses } from "@mui/x-charts/Gauge";
 import { fetchAPI } from "../keycloak";
-import { Divider, Card, CardContent, CardHeader } from "@mui/material";
 import Stack from "@mui/material/Stack";
 import Box from "@mui/material/Box";
+import Divider from "@mui/material/Divider";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
+import CardHeader from "@mui/material/CardHeader";
 import NetworkMap from "../components/NetworkMap";
 
 const HomePage = () => {
@@ -32,6 +35,13 @@ const HomePage = () => {
         setLoading(false);
       });
   };
+  const overviewOffset = () => {
+    let overviewElement = document.getElementById("overview-stack");
+    let navbarHeight = 64;
+    let mapHeight = document.documentElement.clientHeight * 0.6;
+    let overviewHeight = overviewElement ? overviewElement.offsetHeight : 0;
+    return window.innerHeight - navbarHeight - mapHeight - overviewHeight - 2;
+  };
   const fetchNodes = () => {
     fetchAPI("/monitoring/devices/?fields=lat&fields=lon&fields=name&fields=mac").then((data) => {
       setNodes(data);
@@ -46,14 +56,16 @@ const HomePage = () => {
         <NetworkMap
           handlePositionChange={handleNodePositionChange}
           nodes={nodes}
-          style={{ position: "sticky", top: "-150px", height: "600px" }}
+          style={{ position: "sticky", top: "-150px", height: "60vh" }}
         />
+        <Divider />
         <Stack
           direction={{ xs: "column", md: "row" }}
           spacing={{ xs: 3, md: 6 }}
           alignItems="center"
           justifyContent="center"
-          sx={{ flexGrow: 1, marginTop: "-100px", paddingBottom: 3 }}
+          sx={{ flexGrow: 1, marginTop: `${overviewOffset()}px`, paddingBottom: 3 }}
+          id="overview-stack"
         >
           <Card variant="outlined" style={{ zIndex: 1000 }}>
             <CardContent sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
