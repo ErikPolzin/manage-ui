@@ -14,9 +14,9 @@ let DefaultIcon = L.icon({
 
 L.Marker.prototype.options.icon = DefaultIcon;
 
-function ChangeView({ center, zoom }) {
+function ChangeView({ center }) {
   const map = useMap();
-  map.setView(center, zoom);
+  map.setView(center);
   return null;
 }
 
@@ -96,7 +96,7 @@ const NetworkMap = ({ nodes, handlePositionChange, style }) => {
       ref={mapRef}
       style={{ height: "100%", width: "100%", ...style }}
     >
-      <ChangeView center={center} zoom={zoom} />
+      <ChangeView center={center} />
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

@@ -94,7 +94,8 @@ function App() {
     if (keycloak.authenticated) {
       let userData = keycloak.idTokenParsed;
       setUsername(userData.preferred_username);
-      setInitials(userData.given_name[0] + userData.family_name[0]);
+      if (userData.given_name && userData.family_name)
+        setInitials(userData.given_name[0] + userData.family_name[0]);
     }
   }, [keycloak, keycloak.idTokenParsed]);
 
