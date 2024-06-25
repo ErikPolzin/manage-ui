@@ -17,7 +17,12 @@ function DeviceList({ devices, isLoading, onDelete, onAdd, onSelect }) {
 
   const handleSelectionChange = (model) => {
     setSelectedDevices(model);
-    if (onSelect) onSelect(model[0]);
+    if (onSelect) onSelect(model[0] || null);
+  };
+
+  const clearSelection = () => {
+    setSelectedDevices([]);
+    handleSelectionChange([]);
   };
 
   function DataGridTitle() {
@@ -41,7 +46,7 @@ function DeviceList({ devices, isLoading, onDelete, onAdd, onSelect }) {
           <Box sx={{ display: "flex", flexGrow: 1, flexDirection: "row-reverse" }}>
             {selectedDevices.length > 0 ? (
               <Box sx={{ display: "inline-flex", flexDirection: "row" }}>
-                <Button onClick={() => setSelectedDevices([])}>Clear Selection</Button>
+                <Button onClick={clearSelection}>Clear Selection</Button>
                 <IconButton onClick={() => onDelete(selectedDevices)}>
                   <DeleteIcon />
                 </IconButton>
@@ -66,17 +71,38 @@ function DeviceList({ devices, isLoading, onDelete, onAdd, onSelect }) {
             [`.${gridClasses.cell}.disabled`]: {
               color: 'grey',
             },
+            [`.${gridClasses.cell}.status`]: {
+              fontWeight: 'bold',
+            },
+            [`.${gridClasses.cell}.status.Unreachable`]: {
+              color: 'red',
+            },
+            [`.${gridClasses.cell}.status.Ok`]: {
+              color: 'green',
+            },
+            [`.${gridClasses.cell}.status.Inactive`]: {
+              color: 'orange',
+            },
+            [`.${gridClasses.cell}.status.Unknown`]: {
+              color: 'grey',
+            }
           }}
           rows={devices}
           columns={[
-            { field: "name", headerName: "Name" },
+            { field: "name", headerName: "Name", align: "center" },
+            { 
+              field: "status",
+              headerName: "Status",
+              cellClassName: (params) => [params.value, "status"],
+              width: 150
+            },
             { field: "mac", headerName: "MAC Address", width: 150 },
             {
               field: "ip",
               headerName: "IP Address",
-              width: 150,
               valueGetter: (value, row) => (value ? value : "Unknown"),
               cellClassName: (params) => (params.value === "Unknown" ? "disabled" : ""),
+              width: 150
             },
             {
               field: "last_contact",
@@ -84,6 +110,7 @@ function DeviceList({ devices, isLoading, onDelete, onAdd, onSelect }) {
               valueGetter: (value, row) =>
                 value ? humanizeDuration(new Date() - new Date(value), { round: true }) : "Never",
               cellClassName: (params) => (params.value === "Never" ? "disabled" : ""),
+              flex: 1
             },
           ]}
           getRowId={(d) => d.mac}

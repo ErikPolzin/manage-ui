@@ -1,8 +1,9 @@
 import * as React from "react";
 import { BarChart } from "@mui/x-charts/BarChart";
 import { axisClasses } from "@mui/x-charts/ChartsAxis";
-import { histogram, filteredData, BUCKET_SIZES, LABEL_FUNCS, MS_IN } from "./utils";
+import { histogram, filteredData, BUCKET_SIZES, LABEL_FUNCS, MS_IN, mainWidthInPixels } from "./utils";
 import { fetchAPI } from "../../keycloak";
+import Box from "@mui/material/Box";
 
 const COLOR_MAP = [
   [10, "#FF0000"],
@@ -33,10 +34,12 @@ const UptimeGraph = ({ showDays, selectedDevice }) => {
     setLoading(true);
     fetchAPI("/metrics/uptime/")
       .then((data) => {
-        setMetrics(data.map((d) => ({
-          ...d,
-          uptime: d.reachable ? 100 : 0,
-        })));
+        setMetrics(
+          data.map((d) => ({
+            ...d,
+            uptime: d.reachable ? 100 : 0,
+          })),
+        );
       })
       .finally(() => {
         setLoading(false);
@@ -44,7 +47,7 @@ const UptimeGraph = ({ showDays, selectedDevice }) => {
   };
 
   React.useEffect(() => {
-    fetchMetrics()
+    fetchMetrics();
   }, []);
 
   React.useEffect(() => {
@@ -55,43 +58,46 @@ const UptimeGraph = ({ showDays, selectedDevice }) => {
   }, [metrics, showDays, selectedDevice]);
 
   return (
-    <BarChart
-      title="Uptime"
-      dataset={data}
-      loading={loading}
-      xAxis={[
-        {
-          id: "Time",
-          scaleType: "band",
-          dataKey: "created",
-          valueFormatter: (k) => LABEL_FUNCS[showDays](k),
-          colorMap: {
-            type: "ordinal",
-            colors: data.map((d) => d.uptime).map(colorForUptime),
+    <Box sx={{ display: "flex", alignItems: "center" }}>
+      <BarChart
+        title="Uptime"
+        dataset={data}
+        loading={loading}
+        xAxis={[
+          {
+            id: "Time",
+            scaleType: "band",
+            dataKey: "created",
+            valueFormatter: (k) => LABEL_FUNCS[showDays](k),
+            colorMap: {
+              type: "ordinal",
+              colors: data.map((d) => d.uptime).map(colorForUptime),
+            },
           },
-        },
-      ]}
-      yAxis={[
-        {
-          label: "Uptime (%)",
-        },
-      ]}
-      height={300}
-      margin={{ top: 5, right: 5, bottom: 30, left: 100 }}
-      series={[
-        {
-          dataKey: "uptime",
-          label: "Uptime",
-          area: true,
-          valueFormatter: (v) => `${Math.round(v)}%`,
-        },
-      ]}
-      sx={{
-        [`.${axisClasses.left} .${axisClasses.label}`]: {
-          transform: "translateX(-50px)",
-        },
-      }}
-    />
+        ]}
+        yAxis={[
+          {
+            label: "Uptime (%)",
+          },
+        ]}
+        height={300}
+        width={mainWidthInPixels(0.8)}
+        margin={{ top: 5, right: 5, bottom: 30, left: 100 }}
+        series={[
+          {
+            dataKey: "uptime",
+            label: "Uptime",
+            area: true,
+            valueFormatter: (v) => `${Math.round(v)}%`,
+          },
+        ]}
+        sx={{
+          [`.${axisClasses.left} .${axisClasses.label}`]: {
+            transform: "translateX(-50px)",
+          },
+        }}
+      />
+    </Box>
   );
 };
 

@@ -58,4 +58,10 @@ function roundDownTo(n, multiple) {
   return multiple * Math.floor(n / multiple);
 }
 
-export { filteredData, histogram, BUCKET_SIZES, LABEL_FUNCS, MS_IN };
+function mainWidthInPixels(percent) {
+  let main = document.getElementsByTagName("main")[0];
+  console.log(main.offsetWidth);
+  return main.offsetWidth * percent;
+}
+
+export { filteredData, histogram, BUCKET_SIZES, LABEL_FUNCS, MS_IN, mainWidthInPixels };
