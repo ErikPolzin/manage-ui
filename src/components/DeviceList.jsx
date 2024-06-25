@@ -9,8 +9,10 @@ import AddIcon from "@mui/icons-material/Add";
 import IconButton from "@mui/material/IconButton";
 import { alpha } from "@mui/material/styles";
 import { DataGrid, gridClasses } from "@mui/x-data-grid";
+import humanizeDuration from "humanize-duration";
 
-function DeviceList({ title, devices, isLoading, columns, onDelete, onAdd, onSelect }) {
+
+function DeviceList({ devices, isLoading, onDelete, onAdd, onSelect }) {
   const [selectedDevices, setSelectedDevices] = React.useState([]);
 
   const handleSelectionChange = (model) => {
@@ -35,7 +37,7 @@ function DeviceList({ title, devices, isLoading, columns, onDelete, onAdd, onSel
             alignItems: "center",
           }}
         >
-          <Typography variant="h6">{title}</Typography>
+          <Typography variant="h6">Devices</Typography>
           <Box sx={{ display: "flex", flexGrow: 1, flexDirection: "row-reverse" }}>
             {selectedDevices.length > 0 ? (
               <Box sx={{ display: "inline-flex", flexDirection: "row" }}>
@@ -66,7 +68,24 @@ function DeviceList({ title, devices, isLoading, columns, onDelete, onAdd, onSel
             },
           }}
           rows={devices}
-          columns={columns}
+          columns={[
+            { field: "name", headerName: "Name" },
+            { field: "mac", headerName: "MAC Address", width: 150 },
+            {
+              field: "ip",
+              headerName: "IP Address",
+              width: 150,
+              valueGetter: (value, row) => (value ? value : "Unknown"),
+              cellClassName: (params) => (params.value === "Unknown" ? "disabled" : ""),
+            },
+            {
+              field: "last_contact",
+              headerName: "Last Seen",
+              valueGetter: (value, row) =>
+                value ? humanizeDuration(new Date() - new Date(value), { round: true }) : "Never",
+              cellClassName: (params) => (params.value === "Never" ? "disabled" : ""),
+            },
+          ]}
           getRowId={(d) => d.mac}
           initialState={{
             pagination: {

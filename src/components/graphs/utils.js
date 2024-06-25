@@ -16,13 +16,14 @@ const MS_IN = {
   month: 36e5 * 24 * 31,
 };
 
-function filteredData(data, minTime) {
+function filteredData(data, minTime, selectedDevice) {
   return data
     .map((item) => ({
       ...item,
       created: new Date(item.created).getTime(),
     }))
     .filter((item) => minTime <= item.created)
+    .filter((item) => !selectedDevice || item.node === selectedDevice)
     .sort((a, b) => a.created - b.created);
 }
 

@@ -2,6 +2,7 @@ import * as React from "react";
 import { BarChart } from "@mui/x-charts/BarChart";
 import { axisClasses } from "@mui/x-charts/ChartsAxis";
 import { histogram, filteredData, BUCKET_SIZES, LABEL_FUNCS, MS_IN } from "./utils";
+import { fetchAPI } from "../../keycloak";
 
 const COLOR_MAP = [
   [10, "#FF0000"],
@@ -23,17 +24,35 @@ const colorForUptime = (uptime) => {
   return COLOR_MAP.slice(-1)[1]; // Last color
 };
 
-const UptimeGraph = ({ dataset, loading, showDays }) => {
+const UptimeGraph = ({ showDays, selectedDevice }) => {
+  const [metrics, setMetrics] = React.useState([]);
   const [data, setData] = React.useState([]);
+  const [loading, setLoading] = React.useState(false);
+
+  const fetchMetrics = () => {
+    setLoading(true);
+    fetchAPI("/metrics/uptime/")
+      .then((data) => {
+        setMetrics(data.map((d) => ({
+          ...d,
+          uptime: d.reachable ? 100 : 0,
+        })));
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
 
   React.useEffect(() => {
-    let showMs = MS_IN[showDays];
-    let minTime = new Date() - new Date(showMs);
-    let sdata = dataset.map(d => ({...d, uptime: d.reachable ? 100 : 0}))
-    let fdata = filteredData(sdata, minTime);
+    fetchMetrics()
+  }, []);
+
+  React.useEffect(() => {
+    let minTime = new Date() - new Date(MS_IN[showDays]);
+    let fdata = filteredData(metrics, minTime, selectedDevice);
     let hdata = histogram(fdata, minTime, BUCKET_SIZES[showDays], ["uptime"], "avg");
     setData(hdata);
-  }, [dataset, showDays]);
+  }, [metrics, showDays, selectedDevice]);
 
   return (
     <BarChart

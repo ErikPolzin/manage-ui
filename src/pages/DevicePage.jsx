@@ -8,7 +8,6 @@ import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import ToggleButton from "@mui/material/ToggleButton";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
-import humanizeDuration from "humanize-duration";
 
 import DeviceList from "../components/DeviceList";
 import DataUsageGraph from "../components/graphs/DataUsageGraph";
@@ -18,30 +17,7 @@ import ConfirmDeleteDialogue from "../components/ConfirmDeleteDialogue";
 import AddDeviceDialogue from "../components/AddDeviceDialogue";
 import { fetchAPI } from "../keycloak";
 
-const AP_COLUMNS = [
-  { field: "name", headerName: "Name" },
-  { field: "mac", headerName: "MAC Address", width: 150 },
-  {
-    field: "last_contact_from_ip",
-    headerName: "IP Address",
-    width: 150,
-    valueGetter: (value, row) => (value ? value : "Unknown"),
-    cellClassName: (params) => (params.value === "Unknown" ? "disabled" : ""),
-  },
-  {
-    field: "last_contact",
-    headerName: "Last Seen",
-    valueGetter: (value, row) =>
-      value ? humanizeDuration(new Date() - new Date(value), { round: true }) : "Never",
-    cellClassName: (params) => (params.value === "Never" ? "disabled" : ""),
-  },
-  {
-    field: "memory_usage",
-    headerName: "Memory Usage",
-    valueGetter: (value, row) => (value !== -1 ? `${Math.round(value * 100)}%` : "--"),
-    cellClassName: (params) => (params.value === "--" ? "disabled" : ""),
-  },
-];
+
 
 function CustomTabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -134,23 +110,7 @@ function DevicePage() {
     setAlert({ show: false, message: "", type: "success" });
   };
 
-  const currentStationData = () => {
-    let data = [];
-    for (let d of devices) {
-      if (!selectedDevice || d.mac === selectedDevice) data = data.concat(d.stations);
-    }
-    return data;
-  };
-
-  const currentUptimeData = () => {
-    let data = [];
-    for (let d of devices) {
-      if (!selectedDevice || d.mac === selectedDevice) data = data.concat(d.uptime_metrics);
-    }
-    return data;
-  };
-
-  const fetchDevices = async () => {
+  const fetchDevices = () => {
     setError(null); // Clear any existing errors
     // Fetch list of mesh nodes
     setLoading(true);
@@ -166,7 +126,7 @@ function DevicePage() {
       });
   };
 
-  const fetchUnknownDevices = async () => {
+  const fetchUnknownDevices = () => {
     fetchAPI("/monitoring/unknown_nodes/")
       .then((data) => {
         setUnknownDevices(data);
@@ -197,13 +157,13 @@ function DevicePage() {
         </Tabs>
       </Box>
       <CustomTabPanel value={tabValue} index={0}>
-        <DataUsageGraph dataset={currentStationData()} loading={loading} showDays={showDays} />
+        <DataUsageGraph showDays={showDays} selectedDevice={selectedDevice} />
       </CustomTabPanel>
       <CustomTabPanel value={tabValue} index={1}>
-        <RTTGraph dataset={currentUptimeData()} loading={loading} showDays={showDays} />
+        <RTTGraph showDays={showDays} selectedDevice={selectedDevice} />
       </CustomTabPanel>
       <CustomTabPanel value={tabValue} index={2}>
-        <UptimeGraph dataset={currentUptimeData()} loading={loading} showDays={showDays} />
+        <UptimeGraph showDays={showDays} selectedDevice={selectedDevice} />
       </CustomTabPanel>
       <Box
         sx={{
@@ -244,10 +204,8 @@ function DevicePage() {
         </Alert>
       ))}
       <DeviceList
-        title="Nodes"
         isLoading={loading}
         devices={devices}
-        columns={AP_COLUMNS}
         onSelect={setSelectedDevice}
         onAdd={(e) => handleAddClick(e, null)}
         onDelete={handleDeleteClick}

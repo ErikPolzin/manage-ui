@@ -2,18 +2,34 @@ import * as React from "react";
 import { LineChart, lineElementClasses } from "@mui/x-charts/LineChart";
 import { axisClasses } from "@mui/x-charts/ChartsAxis";
 import { histogram, filteredData, BUCKET_SIZES, LABEL_FUNCS, MS_IN } from "./utils";
+import { fetchAPI } from "../../keycloak";
 
-const RTTGraph = ({ dataset, loading, showDays }) => {
+const RTTGraph = ({ showDays, selectedDevice }) => {
+  const [metrics, setMetrics] = React.useState([]);
   const [data, setData] = React.useState([]);
+  const [loading, setLoading] = React.useState(false);
+
+  const fetchMetrics = () => {
+    setLoading(true);
+    fetchAPI("/metrics/rtt/")
+      .then((data) => {
+        setMetrics(data);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
 
   React.useEffect(() => {
-    let showMs = MS_IN[showDays];
-    let minTime = new Date() - new Date(showMs);
-    let sdata = dataset.map((d) => ({ ...d, uptime: d.reachable ? 100 : 0 }));
-    let fdata = filteredData(sdata, minTime);
+    fetchMetrics()
+  }, []);
+
+  React.useEffect(() => {
+    let minTime = new Date() - new Date(MS_IN[showDays]);
+    let fdata = filteredData(metrics, minTime, selectedDevice);
     let hdata = histogram(fdata, minTime, BUCKET_SIZES[showDays], ["rtt_max", "rtt_min", "rtt_avg"], "avg");
     setData(hdata);
-  }, [dataset, showDays]);
+  }, [metrics, showDays, selectedDevice]);
 
   return (
     <LineChart

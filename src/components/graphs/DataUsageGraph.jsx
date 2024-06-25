@@ -2,22 +2,38 @@ import * as React from "react";
 import { BarChart } from "@mui/x-charts/BarChart";
 import { axisClasses } from "@mui/x-charts/ChartsAxis";
 import { histogram, filteredData, BUCKET_SIZES, LABEL_FUNCS, MS_IN } from "./utils";
+import { fetchAPI } from "../../keycloak";
 
-const DataUsageGraph = ({ dataset, loading, showDays }) => {
+const DataUsageGraph = ({ showDays, selectedDevice }) => {
+  const [metrics, setMetrics] = React.useState([]);
   const [data, setData] = React.useState([]);
+  const [loading, setLoading] = React.useState(false);
+
+  const fetchMetrics = () => {
+    setLoading(true);
+    fetchAPI("/metrics/data_usage/")
+      .then((data) => {
+        setMetrics(data.map((d) => ({
+          ...d,
+          rx_bytes: Math.abs(d.rx_bytes / 1048576),
+          tx_bytes: Math.abs(d.tx_bytes / 1048576),
+        })));
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
 
   React.useEffect(() => {
-    let showMs = MS_IN[showDays];
-    let minTime = new Date() - new Date(showMs);
-    let sdata = dataset.map((d) => ({
-      ...d,
-      rx_bytes: Math.abs(d.rx_bytes / 1048576),
-      tx_bytes: Math.abs(d.tx_bytes / 1048576),
-    }));
-    let fdata = filteredData(sdata, minTime);
+    fetchMetrics()
+  }, []);
+
+  React.useEffect(() => {
+    let minTime = new Date() - new Date(MS_IN[showDays]);
+    let fdata = filteredData(metrics, minTime, selectedDevice);
     let hdata = histogram(fdata, minTime, BUCKET_SIZES[showDays], ["rx_bytes", "tx_bytes"], "sum");
     setData(hdata);
-  }, [dataset, showDays]);
+  }, [metrics, showDays, selectedDevice]);
 
   return (
     <BarChart
