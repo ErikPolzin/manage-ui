@@ -50,6 +50,7 @@ const HomePage = () => {
   const handleNodePositionChange = (node, lat, lon) => {
     return fetchAPI(`/monitoring/devices/${node.mac}/`, "PATCH", { lat, lon }).then(() => {
       fetchOverview(); // refresh the overview stats, may have changed
+      fetchNodes();
     });
   };
   return (

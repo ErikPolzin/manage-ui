@@ -23,13 +23,12 @@ function ChangeView({ center }) {
 function DraggableMarker({ node, defaultPos, handlePositionChange }) {
   const markerRef = useRef(null);
 
-  React.useEffect(() => {
-    updateMarkerClass();
-  }, [node]);
-
-  const isPositioned = () => node.lat && node.lon;
-  const position = () => (isPositioned() ? [node.lat, node.lon] : defaultPos);
-  const updateMarkerClass = () => {
+  const isPositioned = React.useCallback(() => node.lat && node.lon, [node]);
+  const position = React.useCallback(
+    () => (isPositioned() ? [node.lat, node.lon] : defaultPos),
+    [node, defaultPos, isPositioned],
+  );
+  const updateMarkerClass = React.useCallback(() => {
     const marker = markerRef.current;
     if (marker != null) {
       marker._icon.classList.remove("dirty");
@@ -41,7 +40,11 @@ function DraggableMarker({ node, defaultPos, handlePositionChange }) {
         marker._icon.classList.add("unpositioned");
       }
     }
-  };
+  }, [isPositioned]);
+
+  React.useEffect(() => {
+    updateMarkerClass();
+  }, [updateMarkerClass]);
 
   const eventHandlers = React.useMemo(
     () => ({
@@ -57,11 +60,7 @@ function DraggableMarker({ node, defaultPos, handlePositionChange }) {
         const marker = markerRef.current;
         if (marker != null) {
           let pos = marker.getLatLng();
-          handlePositionChange(node, pos.lat, pos.lng).then(() => {
-            node.lat = pos.lat;
-            node.lon = pos.lng;
-            updateMarkerClass();
-          });
+          handlePositionChange(node, pos.lat, pos.lng);
         }
       },
     }),
@@ -86,7 +85,7 @@ const NetworkMap = ({ nodes, handlePositionChange, style }) => {
     // Shift the marker if there's only one other, we don't want overlapping nodes
     if (validNodes.length === 1) avgLon += 0.1 / zoom;
     setCenter([avgLat, avgLon]);
-  }, [nodes]);
+  }, [nodes, zoom]);
 
   return (
     <MapContainer
