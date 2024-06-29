@@ -1,9 +1,11 @@
 import * as React from "react";
-import { BarChart } from "@mui/x-charts/BarChart";
-import { axisClasses } from "@mui/x-charts/ChartsAxis";
-import { histogram, filteredData, BUCKET_SIZES, LABEL_FUNCS, MS_IN, mainWidthInPixels } from "./utils";
+import { ResponsiveChartContainer } from "@mui/x-charts/ResponsiveChartContainer";
+import { BarPlot } from "@mui/x-charts/BarChart";
+import { ChartsXAxis } from "@mui/x-charts/ChartsXAxis";
+import { ChartsYAxis } from "@mui/x-charts/ChartsYAxis";
+import { ChartsReferenceLine } from "@mui/x-charts/ChartsReferenceLine";
+import { histogram, filteredData, BUCKET_SIZES, LABEL_FUNCS, MS_IN } from "./utils";
 import { fetchAPI } from "../../keycloak";
-import Box from "@mui/material/Box";
 
 const COLOR_MAP = [
   [10, "#FF0000"],
@@ -58,46 +60,46 @@ const UptimeGraph = ({ showDays, selectedDevice }) => {
   }, [metrics, showDays, selectedDevice]);
 
   return (
-    <Box sx={{ display: "flex", alignItems: "center" }}>
-      <BarChart
-        title="Uptime"
-        dataset={data}
-        loading={loading}
-        xAxis={[
-          {
-            id: "Time",
-            scaleType: "band",
-            dataKey: "created",
-            valueFormatter: (k) => LABEL_FUNCS[showDays](k),
-            colorMap: {
-              type: "ordinal",
-              colors: data.map((d) => d.uptime).map(colorForUptime),
-            },
+    <ResponsiveChartContainer
+      loading={loading}
+      dataset={data}
+      xAxis={[
+        {
+          id: "time",
+          scaleType: "band",
+          dataKey: "created",
+          valueFormatter: (k) => LABEL_FUNCS[showDays](k),
+          colorMap: {
+            type: "ordinal",
+            colors: data.map((d) => d.uptime).map(colorForUptime),
           },
-        ]}
-        yAxis={[
-          {
-            label: "Uptime (%)",
-          },
-        ]}
-        height={300}
-        width={mainWidthInPixels(0.8)}
-        margin={{ top: 5, right: 5, bottom: 30, left: 100 }}
-        series={[
-          {
-            dataKey: "uptime",
-            label: "Uptime",
-            area: true,
-            valueFormatter: (v) => `${Math.round(v)}%`,
-          },
-        ]}
-        sx={{
-          [`.${axisClasses.left} .${axisClasses.label}`]: {
-            transform: "translateX(-50px)",
-          },
-        }}
+        },
+      ]}
+      yAxis={[
+        {
+          id: "uptime",
+        },
+      ]}
+      height={300}
+      series={[
+        {
+          dataKey: "uptime",
+          label: "Uptime",
+          area: true,
+          type: "bar",
+          valueFormatter: (v) => `${Math.round(v)}%`,
+        },
+      ]}
+    >
+      <BarPlot />
+      <ChartsReferenceLine y={10} label="Warning Level" labelAlign="end" />
+      <ChartsXAxis
+        axisId="time"
+        label={selectedDevice ? `Uptime for ${selectedDevice}` : "Average Uptime"}
+        labelFontSize={18}
       />
-    </Box>
+      <ChartsYAxis axisId="uptime" label={"Uptime (%)"} />
+    </ResponsiveChartContainer>
   );
 };
 
