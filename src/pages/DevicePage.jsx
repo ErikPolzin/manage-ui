@@ -4,6 +4,7 @@ import Alert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
 import AlertTitle from "@mui/material/AlertTitle";
 import Box from "@mui/material/Box";
+import Grid from "@mui/material/Unstable_Grid2"; // Grid version 2
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import ToggleButton from "@mui/material/ToggleButton";
 import Tabs from "@mui/material/Tabs";
@@ -15,9 +16,8 @@ import RTTGraph from "../components/graphs/RTTGraph";
 import UptimeGraph from "../components/graphs/UptimeGraph";
 import ConfirmDeleteDialogue from "../components/ConfirmDeleteDialogue";
 import AddDeviceDialogue from "../components/AddDeviceDialogue";
+import DeviceDetailCard from "../components/DeviceDetailCard";
 import { fetchAPI } from "../keycloak";
-
-
 
 function CustomTabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -143,73 +143,93 @@ function DevicePage() {
   };
 
   return (
-    <Box sx={{ padding: 3, marginTop: -3 }}>
-      {alert.show && (
-        <Alert severity={alert.type} onClose={handleCloseAlert}>
-          {alert.message}
-        </Alert>
-      )}
-      <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-        <Tabs value={tabValue} onChange={(e, v) => setTabValue(v)} aria-label="basic tabs example">
-          <Tab label="Data Usage" {...a11yProps(0)} />
-          <Tab label="RTT" {...a11yProps(1)} />
-          <Tab label="Uptime" {...a11yProps(2)} />
-        </Tabs>
-      </Box>
-      <CustomTabPanel value={tabValue} index={0}>
-        <DataUsageGraph showDays={showDays} selectedDevice={selectedDevice} />
-      </CustomTabPanel>
-      <CustomTabPanel value={tabValue} index={1}>
-        <RTTGraph showDays={showDays} selectedDevice={selectedDevice} />
-      </CustomTabPanel>
-      <CustomTabPanel value={tabValue} index={2}>
-        <UptimeGraph showDays={showDays} selectedDevice={selectedDevice} />
-      </CustomTabPanel>
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          marginBottom: 2,
-        }}
-      >
-        <ToggleButtonGroup
-          color="primary"
-          value={showDays}
-          onChange={(e, v) => setShowDays(v)}
-          exclusive
-          size="small"
-          aria-label="Date Range"
+    <Grid container spacing={2}>
+      <Grid xs={selectedDevice ? 9 : 12}>
+        {alert.show && (
+          <Alert severity={alert.type} onClose={handleCloseAlert}>
+            {alert.message}
+          </Alert>
+        )}
+        <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+          <Tabs
+            value={tabValue}
+            onChange={(e, v) => setTabValue(v)}
+            aria-label="basic tabs example"
+          >
+            <Tab label="Data Usage" {...a11yProps(0)} />
+            <Tab label="RTT" {...a11yProps(1)} />
+            <Tab label="Uptime" {...a11yProps(2)} />
+          </Tabs>
+        </Box>
+        <CustomTabPanel value={tabValue} index={0}>
+          <DataUsageGraph showDays={showDays} selectedDevice={selectedDevice} />
+        </CustomTabPanel>
+        <CustomTabPanel value={tabValue} index={1}>
+          <RTTGraph showDays={showDays} selectedDevice={selectedDevice} />
+        </CustomTabPanel>
+        <CustomTabPanel value={tabValue} index={2}>
+          <UptimeGraph showDays={showDays} selectedDevice={selectedDevice} />
+        </CustomTabPanel>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            marginBottom: 2,
+          }}
         >
-          <ToggleButton value={"day"}>24 Hours</ToggleButton>
-          <ToggleButton value={"week"}>Week</ToggleButton>
-          <ToggleButton value={"month"}>Month</ToggleButton>
-        </ToggleButtonGroup>
-      </Box>
-      {unknownDevices.map((device) => (
-        <Alert
-          key={device.mac}
-          variant="outlined"
-          severity="info"
-          action={
-            <Button color="inherit" onClick={(e) => handleAddClick(e, device)}>
-              Register
-            </Button>
-          }
-          sx={{ marginBottom: 2 }}
-        >
-          <AlertTitle>New device {device.mac}</AlertTitle>
-          Last contacted at {new Date(device.last_contact).toLocaleString()} from {device.from_ip}
-        </Alert>
-      ))}
-      <DeviceList
-        isLoading={loading}
-        devices={devices}
-        onSelect={setSelectedDevice}
-        onAdd={(e) => handleAddClick(e, null)}
-        onDelete={handleDeleteClick}
-      />
+          <ToggleButtonGroup
+            color="primary"
+            value={showDays}
+            onChange={(e, v) => setShowDays(v)}
+            exclusive
+            size="small"
+            aria-label="Date Range"
+          >
+            <ToggleButton value={"day"}>24 Hours</ToggleButton>
+            <ToggleButton value={"week"}>Week</ToggleButton>
+            <ToggleButton value={"month"}>Month</ToggleButton>
+          </ToggleButtonGroup>
+        </Box>
+        {unknownDevices.map((device) => (
+          <Alert
+            key={device.mac}
+            variant="outlined"
+            severity="info"
+            action={
+              <Button color="inherit" onClick={(e) => handleAddClick(e, device)}>
+                Register
+              </Button>
+            }
+            sx={{ marginBottom: 2 }}
+          >
+            <AlertTitle>New device {device.mac}</AlertTitle>
+            Last contacted at {new Date(device.last_contact).toLocaleString()} from {device.from_ip}
+          </Alert>
+        ))}
+        <DeviceList
+          sx={{
+            marginRight: 2,
+            marginLeft: 2,
+          }}
+          isLoading={loading}
+          devices={devices}
+          onSelect={setSelectedDevice}
+          onAdd={(e) => handleAddClick(e, null)}
+          onDelete={handleDeleteClick}
+        />
+      </Grid>
+      {selectedDevice ? (
+        <Grid xs={3}>
+          <DeviceDetailCard
+            deviceMac={selectedDevice}
+            sx={{
+              margin: 1,
+            }}
+          />
+        </Grid>
+      ) : null}
       <ConfirmDeleteDialogue
         open={openDeleteDialog}
         handleClose={handleCloseDeleteDialog}
@@ -223,7 +243,7 @@ function DevicePage() {
         defaults={deviceToAdd}
         errors={deviceErrors}
       />
-    </Box>
+    </Grid>
   );
 }
 

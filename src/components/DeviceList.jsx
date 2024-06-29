@@ -11,8 +11,7 @@ import { alpha } from "@mui/material/styles";
 import { DataGrid, gridClasses } from "@mui/x-data-grid";
 import humanizeDuration from "humanize-duration";
 
-
-function DeviceList({ devices, isLoading, onDelete, onAdd, onSelect }) {
+function DeviceList({ devices, isLoading, onDelete, onAdd, onSelect, ...props }) {
   const [selectedDevices, setSelectedDevices] = React.useState([]);
 
   const handleSelectionChange = (model) => {
@@ -63,68 +62,66 @@ function DeviceList({ devices, isLoading, onDelete, onAdd, onSelect }) {
     );
   }
   return (
-    <Box>
-      <Paper sx={{ width: "100%", mb: 2 }}>
-        <DataGrid
-          slots={{ toolbar: DataGridTitle }}
-          sx={{
-            [`.${gridClasses.cell}.disabled`]: {
-              color: 'grey',
-            },
-            [`.${gridClasses.cell}.status`]: {
-              fontWeight: 'bold',
-            },
-            [`.${gridClasses.cell}.status.Unreachable`]: {
-              color: 'red',
-            },
-            [`.${gridClasses.cell}.status.Ok`]: {
-              color: 'green',
-            },
-            [`.${gridClasses.cell}.status.Inactive`]: {
-              color: 'orange',
-            },
-            [`.${gridClasses.cell}.status.Unknown`]: {
-              color: 'grey',
-            }
-          }}
-          rows={devices}
-          columns={[
-            { field: "name", headerName: "Name", align: "center" },
-            { 
-              field: "status",
-              headerName: "Status",
-              cellClassName: (params) => [params.value, "status"],
-              width: 150
-            },
-            { field: "mac", headerName: "MAC Address", width: 150 },
-            {
-              field: "ip",
-              headerName: "IP Address",
-              valueGetter: (value, row) => (value ? value : "Unknown"),
-              cellClassName: (params) => (params.value === "Unknown" ? "disabled" : ""),
-              width: 150
-            },
-            {
-              field: "last_contact",
-              headerName: "Last Seen",
-              valueGetter: (value, row) =>
-                value ? humanizeDuration(new Date() - new Date(value), { round: true }) : "Never",
-              cellClassName: (params) => (params.value === "Never" ? "disabled" : ""),
-              flex: 1
-            },
-          ]}
-          getRowId={(d) => d.mac}
-          initialState={{
-            pagination: {
-              paginationModel: { page: 0, pageSize: 5 },
-            },
-          }}
-          pageSizeOptions={[5, 10]}
-          onRowSelectionModelChange={handleSelectionChange}
-          rowSelectionModel={selectedDevices}
-          disableMultipleRowSelection
-        />
-      </Paper>
+    <Box {...props}>
+      <DataGrid
+        slots={{ toolbar: DataGridTitle }}
+        sx={{
+          [`.${gridClasses.cell}.disabled`]: {
+            color: "grey",
+          },
+          [`.${gridClasses.cell}.status`]: {
+            fontWeight: "bold",
+          },
+          [`.${gridClasses.cell}.status.Unreachable`]: {
+            color: "red",
+          },
+          [`.${gridClasses.cell}.status.Ok`]: {
+            color: "green",
+          },
+          [`.${gridClasses.cell}.status.Inactive`]: {
+            color: "orange",
+          },
+          [`.${gridClasses.cell}.status.Unknown`]: {
+            color: "grey",
+          },
+        }}
+        rows={devices}
+        columns={[
+          { field: "name", headerName: "Name", align: "center" },
+          {
+            field: "status",
+            headerName: "Status",
+            cellClassName: (params) => [params.value, "status"],
+            width: 150,
+          },
+          { field: "mac", headerName: "MAC Address", width: 150 },
+          {
+            field: "ip",
+            headerName: "IP Address",
+            valueGetter: (value, row) => (value ? value : "Unknown"),
+            cellClassName: (params) => (params.value === "Unknown" ? "disabled" : ""),
+            width: 150,
+          },
+          {
+            field: "last_contact",
+            headerName: "Last Seen",
+            valueGetter: (value, row) =>
+              value ? humanizeDuration(new Date() - new Date(value), { round: true }) : "Never",
+            cellClassName: (params) => (params.value === "Never" ? "disabled" : ""),
+            flex: 1,
+          },
+        ]}
+        getRowId={(d) => d.mac}
+        initialState={{
+          pagination: {
+            paginationModel: { page: 0, pageSize: 5 },
+          },
+        }}
+        pageSizeOptions={[5, 10]}
+        onRowSelectionModelChange={handleSelectionChange}
+        rowSelectionModel={selectedDevices}
+        disableMultipleRowSelection
+      />
     </Box>
   );
 }
