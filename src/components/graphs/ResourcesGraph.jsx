@@ -1,6 +1,6 @@
 import * as React from "react";
 import { ResponsiveChartContainer } from "@mui/x-charts/ResponsiveChartContainer";
-import { LinePlot } from "@mui/x-charts/LineChart";
+import { AreaPlot } from "@mui/x-charts/LineChart";
 import { ChartsXAxis } from "@mui/x-charts/ChartsXAxis";
 import { ChartsYAxis } from "@mui/x-charts/ChartsYAxis";
 import { fetchAPI } from "../../keycloak";
@@ -53,6 +53,7 @@ const ResourcesGraph = ({ deviceMac }) => {
             stack: "A",
             type: "line",
             label: "CPU",
+            area: true,
             valueFormatter: (v) => `${Math.round(v)}%`,
           },
           {
@@ -60,11 +61,12 @@ const ResourcesGraph = ({ deviceMac }) => {
             stack: "A",
             type: "line",
             label: "Memory",
+            area: true,
             valueFormatter: (v) => `${Math.round(v)}%`,
           },
         ]}
       >
-        <LinePlot />
+        <AreaPlot />
         <ChartsXAxis axisId="time" />
         <ChartsYAxis axisId="usage" label={"Usage (%)"} />
       </ResponsiveChartContainer>
