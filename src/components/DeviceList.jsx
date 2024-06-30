@@ -1,7 +1,6 @@
 import React from "react";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
 import LinearProgress from "@mui/material/LinearProgress";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -72,17 +71,17 @@ function DeviceList({ devices, isLoading, onDelete, onAdd, onSelect, ...props })
           [`.${gridClasses.cell}.status`]: {
             fontWeight: "bold",
           },
-          [`.${gridClasses.cell}.status.Unreachable`]: {
+          [`.${gridClasses.cell}.status.Critical`]: {
             color: "red",
           },
           [`.${gridClasses.cell}.status.Ok`]: {
             color: "green",
           },
-          [`.${gridClasses.cell}.status.Inactive`]: {
+          [`.${gridClasses.cell}.status.Warning`]: {
             color: "orange",
           },
-          [`.${gridClasses.cell}.status.Unknown`]: {
-            color: "grey",
+          [`.${gridClasses.cell}.status.Decent`]: {
+            color: "yellow",
           },
         }}
         rows={devices}

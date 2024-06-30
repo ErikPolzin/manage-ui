@@ -108,9 +108,15 @@ const RetriesGraph = ({ deviceMac }) => {
         },
       ]}
       leftAxis={null}
-      height={110}
+      height={50}
       layout="horizontal"
       series={generateSeries()}
+      margin={{
+        left: 0,
+        right: 0,
+        top: 0,
+        bottom: 20,
+      }}
     />
   );
 };

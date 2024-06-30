@@ -23,7 +23,7 @@ function filteredData(data, minTime, selectedDevice) {
       created: new Date(item.created).getTime(),
     }))
     .filter((item) => minTime <= item.created)
-    .filter((item) => !selectedDevice || item.node === selectedDevice)
+    .filter((item) => !selectedDevice || item.mac === selectedDevice)
     .sort((a, b) => a.created - b.created);
 }
 
