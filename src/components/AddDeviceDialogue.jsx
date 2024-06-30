@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { MeshContext } from "../App";
 import {
   Dialog,
   DialogActions,
@@ -19,22 +20,22 @@ const DEFAULT_DEVICE = {
   hardware: "tl_eap225_3_o",
   description: "",
   last_contact_from_ip: "",
-  created: (new Date()).toISOString(),
+  created: new Date().toISOString(),
 };
 
 function AddDeviceDialogue({ open, defaults, onClose, onAdd, errors }) {
   const [newDevice, setNewDevice] = useState(Object.assign({}, DEFAULT_DEVICE));
+  const { mesh } = React.useContext(MeshContext);
 
   React.useEffect(() => {
-    if (defaults) {
-      setNewDevice({
-        ...DEFAULT_DEVICE,
-        name: defaults.name,
-        mac: defaults.mac,
-        ip: defaults.from_ip,
-      });
-    }
-  }, [defaults]);
+    setNewDevice({
+      ...DEFAULT_DEVICE,
+      mesh: mesh,
+      name: defaults?.name,
+      mac: defaults?.mac,
+      ip: defaults?.from_ip,
+    });
+  }, [defaults, mesh]);
 
   const handleChange = (e) => {
     setNewDevice({ ...newDevice, [e.target.name]: e.target.value });
@@ -47,16 +48,30 @@ function AddDeviceDialogue({ open, defaults, onClose, onAdd, errors }) {
   const handleClose = () => {
     resetForm();
     onClose();
-  }
+  };
 
   const resetForm = () => {
     setNewDevice(Object.assign({}, DEFAULT_DEVICE));
-  }
+  };
 
   return (
     <Dialog open={open} onClose={handleClose} onAbort={resetForm}>
       <DialogTitle>Add New Device</DialogTitle>
       <DialogContent>
+        <TextField
+          margin="dense"
+          name="mesh"
+          label="Mesh"
+          type="text"
+          fullWidth
+          disabled
+          variant="outlined"
+          inputProps={{ readOnly: true }}
+          value={newDevice.mesh}
+          onChange={handleChange}
+          error={Boolean(errors.mesh)}
+          helperText={errors.mesh ? errors.mesh.join("\n") : null}
+        />
         <TextField
           autoFocus
           margin="dense"

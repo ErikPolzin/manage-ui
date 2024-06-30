@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { ThemeProvider, styled } from "@mui/material/styles";
 import { Dashboard, Router, Public, Error } from "@mui/icons-material";
+import InputLabel from "@mui/material/InputLabel";
+import MenuItem from "@mui/material/MenuItem";
+import FormControl from "@mui/material/FormControl";
+import Select from "@mui/material/Select";
 import {
   Avatar,
   Typography,
@@ -13,6 +17,7 @@ import {
   ListItemText,
   Divider,
   CircularProgress,
+  ListItem,
 } from "@mui/material";
 import { Routes, Route, Link, useLocation } from "react-router-dom";
 import { useKeycloak } from "@react-keycloak/web";
@@ -22,6 +27,8 @@ import ServicesPage from "./pages/ServicesPage";
 import AlertsPage from "./pages/AlertsPage";
 import NavBar from "./components/NavBar";
 import theme from "./theme";
+import { usePersistantState } from "./hooks"
+import { fetchAPI } from "./keycloak";
 
 const drawerWidth = 240;
 
@@ -79,11 +86,15 @@ const StyledDrawer = styled(Drawer, { shouldForwardProp: (prop) => prop !== "ope
   }),
 );
 
+export const MeshContext = React.createContext(null);
+
 function App() {
   const { keycloak, initialized } = useKeycloak();
   const [open, setOpen] = useState(true);
   const [username, setUsername] = useState("");
   const [initials, setInitials] = useState("");
+  const [mesh, setMesh] = usePersistantState("mesh", "");
+  const [meshes, setMeshes] = useState([]);
   const location = useLocation();
 
   const toggleDrawer = () => {
@@ -99,9 +110,18 @@ function App() {
     }
   }, [keycloak, keycloak.idTokenParsed]);
 
+  const fetchMeshes = () => {
+    fetchAPI("/monitoring/meshes/").then((data) => {
+      setMeshes(data);
+    });
+  };
+
   useEffect(() => {
     if (initialized && !keycloak.authenticated) {
       keycloak.login();
+    }
+    if (initialized && keycloak.authenticated) {
+      fetchMeshes();
     }
   }, [initialized, keycloak]);
 
@@ -117,6 +137,20 @@ function App() {
           </DrawerHeader>
           <Divider />
           <List>
+            {open ? (
+              <ListItem>
+                <FormControl sx={{ m: 0, width: 200 }} size="small">
+                  <InputLabel>Mesh</InputLabel>
+                  <Select value={mesh} onChange={(e) => setMesh(e.target.value)} label="Mesh">
+                    {meshes.map((m) => (
+                      <MenuItem key={m.name} value={m.name}>
+                        {m.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </ListItem>
+            ) : null}
             <ListItemButton key="0" component={Link} to="/" selected={location.pathname === "/"}>
               <ListItemIcon>
                 <Dashboard />
@@ -158,31 +192,33 @@ function App() {
             </ListItemButton>
           </List>
         </StyledDrawer>
-        <Main open={open}>
-          <DrawerHeader />
-          {!initialized ? (
-            <Box
-              sx={{
-                width: "100%",
-                height: "100%",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "center"
-              }}
-            >
-              <CircularProgress />
-              <Typography sx={{ marginTop: 1 }}>Checking Keycloak credentials...</Typography>
-            </Box>
-          ) : (
-            <Routes>
-              <Route path="/" element={<HomePage />} />
-              <Route path="/devices" element={<DevicePage />} />
-              <Route path="/services" element={<ServicesPage />} />
-              <Route path="/alerts" element={<AlertsPage />} />
-            </Routes>
-          )}
-        </Main>
+        <MeshContext.Provider value={{ mesh, setMesh }}>
+          <Main open={open}>
+            <DrawerHeader />
+            {!initialized ? (
+              <Box
+                sx={{
+                  width: "100%",
+                  height: "100%",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <CircularProgress />
+                <Typography sx={{ marginTop: 1 }}>Checking Keycloak credentials...</Typography>
+              </Box>
+            ) : (
+              <Routes>
+                <Route path="/" element={<HomePage />} />
+                <Route path="/devices" element={<DevicePage />} />
+                <Route path="/services" element={<ServicesPage />} />
+                <Route path="/alerts" element={<AlertsPage />} />
+              </Routes>
+            )}
+          </Main>
+        </MeshContext.Provider>
       </Box>
     </ThemeProvider>
   );
