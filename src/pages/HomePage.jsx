@@ -71,10 +71,17 @@ const HomePage = () => {
           id="overview-stack"
         >
           <Card variant="outlined" style={{ zIndex: 1000 }}>
-            <CardContent sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+            <CardContent
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                width: "10vw",
+                height: "10vw",
+                mx: "auto",
+              }}
+            >
               <Gauge
-                width={200}
-                height={200}
                 value={(nPositionedNodes / nNodes) * 100}
                 sx={{
                   [`& .${gaugeClasses.valueText}`]: {
@@ -89,10 +96,17 @@ const HomePage = () => {
             <CardHeader subheader={"Geopositioned Nodes"} sx={{ textAlign: "center" }} />
           </Card>
           <Card sx={{ borderRadius: 3, zIndex: 1000 }}>
-            <CardContent sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+            <CardContent
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                width: "20vw",
+                height: "15vw",
+                mx: "auto",
+              }}
+            >
               <Gauge
-                width={300}
-                height={250}
                 value={(nOkNodes / nNodes) * 100}
                 startAngle={-110}
                 endAngle={110}
@@ -109,10 +123,17 @@ const HomePage = () => {
             <CardHeader title={"OK Nodes"} sx={{ textAlign: "center" }} />
           </Card>
           <Card variant="outlined" style={{ zIndex: 1000 }}>
-            <CardContent sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+            <CardContent
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                width: "10vw",
+                height: "10vw",
+                mx: "auto",
+              }}
+            >
               <Gauge
-                width={200}
-                height={200}
                 value={(nNodes / (nNodes + nUnknownNodes)) * 100}
                 sx={{
                   [`& .${gaugeClasses.valueText}`]: {

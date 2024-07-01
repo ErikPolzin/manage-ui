@@ -144,7 +144,7 @@ function DevicePage() {
 
   return (
     <Grid container spacing={2}>
-      <Grid xs={selectedDevice ? 9 : 12}>
+      <Grid xs={12} lg={selectedDevice ? 8 : 12} xl={selectedDevice ? 9 : 12}>
         {alert.show && (
           <Alert severity={alert.type} onClose={handleCloseAlert}>
             {alert.message}
@@ -221,7 +221,7 @@ function DevicePage() {
         />
       </Grid>
       {selectedDevice ? (
-        <Grid xs={3}>
+        <Grid xs={12} lg={4} xl={3}>
           <DeviceDetailCard
             deviceMac={selectedDevice}
             sx={{
