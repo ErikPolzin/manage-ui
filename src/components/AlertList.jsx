@@ -10,36 +10,49 @@ import Typography from "@mui/material/Typography";
 import { Info, Warning, Error, CheckCircle, Close } from "@mui/icons-material";
 
 const alertIconMap = {
-  error: {
+  3: {
     icon: Error,
-    color: "error"
+    color: "error",
   },
-  warning: {
+  2: {
     icon: Warning,
-    color: "warning"
+    color: "warning",
   },
-  info: {
+  1: {
     icon: Info,
-    color: "default"
+    color: "default",
   },
-  success: {
+  0: {
     icon: CheckCircle,
-    color: "success"
-  }
+    color: "success",
+  },
 };
 
 function AlertItem({ alert }) {
-  let alertIcon = alertIconMap[alert.type];
+  let alertIcon = alertIconMap[alert.level];
 
   function createdTime() {
-    let d = new Date(alert.created_time);
+    let d = new Date(alert.created);
     return d.toLocaleTimeString();
   }
 
   return (
     <ListItem>
-      <ListItemIcon><SvgIcon component={alertIcon.icon} color={alertIcon.color}></SvgIcon></ListItemIcon>
-      <ListItemText primary={alert.text} secondary={createdTime()} />
+      <ListItemIcon>
+        <SvgIcon component={alertIcon.icon} color={alertIcon.color}></SvgIcon>
+      </ListItemIcon>
+      <ListItemText secondary={createdTime()}>
+        <table>
+          <tbody>
+            {alert.text.split("\n").map((text) => (
+              <tr key={text}>
+                <td style={{ fontWeight: "bold", textAlign: "right" }}>{text.split(":")[0]}</td>
+                <td>{text.split(":")[1]}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </ListItemText>
       <IconButton sx={{ mx: "4px" }}>
         <Close />
       </IconButton>
@@ -48,12 +61,11 @@ function AlertItem({ alert }) {
 }
 
 function AlertList({ alerts, error }) {
-
   function alertsByDay(alerts) {
     let datesDict = {};
     let currentDay = null;
     for (let alert of alerts) {
-      let day = new Date(alert.created_time);
+      let day = new Date(alert.created);
       if (!currentDay || day.toDateString() !== currentDay.toDateString()) {
         currentDay = day;
         datesDict[currentDay] = [];

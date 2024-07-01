@@ -28,19 +28,17 @@ function AlertsPage() {
   return (
     <Box sx={{ padding: 2 }}>
       <Card
+        variant="outlined"
         sx={{
           margin: 2,
           maxWidth: 600,
-          boxShadow: 3,
         }}
       >
         <CardContent>
           {alerts && alerts.length > 0 ? (
             <AlertList alerts={alerts} error={error}></AlertList>
           ) : (
-            <Typography>
-                There are no alerts currently.
-            </Typography>
+            <Typography>There are no alerts currently.</Typography>
           )}
         </CardContent>
       </Card>

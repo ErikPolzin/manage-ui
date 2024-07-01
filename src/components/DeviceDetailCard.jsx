@@ -52,12 +52,12 @@ function DeviceDetailCard({ deviceMac, ...props }) {
   }, [deviceMac, fetchDetails]);
 
   return (
-    <Card {...props} sx={{ backgroundColor: "#ececec", margin: 1 }}>
+    <Card {...props} sx={{ backgroundColor: theme.palette.action.selected, margin: 1 }}>
       <CardHeader
         title={"Device: " + (deviceDetails?.name || deviceMac)}
         sx={{
           backgroundColor: theme.palette.secondary.main,
-          color: "white",
+          color: theme.palette.secondary.contrastText,
         }}
       />
       <Divider></Divider>
@@ -78,7 +78,7 @@ function DeviceDetailCard({ deviceMac, ...props }) {
             <AccordionDetails>
               <List dense>
                 {deviceDetails.checks.map((check) => (
-                  <StatusCheck {...check} />
+                  <StatusCheck key={check.title} {...check} />
                 ))}
               </List>
             </AccordionDetails>
