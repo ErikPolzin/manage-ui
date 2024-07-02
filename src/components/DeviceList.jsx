@@ -72,16 +72,16 @@ function DeviceList({ devices, isLoading, onDelete, onAdd, onSelect, ...props })
             fontWeight: "bold",
           },
           [`.${gridClasses.cell}.status.Critical`]: {
-            color: "red",
+            color: "purple",
           },
           [`.${gridClasses.cell}.status.Ok`]: {
             color: "green",
           },
           [`.${gridClasses.cell}.status.Warning`]: {
-            color: "orange",
+            color: "red",
           },
           [`.${gridClasses.cell}.status.Decent`]: {
-            color: "yellow",
+            color: "orange",
           },
         }}
         rows={devices}
