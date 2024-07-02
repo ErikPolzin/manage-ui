@@ -32,6 +32,9 @@ function IconAccordionSummary({ icon, title, badgeNum }) {
         "& .MuiAccordionSummary-content": {
           margin: "4px",
         },
+        "& .Mui-expanded": {
+          maxHeight: "40px"
+        }
       }}
     >
       <ListItem>
@@ -103,12 +106,14 @@ function DeviceDetailCard({ deviceMac, ...props }) {
               icon={SignalWifiStatusbarConnectedNoInternet4Icon}
               title={"TX Retries"}
             />
+            <Divider />
             <AccordionDetails>
               <RetriesGraph deviceMac={deviceMac} />
             </AccordionDetails>
           </Accordion>
           <Accordion variant="outlined" defaultExpanded>
             <IconAccordionSummary icon={InfoIcon} title={`Status: ${deviceDetails.status}`} />
+            <Divider />
             <AccordionDetails>
               <List dense>
                 {deviceDetails.checks.map((check) => (
@@ -119,6 +124,7 @@ function DeviceDetailCard({ deviceMac, ...props }) {
           </Accordion>
           <Accordion variant="outlined" defaultExpanded>
             <IconAccordionSummary icon={MonitorHeartIcon} title="System Info" />
+            <Divider />
             <AccordionDetails>
               <ResourcesGraph deviceMac={deviceMac} />
             </AccordionDetails>
@@ -129,6 +135,7 @@ function DeviceDetailCard({ deviceMac, ...props }) {
               title="Alert History"
               badgeNum={deviceDetails.num_unresolved_alerts}
             />
+            <Divider />
             <AccordionDetails>
               <AlertList alerts={deviceDetails.latest_alerts} />
             </AccordionDetails>
