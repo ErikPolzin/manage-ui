@@ -10,16 +10,13 @@ import { alpha } from "@mui/material/styles";
 import { DataGrid, gridClasses } from "@mui/x-data-grid";
 import humanizeDuration from "humanize-duration";
 
-function DeviceList({ devices, isLoading, onDelete, onAdd, onSelect, ...props }) {
-  const [selectedDevices, setSelectedDevices] = React.useState([]);
+function DeviceList({ devices, isLoading, onDelete, onAdd, selectedDevice, onSelect, ...props }) {
 
   const handleSelectionChange = (model) => {
-    setSelectedDevices(model);
-    if (onSelect) onSelect(model[0] || null);
+    if (onSelect) onSelect(model.length > 0 ? model[0] : null);
   };
 
   const clearSelection = () => {
-    setSelectedDevices([]);
     handleSelectionChange([]);
   };
 
@@ -42,10 +39,10 @@ function DeviceList({ devices, isLoading, onDelete, onAdd, onSelect, ...props })
         >
           <Typography variant="h6">Devices</Typography>
           <Box sx={{ display: "flex", flexGrow: 1, flexDirection: "row-reverse" }}>
-            {selectedDevices.length > 0 ? (
+            {selectedDevice ? (
               <Box sx={{ display: "inline-flex", flexDirection: "row" }}>
                 <Button onClick={clearSelection}>Clear Selection</Button>
-                <IconButton onClick={() => onDelete(selectedDevices)}>
+                <IconButton onClick={() => onDelete(selectedDevice)}>
                   <DeleteIcon />
                 </IconButton>
               </Box>
@@ -118,7 +115,7 @@ function DeviceList({ devices, isLoading, onDelete, onAdd, onSelect, ...props })
         }}
         pageSizeOptions={[5, 10]}
         onRowSelectionModelChange={handleSelectionChange}
-        rowSelectionModel={selectedDevices}
+        rowSelectionModel={selectedDevice ? [selectedDevice] : []}
         disableMultipleRowSelection
       />
     </Box>

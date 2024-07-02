@@ -17,6 +17,7 @@ import UptimeGraph from "../components/graphs/UptimeGraph";
 import ConfirmDeleteDialogue from "../components/ConfirmDeleteDialogue";
 import AddDeviceDialogue from "../components/AddDeviceDialogue";
 import DeviceDetailCard from "../components/DeviceDetailCard";
+import { useQueryState } from "../hooks";
 import { fetchAPI } from "../keycloak";
 
 function CustomTabPanel(props) {
@@ -50,7 +51,7 @@ function a11yProps(index) {
 
 function DevicePage() {
   const [devices, setDevices] = React.useState([]);
-  const [selectedDevice, setSelectedDevice] = React.useState(null);
+  const [selectedDevice, setSelectedDevice] = useQueryState("selected");
   const [unknownDevices, setUnknownDevices] = React.useState([]);
   const [alert, setAlert] = React.useState({ show: false, message: "", type: "error" });
   const [loading, setLoading] = React.useState(false);
@@ -68,8 +69,8 @@ function DevicePage() {
     fetchDevices();
   }, []);
 
-  const handleDeleteClick = (devices) => {
-    setDeviceToDelete(devices[0]);
+  const handleDeleteClick = (device) => {
+    setDeviceToDelete(device);
     setOpenDeleteDialog(true);
   };
 
@@ -114,7 +115,9 @@ function DevicePage() {
     setError(null); // Clear any existing errors
     // Fetch list of mesh nodes
     setLoading(true);
-    fetchAPI("/monitoring/devices/?fields=name&fields=status&fields=mac&fields=ip&fields=last_contact")
+    fetchAPI(
+      "/monitoring/devices/?fields=name&fields=status&fields=mac&fields=ip&fields=last_contact",
+    )
       .then((data) => {
         setDevices(data);
       })
@@ -145,17 +148,8 @@ function DevicePage() {
   return (
     <Grid container spacing={2}>
       <Grid xs={12} lg={selectedDevice ? 8 : 12} xl={selectedDevice ? 9 : 12}>
-        {alert.show && (
-          <Alert severity={alert.type} onClose={handleCloseAlert}>
-            {alert.message}
-          </Alert>
-        )}
         <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-          <Tabs
-            value={tabValue}
-            onChange={(e, v) => setTabValue(v)}
-            centered
-          >
+          <Tabs value={tabValue} onChange={(e, v) => setTabValue(v)} centered>
             <Tab label="Data Usage" {...a11yProps(0)} />
             <Tab label="RTT" {...a11yProps(1)} />
             <Tab label="Uptime" {...a11yProps(2)} />
@@ -192,6 +186,11 @@ function DevicePage() {
             <ToggleButton value={"month"}>Month</ToggleButton>
           </ToggleButtonGroup>
         </Box>
+        {alert.show && (
+          <Alert severity={alert.type} onClose={handleCloseAlert}>
+            {alert.message}
+          </Alert>
+        )}
         {unknownDevices.map((device) => (
           <Alert
             key={device.mac}
@@ -216,6 +215,7 @@ function DevicePage() {
           isLoading={loading}
           devices={devices}
           onSelect={setSelectedDevice}
+          selectedDevice={selectedDevice}
           onAdd={(e) => handleAddClick(e, null)}
           onDelete={handleDeleteClick}
         />
