@@ -5,25 +5,60 @@ import CardHeader from "@mui/material/CardHeader";
 import Accordion from "@mui/material/Accordion";
 import AccordionSummary from "@mui/material/AccordionSummary";
 import AccordionDetails from "@mui/material/AccordionDetails";
-import Typography from "@mui/material/Typography";
+import Badge from "@mui/material/Badge";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
+import SvgIcon from "@mui/material/SvgIcon";
 import { useTheme } from "@mui/material";
 import { fetchAPI } from "../keycloak";
 import { Divider } from "@mui/material";
 import ResourcesGraph from "./graphs/ResourcesGraph";
 import RetriesGraph from "./graphs/RetriesGraph";
 
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import CancelIcon from "@mui/icons-material/Cancel";
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+import ErrorIcon from "@mui/icons-material/Error";
+import InfoIcon from "@mui/icons-material/Info";
+import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
+import SignalWifiStatusbarConnectedNoInternet4Icon from "@mui/icons-material/SignalWifiStatusbarConnectedNoInternet4";
+import MonitorHeartIcon from "@mui/icons-material/MonitorHeart";
+import AlertList from "./AlertList";
+
+function IconAccordionSummary({ icon, title, badgeNum }) {
+  return (
+    <AccordionSummary
+      sx={{
+        "& .MuiAccordionSummary-content": {
+          margin: "4px",
+        },
+      }}
+    >
+      <ListItem>
+        <ListItemIcon>
+          {badgeNum ? (
+            <Badge badgeContent={badgeNum} color="secondary">
+              <SvgIcon component={icon} color="action" />
+            </Badge>
+          ) : (
+            <SvgIcon component={icon} color="action" />
+          )}
+        </ListItemIcon>
+        <ListItemText primary={title} />
+      </ListItem>
+    </AccordionSummary>
+  );
+}
 
 function StatusCheck({ passed, title, feedback }) {
   return (
     <ListItem>
       <ListItemIcon>
-        {passed === true ? <CheckCircleIcon color="success" /> : <CancelIcon color="warning" />}
+        {passed === true ? (
+          <CheckCircleOutlineIcon color="success" />
+        ) : (
+          <CancelOutlinedIcon color="warning" />
+        )}
       </ListItemIcon>
       <ListItemText primary={title} secondary={feedback} />
     </ListItem>
@@ -64,17 +99,16 @@ function DeviceDetailCard({ deviceMac, ...props }) {
       {deviceDetails ? (
         <CardContent>
           <Accordion variant="outlined" defaultExpanded>
-            <AccordionSummary>
-              <Typography>TX Retries</Typography>
-            </AccordionSummary>
+            <IconAccordionSummary
+              icon={SignalWifiStatusbarConnectedNoInternet4Icon}
+              title={"TX Retries"}
+            />
             <AccordionDetails>
               <RetriesGraph deviceMac={deviceMac} />
             </AccordionDetails>
           </Accordion>
           <Accordion variant="outlined" defaultExpanded>
-            <AccordionSummary>
-              <Typography>Status: {deviceDetails.status}</Typography>
-            </AccordionSummary>
+            <IconAccordionSummary icon={InfoIcon} title={`Status: ${deviceDetails.status}`} />
             <AccordionDetails>
               <List dense>
                 {deviceDetails.checks.map((check) => (
@@ -84,11 +118,19 @@ function DeviceDetailCard({ deviceMac, ...props }) {
             </AccordionDetails>
           </Accordion>
           <Accordion variant="outlined" defaultExpanded>
-            <AccordionSummary>
-              <Typography>System Info</Typography>
-            </AccordionSummary>
+            <IconAccordionSummary icon={MonitorHeartIcon} title="System Info" />
             <AccordionDetails>
               <ResourcesGraph deviceMac={deviceMac} />
+            </AccordionDetails>
+          </Accordion>
+          <Accordion variant="outlined">
+            <IconAccordionSummary
+              icon={ErrorIcon}
+              title="Alert History"
+              badgeNum={deviceDetails.num_unresolved_alerts}
+            />
+            <AccordionDetails>
+              <AlertList alerts={deviceDetails.latest_alerts} />
             </AccordionDetails>
           </Accordion>
         </CardContent>

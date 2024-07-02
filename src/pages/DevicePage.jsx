@@ -114,7 +114,7 @@ function DevicePage() {
     setError(null); // Clear any existing errors
     // Fetch list of mesh nodes
     setLoading(true);
-    fetchAPI("/monitoring/devices/")
+    fetchAPI("/monitoring/devices/?fields=name&fields=status&fields=mac&fields=ip&fields=last_contact")
       .then((data) => {
         setDevices(data);
       })
@@ -154,7 +154,7 @@ function DevicePage() {
           <Tabs
             value={tabValue}
             onChange={(e, v) => setTabValue(v)}
-            aria-label="basic tabs example"
+            centered
           >
             <Tab label="Data Usage" {...a11yProps(0)} />
             <Tab label="RTT" {...a11yProps(1)} />
