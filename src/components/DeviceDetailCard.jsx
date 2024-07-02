@@ -33,8 +33,8 @@ function IconAccordionSummary({ icon, title, badgeNum }) {
           margin: "4px",
         },
         "& .Mui-expanded": {
-          maxHeight: "40px"
-        }
+          maxHeight: "40px",
+        },
       }}
     >
       <ListItem>
@@ -90,7 +90,17 @@ function DeviceDetailCard({ deviceMac, ...props }) {
   }, [deviceMac, fetchDetails]);
 
   return (
-    <Card {...props} sx={{ backgroundColor: theme.palette.action.selected, margin: 1 }}>
+    <Card
+      {...props}
+      sx={{
+        backgroundColor: theme.palette.action.selected,
+        margin: 1,
+        // Device details remain fixed when the rest of the page is scrollable
+        [theme.breakpoints.up("lg")]: {
+          position: "fixed",
+        },
+      }}
+    >
       <CardHeader
         title={"Device: " + (deviceDetails?.name || deviceMac)}
         sx={{
@@ -100,7 +110,15 @@ function DeviceDetailCard({ deviceMac, ...props }) {
       />
       <Divider></Divider>
       {deviceDetails ? (
-        <CardContent>
+        <CardContent
+          sx={{
+            [theme.breakpoints.up("lg")]: {
+              // window - navbar - card header - padding - some extra padding
+              maxHeight: "calc(100vh - 64px - 64px - 16px - 10px)",
+              overflowY: "auto",
+            },
+          }}
+        >
           <Accordion variant="outlined" defaultExpanded>
             <IconAccordionSummary
               icon={SignalWifiStatusbarConnectedNoInternet4Icon}
