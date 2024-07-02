@@ -90,7 +90,7 @@ export const MeshContext = React.createContext(null);
 
 function App() {
   const { keycloak, initialized } = useKeycloak();
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = usePersistantState("drawerOpen", true);
   const [username, setUsername] = useState("");
   const [initials, setInitials] = useState("");
   const [mesh, setMesh] = usePersistantState("mesh", "");
