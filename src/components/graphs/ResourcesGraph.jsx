@@ -5,6 +5,8 @@ import { ChartsXAxis } from "@mui/x-charts/ChartsXAxis";
 import { ChartsYAxis } from "@mui/x-charts/ChartsYAxis";
 import { fetchAPI } from "../../keycloak";
 
+const H24 = 1000 * 60 * 60 * 24;
+
 
 const ResourcesGraph = ({ deviceMac }) => {
   const [data, setData] = React.useState([]);
@@ -13,8 +15,9 @@ const ResourcesGraph = ({ deviceMac }) => {
 
   const fetchResourcesMetrics = React.useCallback(() => {
     if (!deviceMac) return;
+    let minTime = Math.round((new Date().getTime() - H24) / 1000);
     setLoading(true);
-    fetchAPI(`/metrics/resources/?mac=${deviceMac}`)
+    fetchAPI(`/metrics/resources/?mac=${deviceMac}&min_time=${minTime}`)
       .then((data) => {
         setData(data);
       })
