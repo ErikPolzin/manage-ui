@@ -27,7 +27,7 @@ import ServicesPage from "./pages/ServicesPage";
 import AlertsPage from "./pages/AlertsPage";
 import NavBar from "./components/NavBar";
 import theme from "./theme";
-import { usePersistantState } from "./hooks"
+import { usePersistantState } from "./hooks";
 import { fetchAPI } from "./keycloak";
 
 const drawerWidth = 240;
@@ -212,7 +212,7 @@ function App() {
             ) : (
               <Routes>
                 <Route path="/" element={<HomePage />} />
-                <Route path="/devices" element={<DevicePage />} />
+                <Route path="/devices/:mac?" element={<DevicePage />} />
                 <Route path="/services" element={<ServicesPage />} />
                 <Route path="/alerts" element={<AlertsPage />} />
               </Routes>

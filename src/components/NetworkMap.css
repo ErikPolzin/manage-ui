@@ -1,11 +1,27 @@
 .leaflet-marker-icon.positioned {
-    filter: none;
+  filter: none;
 }
 
 .leaflet-marker-icon.dirty {
-    filter: hue-rotate(100deg);
+  filter: hue-rotate(100deg);
 }
 
 .leaflet-marker-icon.unpositioned {
-    filter: grayscale(100%);
+  filter: grayscale(100%);
+}
+
+.ap-online {
+  filter: invert(50%) sepia(100%) saturate(1000%) hue-rotate(90deg); /* Green color */
+}
+
+.ap-offline {
+  filter: invert(50%) sepia(100%) saturate(100000%) hue-rotate(-0deg) brightness(0.7); /* Red color */
+}
+
+.mesh-online {
+  filter: invert(50%) sepia(100%) saturate(1000%) hue-rotate(90deg); /* Green color */
+}
+
+.mesh-offline {
+  filter: invert(50%) sepia(100%) saturate(100000%) hue-rotate(-0deg) brightness(0.7); /* Red color */
 }

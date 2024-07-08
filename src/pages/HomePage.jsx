@@ -8,6 +8,8 @@ import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import CardHeader from "@mui/material/CardHeader";
 import NetworkMap from "../components/NetworkMap";
+import MappedNodeCard from "../components/MappedNodeCard";
+import { useNavigate } from "react-router-dom";
 
 const HomePage = () => {
   const [nodes, setNodes] = React.useState([]);
@@ -16,11 +18,32 @@ const HomePage = () => {
   const [nPositionedNodes, setNPositionedNodes] = React.useState(0);
   const [nUnknownNodes, setNUnknownNodes] = React.useState(0);
   const [nOkNodes, setNOkNodes] = React.useState(0);
+  const [clickedNode, setClickedNode] = React.useState(null);
+  const [nodeCardPosition, setNodeCardPosition] = React.useState({ x: null, y: null });
+  //const [mousePosition, setMousePosition] = React.useState({ x: null, y: null });
+  const [nodeInfoCardHeight, setNodeInfoCardHeight] = React.useState({ height: 200, set: false });
+  let mousePosition = { x: null, y: null };
 
   React.useEffect(() => {
     fetchOverview();
     fetchNodes();
   }, []);
+
+  React.useEffect(() => {
+    //
+    if (!clickedNode) {
+      setNodeCardPosition(calculateNodePosition());
+    } else if (nodeInfoCardHeight.set === false) {
+      try {
+        let height = document.getElementById("node-info-card").offsetHeight;
+        setNodeInfoCardHeight({
+          height: height,
+          set: true,
+        });
+        console.log("Node info card height found. Set to: " + height);
+      } catch (e) {}
+    }
+  }, [clickedNode]);
 
   const fetchOverview = () => {
     setLoading(true);
@@ -42,7 +65,32 @@ const HomePage = () => {
     let overviewHeight = overviewElement ? overviewElement.offsetHeight : 0;
     return window.innerHeight - navbarHeight - mapHeight - overviewHeight - 2;
   };
+
+  const calculateNodePosition = () => {
+    let mapHeight = document.getElementById("dashboard-map").offsetHeight;
+    let navbarHeight = 64;
+    let navbarMapHeight = mapHeight + navbarHeight;
+    let nodeInfoCardWidth = 160;
+
+    let nodeCardX =
+      mousePosition.x + nodeInfoCardWidth + 10 > window.innerWidth
+        ? window.innerWidth - nodeInfoCardWidth - 10
+        : mousePosition.x + 20;
+    let nodeCardY =
+      mousePosition.y + nodeInfoCardHeight + 10 > navbarMapHeight
+        ? navbarMapHeight - nodeInfoCardHeight - 10
+        : mousePosition.y;
+
+    return { x: nodeCardX, y: nodeCardY };
+  };
+
+  const handleMouseMove = (event) => {
+    // This must not update if the mouse is being held in
+    mousePosition = { x: event.pageX, y: event.pageY };
+  };
+
   const fetchNodes = () => {
+    console.log("setting the nodes");
     fetchAPI("/monitoring/devices/?fields=lat&fields=lon&fields=name&fields=mac").then((data) => {
       setNodes(data);
     });
@@ -53,14 +101,51 @@ const HomePage = () => {
       fetchNodes();
     });
   };
+
+  const handleClickedNode = (node) => {
+    if (node === null) {
+      console.log("Closing node info");
+      setClickedNode(null);
+    } else if (node !== clickedNode) {
+      console.log("Showing node info");
+      setNodeCardPosition(calculateNodePosition());
+      setClickedNode(node);
+    } else {
+      setNodeCardPosition(calculateNodePosition());
+      setClickedNode(null);
+    }
+  };
+
+  const navigate = useNavigate();
+  const handleMoreDetailsClick = () => {
+    navigate(`/devices/${clickedNode.mac}`);
+  };
+
   return (
     <Box>
-      <Box>
+      <Box onMouseMove={handleMouseMove}>
         <NetworkMap
           handlePositionChange={handleNodePositionChange}
           nodes={nodes}
           style={{ position: "sticky", top: "-150px", height: "60vh" }}
+          handleMarkerClick={handleClickedNode}
+          id="dashboard-map"
         />
+        {clickedNode && (
+          <Box
+            position="absolute"
+            top={`${nodeCardPosition.y}px`}
+            left={`${nodeCardPosition.x}px`}
+            zIndex={1000}
+          >
+            <MappedNodeCard
+              id="node-info-card"
+              node={clickedNode}
+              handleCloseMarkerClick={handleClickedNode}
+              onMoreDetailsClick={handleMoreDetailsClick}
+            ></MappedNodeCard>
+          </Box>
+        )}
         <Divider />
         <Stack
           direction={{ xs: "column", md: "row" }}

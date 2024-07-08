@@ -6,13 +6,24 @@ import "./NetworkMap.css";
 
 import icon from "leaflet/dist/images/marker-icon.png";
 import iconShadow from "leaflet/dist/images/marker-shadow.png";
+import apIconUrl from "../images/ap.png";
+import meshIconUrl from "../images/meshnode.png";
 
+// Map Icons
 let DefaultIcon = L.icon({
   iconUrl: icon,
   shadowUrl: iconShadow,
 });
-
 L.Marker.prototype.options.icon = DefaultIcon;
+const createNodeIcon = (type, isOnline) => {
+  return (
+    new L.Icon({
+      iconUrl: type === "AP" ? apIconUrl : meshIconUrl,
+      iconSize: [41, 41],
+      className: isOnline ? `${type.toLowerCase()}-online` : `${type.toLowerCase()}-offline`,
+    }) || DefaultIcon
+  );
+};
 
 function ChangeView({ center }) {
   const map = useMap();
@@ -20,7 +31,7 @@ function ChangeView({ center }) {
   return null;
 }
 
-function DraggableMarker({ node, defaultPos, handlePositionChange }) {
+function DraggableMarker({ node, defaultPos, handlePositionChange, handleMarkerClick }) {
   const markerRef = useRef(null);
 
   const isPositioned = React.useCallback(() => node.lat && node.lon, [node]);
@@ -63,17 +74,28 @@ function DraggableMarker({ node, defaultPos, handlePositionChange }) {
           handlePositionChange(node, pos.lat, pos.lng);
         }
       },
+      click() {
+        let myNode = node; // see if you can remove this line
+        handleMarkerClick(myNode);
+      },
     }),
-    [],
+    [node, handlePositionChange, handleMarkerClick],
   );
+
+  const icon = createNodeIcon("AP", true);
+
   return (
-    <Marker draggable eventHandlers={eventHandlers} position={position()} ref={markerRef}>
-      <Popup>{node.name}</Popup>
-    </Marker>
+    <Marker
+      draggable
+      eventHandlers={eventHandlers}
+      position={position()}
+      ref={markerRef}
+      icon={icon}
+    ></Marker>
   );
 }
 
-const NetworkMap = ({ nodes, handlePositionChange, style }) => {
+const NetworkMap = ({ nodes, handlePositionChange, style, handleMarkerClick, id }) => {
   const mapRef = useRef(null);
   const [center, setCenter] = React.useState([-33.9221, 18.4231]);
   const [zoom, setZoom] = React.useState(13);
@@ -94,6 +116,7 @@ const NetworkMap = ({ nodes, handlePositionChange, style }) => {
       scrollWheelZoom={false}
       ref={mapRef}
       style={{ height: "100%", width: "100%", ...style }}
+      id={id}
     >
       <ChangeView center={center} />
       <TileLayer
@@ -106,6 +129,7 @@ const NetworkMap = ({ nodes, handlePositionChange, style }) => {
           node={node}
           defaultPos={center}
           handlePositionChange={handlePositionChange}
+          handleMarkerClick={handleMarkerClick}
         />
       ))}
     </MapContainer>
