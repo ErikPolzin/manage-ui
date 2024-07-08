@@ -75,8 +75,7 @@ function DraggableMarker({ node, defaultPos, handlePositionChange, handleMarkerC
         }
       },
       click() {
-        let myNode = node; // see if you can remove this line
-        handleMarkerClick(myNode);
+        handleMarkerClick(node);
       },
     }),
     [node, handlePositionChange, handleMarkerClick],

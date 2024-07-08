@@ -8,7 +8,7 @@ import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import CardHeader from "@mui/material/CardHeader";
 import NetworkMap from "../components/NetworkMap";
-import MappedNodeCard from "../components/MappedNodeCard";
+import MapNodePopup from "../components/MapNodePopup";
 import { useNavigate } from "react-router-dom";
 
 const HomePage = () => {
@@ -111,6 +111,7 @@ const HomePage = () => {
       setNodeCardPosition(calculateNodePosition());
       setClickedNode(node);
     } else {
+      console.log("Closing node info");
       setNodeCardPosition(calculateNodePosition());
       setClickedNode(null);
     }
@@ -138,12 +139,12 @@ const HomePage = () => {
             left={`${nodeCardPosition.x}px`}
             zIndex={1000}
           >
-            <MappedNodeCard
+            <MapNodePopup
               id="node-info-card"
               node={clickedNode}
               handleCloseMarkerClick={handleClickedNode}
               onMoreDetailsClick={handleMoreDetailsClick}
-            ></MappedNodeCard>
+            ></MapNodePopup>
           </Box>
         )}
         <Divider />
