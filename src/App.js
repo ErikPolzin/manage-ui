@@ -212,7 +212,7 @@ function App() {
             ) : (
               <Routes>
                 <Route path="/" element={<HomePage />} />
-                <Route path="/devices/:mac?" element={<DevicePage />} />
+                <Route path="/devices" element={<DevicePage />} />
                 <Route path="/services" element={<ServicesPage />} />
                 <Route path="/alerts" element={<AlertsPage />} />
               </Routes>

@@ -19,7 +19,6 @@ import AddDeviceDialogue from "../components/AddDeviceDialogue";
 import DeviceDetailCard from "../components/DeviceDetailCard";
 import { useQueryState } from "../hooks";
 import { fetchAPI } from "../keycloak";
-import { useParams } from "react-router-dom";
 
 function CustomTabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -51,11 +50,8 @@ function a11yProps(index) {
 }
 
 function DevicePage() {
-  const params = useParams();
-  console.log(params.mac);
   const [devices, setDevices] = React.useState([]);
   const [selectedDevice, setSelectedDevice] = useQueryState("selected");
-  //const [selectedDevice, setSelectedDevice] = React.useState(params.mac || null); // put the default value as the node clicked on from the map
   const [unknownDevices, setUnknownDevices] = React.useState([]);
   const [alert, setAlert] = React.useState({ show: false, message: "", type: "error" });
   const [loading, setLoading] = React.useState(false);

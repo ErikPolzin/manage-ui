@@ -10,6 +10,7 @@ import CardHeader from "@mui/material/CardHeader";
 import NetworkMap from "../components/NetworkMap";
 import MapNodePopup from "../components/MapNodePopup";
 import { useNavigate } from "react-router-dom";
+import qs from "qs";
 
 const HomePage = () => {
   const [nodes, setNodes] = React.useState([]);
@@ -118,8 +119,9 @@ const HomePage = () => {
   };
 
   const navigate = useNavigate();
+
   const handleMoreDetailsClick = () => {
-    navigate(`/devices/${clickedNode.mac}`);
+    navigate(`/devices/?${qs.stringify({ selected: clickedNode.mac })}`);
   };
 
   return (
