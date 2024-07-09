@@ -12,6 +12,7 @@ import Tab from "@mui/material/Tab";
 
 import DeviceList from "../components/DeviceList";
 import DataUsageGraph from "../components/graphs/DataUsageGraph";
+import DataRateGraph from "../components/graphs/DataRateGraph";
 import RTTGraph from "../components/graphs/RTTGraph";
 import UptimeGraph from "../components/graphs/UptimeGraph";
 import ConfirmDeleteDialogue from "../components/ConfirmDeleteDialogue";
@@ -154,17 +155,21 @@ function DevicePage() {
         <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
           <Tabs value={tabValue} onChange={(e, v) => setTabValue(v)} centered>
             <Tab label="Data Usage" {...a11yProps(0)} />
-            <Tab label="RTT" {...a11yProps(1)} />
-            <Tab label="Uptime" {...a11yProps(2)} />
+            <Tab label="Speed" {...a11yProps(1)} />
+            <Tab label="RTT" {...a11yProps(2)} />
+            <Tab label="Uptime" {...a11yProps(3)} />
           </Tabs>
         </Box>
         <CustomTabPanel value={tabValue} index={0}>
           <DataUsageGraph showDays={showDays} selectedDevice={selectedDevice} />
         </CustomTabPanel>
         <CustomTabPanel value={tabValue} index={1}>
-          <RTTGraph showDays={showDays} selectedDevice={selectedDevice} />
+          <DataRateGraph showDays={showDays} selectedDevice={selectedDevice} />
         </CustomTabPanel>
         <CustomTabPanel value={tabValue} index={2}>
+          <RTTGraph showDays={showDays} selectedDevice={selectedDevice} />
+        </CustomTabPanel>
+        <CustomTabPanel value={tabValue} index={3}>
           <UptimeGraph showDays={showDays} selectedDevice={selectedDevice} />
         </CustomTabPanel>
         <Box

@@ -1,4 +1,10 @@
 import React, { useState, useEffect } from "react";
+import { fetchAPI } from "../keycloak";
+import ResourcesGraph from "./graphs/ResourcesGraph";
+import RetriesGraph from "./graphs/RetriesGraph";
+import AlertList from "./AlertList";
+import { formatBitsPerSecond } from "../units";
+// MUI components
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import CardHeader from "@mui/material/CardHeader";
@@ -10,20 +16,19 @@ import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
-import SvgIcon from "@mui/material/SvgIcon";
+import Divider from "@mui/material/Divider";
+import Box from "@mui/material/Box";
 import { useTheme } from "@mui/material";
-import { fetchAPI } from "../keycloak";
-import { Divider } from "@mui/material";
-import ResourcesGraph from "./graphs/ResourcesGraph";
-import RetriesGraph from "./graphs/RetriesGraph";
-
+// Icons
+import SvgIcon from "@mui/material/SvgIcon";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import ErrorIcon from "@mui/icons-material/Error";
 import InfoIcon from "@mui/icons-material/Info";
 import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
 import SignalWifiStatusbarConnectedNoInternet4Icon from "@mui/icons-material/SignalWifiStatusbarConnectedNoInternet4";
 import MonitorHeartIcon from "@mui/icons-material/MonitorHeart";
-import AlertList from "./AlertList";
+import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
+import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 
 function IconAccordionSummary({ icon, title, badgeNum }) {
   return (
@@ -127,6 +132,14 @@ function DeviceDetailCard({ deviceMac, ...props }) {
             <Divider />
             <AccordionDetails>
               <RetriesGraph deviceMac={deviceMac} />
+              <Box sx={{ display: "flex", alignItems: "center", marginX: 1, marginY: 2, fontSize: "0.9rem" }}>
+                <Box component={"span"} sx={{ display: "flex", alignItems: "center", marginRight: 1, color: "#1ba6c9" }}>
+                  <ArrowDownwardIcon /> {(deviceDetails.download_speed !== null) ? formatBitsPerSecond(deviceDetails.download_speed) : "??"}
+                </Box>
+                <Box component={"span"} sx={{ display: "flex", alignItems: "center", color: "#be20cc" }}>
+                  <ArrowUpwardIcon /> {(deviceDetails.upload_speed !== null) ? formatBitsPerSecond(deviceDetails.upload_speed) : "??"}
+                </Box>
+              </Box>
             </AccordionDetails>
           </Accordion>
           <Accordion variant="outlined" defaultExpanded>
