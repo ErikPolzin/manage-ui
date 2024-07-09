@@ -142,6 +142,9 @@ function DevicePage() {
   const deleteDevice = async (deviceMac) => {
     fetchAPI(`/monitoring/devices/${deviceMac}/`, "DELETE").then(() => {
       fetchDevices();
+    })
+    .catch((error) => {
+      console.log("Error deleting device: " + error);
     });
   };
 

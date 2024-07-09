@@ -25,7 +25,7 @@ function ServicesPage() {
         setServices(data);
       })
       .catch((error) => {
-        console.error("Error:", error);
+        console.error("Error fetching services:", error);
         setAlert({ show: true, message: `Failed to fetch services: ${error}` });
       });
   };
@@ -60,7 +60,7 @@ function ServicesPage() {
         fetchServices();
       })
       .catch((error) => {
-        console.error("Error:", error);
+        console.error("Error deleting service:", error);
         setAlert({ show: true, message: "Failed to delete the service." });
       });
   };
@@ -73,7 +73,7 @@ function ServicesPage() {
         fetchServices();
       })
       .catch((error) => {
-        console.error("Error:", error);
+        console.error("Error adding service:", error);
         setAlert({ show: true, message: `Failed to add service: ${error}` });
       });
   };
@@ -87,7 +87,7 @@ function ServicesPage() {
         fetchServices();
       })
       .catch((error) => {
-        console.error("Error:", error);
+        console.error("Error updating service:", error);
         setAlert({ show: true, message: `Failed to update service: ${error}` });
       });
   };

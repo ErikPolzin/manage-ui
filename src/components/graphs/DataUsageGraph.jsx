@@ -25,6 +25,9 @@ const DataUsageGraph = ({ showDays, selectedDevice }) => {
           })),
         );
       })
+      .catch((error) => {
+        console.log("Error fetching data usage: " + error);
+      })
       .finally(() => {
         setLoading(false);
       });

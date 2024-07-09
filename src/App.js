@@ -113,6 +113,9 @@ function App() {
   const fetchMeshes = () => {
     fetchAPI("/monitoring/meshes/").then((data) => {
       setMeshes(data);
+    })
+    .catch((error) => {
+      console.log("Error fetching meshes: " + error);
     });
   };
 

@@ -43,6 +43,9 @@ const UptimeGraph = ({ showDays, selectedDevice }) => {
           })),
         );
       })
+      .catch((error) => {
+        console.log("Error fetching uptime: " + error);
+      })
       .finally(() => {
         setLoading(false);
       });

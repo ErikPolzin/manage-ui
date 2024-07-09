@@ -55,6 +55,9 @@ const HomePage = () => {
         setNUnknownNodes(data.n_unknown_nodes);
         setNOkNodes(data.n_ok_nodes);
       })
+      .catch((error) => {
+        console.log("Error fetching overview: " + error);
+      })
       .finally(() => {
         setLoading(false);
       });
@@ -94,12 +97,18 @@ const HomePage = () => {
     console.log("setting the nodes");
     fetchAPI("/monitoring/devices/?fields=lat&fields=lon&fields=name&fields=mac").then((data) => {
       setNodes(data);
+    })
+    .catch((error) => {
+      console.log("Error fetching device locations: " + error);
     });
   };
   const handleNodePositionChange = (node, lat, lon) => {
     return fetchAPI(`/monitoring/devices/${node.mac}/`, "PATCH", { lat, lon }).then(() => {
       fetchOverview(); // refresh the overview stats, may have changed
       fetchNodes();
+    })
+    .catch((error) => {
+      console.log("Error updating device position: " + error);
     });
   };
 
