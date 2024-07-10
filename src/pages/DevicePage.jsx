@@ -21,15 +21,13 @@ import DeviceDetailCard from "../components/DeviceDetailCard";
 import { useQueryState } from "../hooks";
 import { fetchAPI } from "../keycloak";
 
-function CustomTabPanel(props) {
-  const { children, value, index, ...other } = props;
-
+function GraphTabPanel({ children, value, index, ...other }) {
   return (
     <div
       role="tabpanel"
       hidden={value !== index}
-      id={`simple-tabpanel-${index}`}
-      aria-labelledby={`simple-tab-${index}`}
+      id={`graph-tabpanel-${index}`}
+      aria-labelledby={`graph-tab-${index}`}
       {...other}
     >
       {value === index && <Box sx={{ px: "10%", py: 1 }}>{children}</Box>}
@@ -37,22 +35,17 @@ function CustomTabPanel(props) {
   );
 }
 
-CustomTabPanel.propTypes = {
-  children: PropTypes.node,
-  index: PropTypes.number.isRequired,
-  value: PropTypes.number.isRequired,
-};
-
 function a11yProps(index) {
   return {
-    id: `simple-tab-${index}`,
-    "aria-controls": `simple-tabpanel-${index}`,
+    id: `graph-tab-${index}`,
+    "aria-controls": `graph-tabpanel-${index}`,
   };
 }
 
 function DevicePage() {
   const [devices, setDevices] = React.useState([]);
-  const [selectedDevice, setSelectedDevice] = useQueryState("selected");
+  const [selectedDeviceMac, setSelectedDeviceMac] = useQueryState("selected");
+  const [selectedDevice, setSelectedDevice] = React.useState(null);
   const [unknownDevices, setUnknownDevices] = React.useState([]);
   const [alert, setAlert] = React.useState({ show: false, message: "", type: "error" });
   const [loading, setLoading] = React.useState(false);
@@ -69,6 +62,16 @@ function DevicePage() {
     fetchUnknownDevices();
     fetchDevices();
   }, []);
+
+  // Ensure that the selected device data changes when the selected device mac changes
+  React.useEffect(() => {
+    for (let device of devices) {
+      if (device.mac === selectedDeviceMac) {
+        setSelectedDevice(device);
+        break;
+      };
+    }
+  }, [devices, selectedDeviceMac]);
 
   const handleDeleteClick = (device) => {
     setDeviceToDelete(device);
@@ -116,9 +119,7 @@ function DevicePage() {
     setError(null); // Clear any existing errors
     // Fetch list of mesh nodes
     setLoading(true);
-    fetchAPI(
-      "/monitoring/devices/?fields=name&fields=status&fields=mac&fields=ip&fields=last_contact",
-    )
+    fetchAPI("/monitoring/devices/")
       .then((data) => {
         setDevices(data);
       })
@@ -141,17 +142,27 @@ function DevicePage() {
   };
 
   const deleteDevice = async (deviceMac) => {
-    fetchAPI(`/monitoring/devices/${deviceMac}/`, "DELETE").then(() => {
-      fetchDevices();
-    })
-    .catch((error) => {
-      console.log("Error deleting device: " + error);
-    });
+    fetchAPI(`/monitoring/devices/${deviceMac}/`, "DELETE")
+      .then(() => {
+        fetchDevices();
+      })
+      .catch((error) => {
+        console.log("Error deleting device: " + error);
+      });
+  };
+
+  /**
+   * Device has been updated in the device detail component, sync the parent
+   * device list. Note this will likely trigger an update to the selected device.
+   * @param {Object} newDevice 
+   */
+  const onDeviceUpdated = (newDevice) => {
+    setDevices(devices.map((d) => (d.mac === newDevice.mac ? newDevice : d)));
   };
 
   return (
     <Grid container spacing={2}>
-      <Grid xs={12} lg={selectedDevice ? 8 : 12} xl={selectedDevice ? 9 : 12}>
+      <Grid xs={12} lg={selectedDeviceMac ? 8 : 12} xl={selectedDeviceMac ? 9 : 12}>
         <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
           <Tabs value={tabValue} onChange={(e, v) => setTabValue(v)} centered>
             <Tab label="Data Usage" {...a11yProps(0)} />
@@ -160,18 +171,18 @@ function DevicePage() {
             <Tab label="Uptime" {...a11yProps(3)} />
           </Tabs>
         </Box>
-        <CustomTabPanel value={tabValue} index={0}>
-          <DataUsageGraph showDays={showDays} selectedDevice={selectedDevice} />
-        </CustomTabPanel>
-        <CustomTabPanel value={tabValue} index={1}>
-          <DataRateGraph showDays={showDays} selectedDevice={selectedDevice} />
-        </CustomTabPanel>
-        <CustomTabPanel value={tabValue} index={2}>
-          <RTTGraph showDays={showDays} selectedDevice={selectedDevice} />
-        </CustomTabPanel>
-        <CustomTabPanel value={tabValue} index={3}>
-          <UptimeGraph showDays={showDays} selectedDevice={selectedDevice} />
-        </CustomTabPanel>
+        <GraphTabPanel value={tabValue} index={0}>
+          <DataUsageGraph showDays={showDays} selectedDevice={selectedDeviceMac} />
+        </GraphTabPanel>
+        <GraphTabPanel value={tabValue} index={1}>
+          <DataRateGraph showDays={showDays} selectedDevice={selectedDeviceMac} />
+        </GraphTabPanel>
+        <GraphTabPanel value={tabValue} index={2}>
+          <RTTGraph showDays={showDays} selectedDevice={selectedDeviceMac} />
+        </GraphTabPanel>
+        <GraphTabPanel value={tabValue} index={3}>
+          <UptimeGraph showDays={showDays} selectedDevice={selectedDeviceMac} />
+        </GraphTabPanel>
         <Box
           sx={{
             display: "flex",
@@ -222,16 +233,17 @@ function DevicePage() {
           }}
           isLoading={loading}
           devices={devices}
-          onSelect={setSelectedDevice}
-          selectedDevice={selectedDevice}
+          onSelect={setSelectedDeviceMac}
+          selectedDevice={selectedDeviceMac}
           onAdd={(e) => handleAddClick(e, null)}
           onDelete={handleDeleteClick}
         />
       </Grid>
-      {selectedDevice ? (
-        <Grid xs={12} lg={4} xl={3}>
+      {selectedDeviceMac ? (
+        <Grid xs={12} lg={4} xl={3} id="detail-cell">
           <DeviceDetailCard
-            deviceMac={selectedDevice}
+            device={selectedDevice}
+            deviceUpdated={onDeviceUpdated}
             sx={{
               margin: 1,
             }}

@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useLayoutEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import qs from "qs";
 
@@ -38,4 +38,18 @@ function useQueryState(query) {
   return [qs.parse(location.search, { ignoreQueryPrefix: true })[query], setQuery];
 }
 
-export { usePersistantState, useQueryState };
+function useSizeOf(elementId) {
+  const [size, setSize] = useState([0, 0]);
+  useLayoutEffect(() => {
+    function updateSize() {
+      let element = document.getElementById(elementId);
+      setSize([element?.clientWidth || 0, element?.clientHeight || 0]);
+    }
+    window.addEventListener("resize", updateSize);
+    updateSize();
+    return () => window.removeEventListener("resize", updateSize);
+  }, [elementId]);
+  return size;
+}
+
+export { usePersistantState, useQueryState, useSizeOf };
