@@ -1,16 +1,45 @@
 import React from "react";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
+import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import LinearProgress from "@mui/material/LinearProgress";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import IconButton from "@mui/material/IconButton";
 import { alpha } from "@mui/material/styles";
-import { DataGrid, gridClasses } from "@mui/x-data-grid";
+import { DataGrid, gridClasses, GridRow, GridActionsCellItem } from "@mui/x-data-grid";
 import humanizeDuration from "humanize-duration";
+import ConnectedClientsList from "./ConnectedClientsList";
+
 
 function DeviceList({ devices, isLoading, onDelete, onAdd, selectedDevice, onSelect, ...props }) {
+  const [expandedIds, setExpandedIds] = React.useState([]);
+
+  function isExpanded(pid) {
+    return expandedIds.indexOf(pid) !== -1;
+  }
+
+  // This functionality is available in the MUI pro-plan, but I've
+  // jury-rigged it here hehe
+  function ExpandableRow(params) {
+    if (isExpanded(params.rowId))
+      return [
+        <GridRow {...params} />,
+        <Stack
+          sx={{
+            marginTop: "-200px",
+            width: "100%",
+            maxHeight: "200px",
+          }}
+        >
+          <ConnectedClientsList clients={params.row.client_sessions} />
+        </Stack>,
+      ];
+    return <GridRow {...params} />;
+  }
 
   const handleSelectionChange = (model) => {
     if (onSelect) onSelect(model.length > 0 ? model[0] : null);
@@ -60,7 +89,10 @@ function DeviceList({ devices, isLoading, onDelete, onAdd, selectedDevice, onSel
   return (
     <Box {...props}>
       <DataGrid
-        slots={{ toolbar: DataGridTitle }}
+        slots={{ toolbar: DataGridTitle, row: ExpandableRow }}
+        getRowSpacing={(p) => ({ bottom: isExpanded(p.id) ? 200 : 0 })}
+        autoHeight
+        autosizeOnMount
         sx={{
           [`.${gridClasses.cell}.disabled`]: {
             color: "grey",
@@ -83,13 +115,24 @@ function DeviceList({ devices, isLoading, onDelete, onAdd, selectedDevice, onSel
         }}
         rows={devices}
         columns={[
+          {
+            field: "actions",
+            type: "actions",
+            width: 40,
+            getActions: (params) => [
+              <GridActionsCellItem
+                icon={isExpanded(params.id) ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+                onClick={() => setExpandedIds(isExpanded(params.id) ? [] : [params.id])}
+              />,
+            ],
+          },
+
           { field: "name", headerName: "Name", align: "center" },
           {
             field: "status",
             headerName: "Status",
             valueGetter: (value, row) => value.toUpperCase(),
             cellClassName: (params) => [params.value.toLowerCase(), "status"],
-            width: 150,
           },
           { field: "mac", headerName: "MAC Address", width: 150 },
           {
@@ -97,7 +140,6 @@ function DeviceList({ devices, isLoading, onDelete, onAdd, selectedDevice, onSel
             headerName: "IP Address",
             valueGetter: (value, row) => (value ? value : "Unknown"),
             cellClassName: (params) => (params.value === "Unknown" ? "disabled" : ""),
-            width: 150,
           },
           {
             field: "last_contact",
@@ -110,7 +152,6 @@ function DeviceList({ devices, isLoading, onDelete, onAdd, selectedDevice, onSel
             field: "created",
             headerName: "Created",
             valueGetter: (value, row) => new Date(value).toLocaleString(),
-            flex: 1,
           },
         ]}
         getRowId={(d) => d.mac}
