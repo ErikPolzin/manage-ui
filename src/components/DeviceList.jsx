@@ -68,16 +68,16 @@ function DeviceList({ devices, isLoading, onDelete, onAdd, selectedDevice, onSel
           [`.${gridClasses.cell}.status`]: {
             fontWeight: "bold",
           },
-          [`.${gridClasses.cell}.status.Critical`]: {
+          [`.${gridClasses.cell}.status.critical`]: {
             color: "purple",
           },
-          [`.${gridClasses.cell}.status.Ok`]: {
+          [`.${gridClasses.cell}.status.ok`]: {
             color: "green",
           },
-          [`.${gridClasses.cell}.status.Warning`]: {
+          [`.${gridClasses.cell}.status.warning`]: {
             color: "red",
           },
-          [`.${gridClasses.cell}.status.Decent`]: {
+          [`.${gridClasses.cell}.status.decent`]: {
             color: "orange",
           },
         }}
@@ -87,7 +87,8 @@ function DeviceList({ devices, isLoading, onDelete, onAdd, selectedDevice, onSel
           {
             field: "status",
             headerName: "Status",
-            cellClassName: (params) => [params.value, "status"],
+            valueGetter: (value, row) => value.toUpperCase(),
+            cellClassName: (params) => [params.value.toLowerCase(), "status"],
             width: 150,
           },
           { field: "mac", headerName: "MAC Address", width: 150 },
@@ -104,6 +105,11 @@ function DeviceList({ devices, isLoading, onDelete, onAdd, selectedDevice, onSel
             valueGetter: (value, row) =>
               value ? humanizeDuration(new Date() - new Date(value), { round: true }) : "Never",
             cellClassName: (params) => (params.value === "Never" ? "disabled" : ""),
+          },
+          {
+            field: "created",
+            headerName: "Created",
+            valueGetter: (value, row) => new Date(value).toLocaleString(),
             flex: 1,
           },
         ]}
