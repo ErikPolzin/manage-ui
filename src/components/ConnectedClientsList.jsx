@@ -1,66 +1,84 @@
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
-import { useTheme } from '@mui/material/styles';
+import { useTheme } from "@mui/material/styles";
+import { DataGrid } from "@mui/x-data-grid";
 
-function ConnectedClientsList({ clients }) {
+function DataUsageIndicator({ sentBytes, recvBytes, totalBytes }) {
   const theme = useTheme();
-  console.log(theme.palette.graphs.dataSent);
 
+  return (
+    <div
+      style={{
+        height: "20px",
+        display: "flex",
+        width: `${((sentBytes + recvBytes) / totalBytes) * 100}%`,
+      }}
+    >
+      <div
+        style={{
+          width: `${(recvBytes / (sentBytes + recvBytes)) * 100}%`,
+          backgroundColor: theme.palette.graphs.dataRecv,
+          borderTopLeftRadius: "2px",
+          borderBottomLeftRadius: "2px",
+          height: "100%",
+        }}
+      />
+      <div
+        style={{
+          width: `${(sentBytes / (sentBytes + recvBytes)) * 100}%`,
+          backgroundColor: theme.palette.graphs.dataSent,
+          borderTopRightRadius: "2px",
+          borderBottomRightRadius: "2px",
+          height: "100%",
+        }}
+      />
+    </div>
+  );
+}
+
+function ConnectedClientsList({ clients, ...params }) {
   function totalBytes() {
     return clients.reduce((a, c) => a + c.bytes_sent + c.bytes_recv, 0);
   }
   return (
-    <TableContainer>
-      <Table size="small">
-        <TableHead>
-          <TableRow>
-            <TableCell>Username</TableCell>
-            <TableCell>MAC</TableCell>
-            <TableCell align="right">Session Start</TableCell>
-            <TableCell align="left">Session End</TableCell>
-            <TableCell>Data Usage</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {clients.map((c) => (
-            <TableRow key={c.mac}>
-              <TableCell component="th" scope="row">
-                {c.username}
-              </TableCell>
-              <TableCell>{c.mac}</TableCell>
-              <TableCell align="right">{new Date(c.start_time).toLocaleString()}</TableCell>
-              <TableCell align="left">{new Date(c.end_time).toLocaleString()}</TableCell>
-              <TableCell>
-                <div style={{ height: "20px", display: "flex", width: `${(c.bytes_sent + c.bytes_recv)/totalBytes()*100}%` }}>
-                  <div
-                    style={{
-                      width: `${(c.bytes_recv / (c.bytes_sent + c.bytes_recv)) * 100}%`,
-                      backgroundColor: theme.palette.graphs.dataRecv,
-                      borderTopLeftRadius: "2px",
-                      borderBottomLeftRadius: "2px",
-                      height: "100%",
-                    }}
-                  />
-                  <div
-                    style={{
-                      width: `${(c.bytes_sent / (c.bytes_sent + c.bytes_recv)) * 100}%`,
-                      backgroundColor: theme.palette.graphs.dataSent,
-                      borderTopRightRadius: "2px",
-                      borderBottomRightRadius: "2px",
-                      height: "100%",
-                    }}
-                  />
-                </div>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
+    <DataGrid
+      autosizeOnMount
+      rows={clients.map((c) => ({ data_usage: c.bytes_sent + c.bytes_recv, ...c }))}
+      density="compact"
+      hideFooter
+      sx={{
+        disableTransition: {
+          transition: 'none',
+        }
+      }}
+      columns={[
+        { field: "username", headerName: "Username", flex: 1 },
+        { field: "mac", headerName: "MAC Address", flex: 1 },
+        {
+          field: "start_time",
+          headerName: "Session Start",
+          type: "dateTime",
+          valueGetter: (value, row) => new Date(value),
+          align: "right",
+        },
+        {
+          field: "end_time",
+          headerName: "Session End",
+          type: "dateTime",
+          valueGetter: (value, row) => new Date(value),
+        },
+        {
+          field: "data_usage",
+          headerName: "Data Usage",
+          renderCell: (params) => (
+            <DataUsageIndicator
+              sentBytes={params.row.bytes_sent}
+              recvBytes={params.row.bytes_recv}
+              totalBytes={totalBytes()}
+            />
+          ),
+        },
+      ]}
+      {...params}
+    />
   );
 }
 

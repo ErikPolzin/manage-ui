@@ -1,7 +1,6 @@
 import React from "react";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import LinearProgress from "@mui/material/LinearProgress";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -13,7 +12,6 @@ import { alpha } from "@mui/material/styles";
 import { DataGrid, gridClasses, GridRow, GridActionsCellItem } from "@mui/x-data-grid";
 import humanizeDuration from "humanize-duration";
 import ConnectedClientsList from "./ConnectedClientsList";
-
 
 function DeviceList({ devices, isLoading, onDelete, onAdd, selectedDevice, onSelect, ...props }) {
   const [expandedIds, setExpandedIds] = React.useState([]);
@@ -28,15 +26,15 @@ function DeviceList({ devices, isLoading, onDelete, onAdd, selectedDevice, onSel
     if (isExpanded(params.rowId))
       return [
         <GridRow {...params} />,
-        <Stack
+        <Box
           sx={{
             marginTop: "-200px",
             width: "100%",
-            maxHeight: "200px",
+            height: 200,
           }}
         >
           <ConnectedClientsList clients={params.row.client_sessions} />
-        </Stack>,
+        </Box>,
       ];
     return <GridRow {...params} />;
   }
@@ -92,7 +90,6 @@ function DeviceList({ devices, isLoading, onDelete, onAdd, selectedDevice, onSel
         slots={{ toolbar: DataGridTitle, row: ExpandableRow }}
         getRowSpacing={(p) => ({ bottom: isExpanded(p.id) ? 200 : 0 })}
         autoHeight
-        autosizeOnMount
         sx={{
           [`.${gridClasses.cell}.disabled`]: {
             color: "grey",
@@ -134,12 +131,13 @@ function DeviceList({ devices, isLoading, onDelete, onAdd, selectedDevice, onSel
             valueGetter: (value, row) => value.toUpperCase(),
             cellClassName: (params) => [params.value.toLowerCase(), "status"],
           },
-          { field: "mac", headerName: "MAC Address", width: 150 },
+          { field: "mac", headerName: "MAC Address", minWidth: 150, flex: 1 },
           {
             field: "ip",
             headerName: "IP Address",
             valueGetter: (value, row) => (value ? value : "Unknown"),
             cellClassName: (params) => (params.value === "Unknown" ? "disabled" : ""),
+            flex: 1,
           },
           {
             field: "last_contact",
