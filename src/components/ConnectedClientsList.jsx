@@ -5,31 +5,33 @@ function DataUsageIndicator({ sentBytes, recvBytes, totalBytes }) {
   const theme = useTheme();
 
   return (
-    <div
-      style={{
-        height: "20px",
-        display: "flex",
-        width: `${((sentBytes + recvBytes) / totalBytes) * 100}%`,
-      }}
-    >
-      <div
+    <div style={{ display: "flex", alignItems: "center", height: "100%" }}>
+      <span
         style={{
-          width: `${(recvBytes / (sentBytes + recvBytes)) * 100}%`,
-          backgroundColor: theme.palette.graphs.dataRecv,
-          borderTopLeftRadius: "2px",
-          borderBottomLeftRadius: "2px",
-          height: "100%",
+          height: "20px",
+          display: "flex",
+          width: `${((sentBytes + recvBytes) / totalBytes) * 100}%`,
         }}
-      />
-      <div
-        style={{
-          width: `${(sentBytes / (sentBytes + recvBytes)) * 100}%`,
-          backgroundColor: theme.palette.graphs.dataSent,
-          borderTopRightRadius: "2px",
-          borderBottomRightRadius: "2px",
-          height: "100%",
-        }}
-      />
+      >
+        <div
+          style={{
+            width: `${(recvBytes / (sentBytes + recvBytes)) * 100}%`,
+            backgroundColor: theme.palette.graphs.dataRecv,
+            borderTopLeftRadius: "2px",
+            borderBottomLeftRadius: "2px",
+            height: "100%",
+          }}
+        />
+        <div
+          style={{
+            width: `${(sentBytes / (sentBytes + recvBytes)) * 100}%`,
+            backgroundColor: theme.palette.graphs.dataSent,
+            borderTopRightRadius: "2px",
+            borderBottomRightRadius: "2px",
+            height: "100%",
+          }}
+        />
+      </span>
     </div>
   );
 }
@@ -44,11 +46,6 @@ function ConnectedClientsList({ clients, ...params }) {
       rows={clients.map((c) => ({ data_usage: c.bytes_sent + c.bytes_recv, ...c }))}
       density="compact"
       hideFooter
-      sx={{
-        disableTransition: {
-          transition: 'none',
-        }
-      }}
       columns={[
         { field: "username", headerName: "Username", flex: 1 },
         { field: "mac", headerName: "MAC Address", flex: 1 },
