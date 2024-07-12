@@ -94,7 +94,9 @@ function App() {
   const [username, setUsername] = useState("");
   const [initials, setInitials] = useState("");
   const [mesh, setMesh] = usePersistantState("mesh", "");
-  const [meshes, setMeshes] = useState([]);
+  // Special null state for meshes so that the mesh select doesn't have
+  // an undefined value before meshes are loaded.
+  const [meshes, setMeshes] = useState(null);
   const location = useLocation();
 
   const toggleDrawer = () => {
@@ -111,12 +113,14 @@ function App() {
   }, [keycloak, keycloak.idTokenParsed]);
 
   const fetchMeshes = () => {
-    fetchAPI("/monitoring/meshes/").then((data) => {
-      setMeshes(data);
-    })
-    .catch((error) => {
-      console.log("Error fetching meshes: " + error);
-    });
+    fetchAPI("/monitoring/meshes/")
+      .then((data) => {
+        setMeshes(data);
+      })
+      .catch((error) => {
+        console.log("Error fetching meshes: " + error);
+        setMeshes(null);
+      });
   };
 
   useEffect(() => {
@@ -140,7 +144,7 @@ function App() {
           </DrawerHeader>
           <Divider />
           <List>
-            {open ? (
+            {open && meshes !== null ? (
               <ListItem>
                 <FormControl sx={{ m: 0, width: 200 }} size="small">
                   <InputLabel>Mesh</InputLabel>

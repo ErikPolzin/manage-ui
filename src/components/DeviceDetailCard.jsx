@@ -76,7 +76,7 @@ function StatusCheck({ passed, title, feedback }) {
 function DeviceDetailCard({ device, deviceUpdated, ...props }) {
   const theme = useTheme();
   const [tabValue, setTabValue] = React.useState(0);
-  const [puttingData, setPuttingData] = React.useState(0);
+  const [puttingData, setPuttingData] = React.useState(false);
   const [cellWidth, cellHeight] = useSizeOf("detail-cell");
   const [deviceCopy, setDeviceCopy] = React.useState(device);
 
@@ -184,6 +184,7 @@ function DeviceDetailCard({ device, deviceUpdated, ...props }) {
                     >
                       <MenuItem value={"tl_eap225_3_o"}>TPLink EAP</MenuItem>
                       <MenuItem value={"ubnt_ac_mesh"}>Ubiquiti AC Mesh</MenuItem>
+                      <MenuItem value={"U7MSH"}>U7MSH</MenuItem>
                     </TextField>
                     <TextField
                       id="device-mac"

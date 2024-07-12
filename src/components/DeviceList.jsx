@@ -120,6 +120,7 @@ function DeviceList({ devices, isLoading, onDelete, onAdd, selectedDevice, onSel
               <GridActionsCellItem
                 icon={isExpanded(params.id) ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
                 onClick={() => setExpandedIds(isExpanded(params.id) ? [] : [params.id])}
+                label="expand"
               />,
             ],
           },
