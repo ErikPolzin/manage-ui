@@ -18,6 +18,7 @@ const theme = createTheme({
     graphs: {
       dataRecv: "#02d5d1",
       dataSent: "#37b3ff",
+      sessionTime: "#1f8127"
     }
   },
 });
