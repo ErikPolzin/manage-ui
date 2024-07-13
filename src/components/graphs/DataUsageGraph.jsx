@@ -7,11 +7,13 @@ import { ChartsReferenceLine } from "@mui/x-charts/ChartsReferenceLine";
 import { axisClasses } from "@mui/x-charts/ChartsAxis";
 import { histogram, filteredData, BUCKET_SIZES, LABEL_FUNCS, MS_IN } from "./utils";
 import { fetchAPI } from "../../keycloak";
+import { useTheme } from "@mui/material";
 
 const DataUsageGraph = ({ showDays, selectedDevice }) => {
   const [metrics, setMetrics] = React.useState([]);
   const [data, setData] = React.useState([]);
   const [loading, setLoading] = React.useState(false);
+  const theme = useTheme();
 
   const fetchMetrics = () => {
     setLoading(true);
@@ -65,6 +67,11 @@ const DataUsageGraph = ({ showDays, selectedDevice }) => {
       series={[
         {
           dataKey: "tx_bytes",
+          // Slight clarification here - from the perspective of the router, it
+          // has 'transmitted' bytes, but from the perspective of the user they
+          // have 'received' bytes, so to keep things consistent I color it
+          // with the 'received' color.
+          color: theme.palette.graphs.dataRecv,
           type: "bar",
           stack: "A",
           label: "Sent Data",
@@ -72,6 +79,7 @@ const DataUsageGraph = ({ showDays, selectedDevice }) => {
         },
         {
           dataKey: "rx_bytes",
+          color: theme.palette.graphs.dataSent,
           type: "bar",
           stack: "A",
           label: "Received Data",

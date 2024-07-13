@@ -6,8 +6,10 @@ import { ChartsYAxis } from "@mui/x-charts/ChartsYAxis";
 import { axisClasses } from "@mui/x-charts/ChartsAxis";
 import { histogram, filteredData, BUCKET_SIZES, LABEL_FUNCS, MS_IN } from "./utils";
 import { fetchAPI } from "../../keycloak";
+import { useTheme } from "@mui/material";
 
 const DataRateGraph = ({ showDays, selectedDevice }) => {
+  const theme = useTheme();
   const [metrics, setMetrics] = React.useState([]);
   const [data, setData] = React.useState([]);
   const [loading, setLoading] = React.useState(false);
@@ -67,6 +69,7 @@ const DataRateGraph = ({ showDays, selectedDevice }) => {
           type: "line",
           area: true,
           label: "Download Speed",
+          color: theme.palette.graphs.dataRecv,
           valueFormatter: (v) => `${v}Mbps`,
         },
         {
@@ -74,6 +77,7 @@ const DataRateGraph = ({ showDays, selectedDevice }) => {
           type: "line",
           area: true,
           label: "Upload Speed",
+          color: theme.palette.graphs.dataSent,
           valueFormatter: (v) => `${v}Mbps`,
         },
       ]}

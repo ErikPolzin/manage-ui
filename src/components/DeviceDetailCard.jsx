@@ -251,7 +251,12 @@ function DeviceDetailCard({ device, deviceUpdated, ...props }) {
                 >
                   <Box
                     component={"span"}
-                    sx={{ display: "flex", alignItems: "center", marginRight: 1, color: "#1ba6c9" }}
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      marginRight: 1,
+                      color: theme.palette.graphs.dataRecv,
+                    }}
                   >
                     <ArrowDownwardIcon />{" "}
                     {device.download_speed !== null
@@ -260,7 +265,11 @@ function DeviceDetailCard({ device, deviceUpdated, ...props }) {
                   </Box>
                   <Box
                     component={"span"}
-                    sx={{ display: "flex", alignItems: "center", color: "#be20cc" }}
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      color: theme.palette.graphs.dataSent,
+                    }}
                   >
                     <ArrowUpwardIcon />{" "}
                     {device.upload_speed !== null ? formatBitsPerSecond(device.upload_speed) : "??"}

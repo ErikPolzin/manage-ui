@@ -16,8 +16,8 @@ const theme = createTheme({
       contrastText: "#fff",
     },
     graphs: {
-      dataRecv: "#7025c7",
-      dataSent: "#17a1b1",
+      dataRecv: "#02d5d1",
+      dataSent: "#37b3ff",
     }
   },
 });
