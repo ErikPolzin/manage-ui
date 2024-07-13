@@ -25,15 +25,22 @@ function DeviceList({ devices, isLoading, onDelete, onAdd, selectedDevice, onSel
   function ExpandableRow(params) {
     if (isExpanded(params.rowId))
       return [
-        <GridRow {...params} />,
+        <GridRow {...params} key={params.rowId} />,
         <Box
           sx={{
             marginTop: "-200px",
             width: "100%",
             height: 200,
           }}
+          key={`${params.rowId}-clients`}
         >
-          <ConnectedClientsList clients={params.row.client_sessions} />
+          <ConnectedClientsList
+            clients={params.row.client_sessions.map((c) => ({
+              ...c,
+              end_time: new Date(c.end_time),
+              start_time: new Date(c.start_time),
+            }))}
+          />
         </Box>,
       ];
     return <GridRow {...params} />;
@@ -91,6 +98,9 @@ function DeviceList({ devices, isLoading, onDelete, onAdd, selectedDevice, onSel
         getRowSpacing={(p) => ({ bottom: isExpanded(p.id) ? 200 : 0 })}
         autoHeight
         sx={{
+          "& .MuiDataGrid-cell:focus-within, & .MuiDataGrid-cell:focus": {
+            outline: "none",
+          },
           [`.${gridClasses.cell}.disabled`]: {
             color: "grey",
           },
