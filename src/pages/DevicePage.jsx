@@ -1,5 +1,4 @@
 import React from "react";
-import PropTypes from "prop-types";
 import Alert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
 import AlertTitle from "@mui/material/AlertTitle";
@@ -9,6 +8,7 @@ import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import ToggleButton from "@mui/material/ToggleButton";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
+import useWebSocket from "react-use-websocket";
 
 import DeviceList from "../components/DeviceList";
 import DataUsageGraph from "../components/graphs/DataUsageGraph";
@@ -58,6 +58,29 @@ function DevicePage() {
   const [showDays, setShowDays] = React.useState("month");
   const [tabValue, setTabValue] = React.useState(0);
 
+  const { lastJsonMessage, readyState } = useWebSocket(
+    `${process.env.REACT_APP_WS_URL}/ws/updates/`,
+    {
+      share: false,
+      shouldReconnect: () => true,
+    },
+  );
+
+  // Run when the connection state (readyState) changes
+  React.useEffect(() => {
+    console.log("WS: Connection state changed", readyState);
+  }, [readyState]);
+
+  // Run when a new WebSocket message is received (lastJsonMessage)
+  React.useEffect(() => {
+    if (lastJsonMessage) {
+      if (lastJsonMessage.type === "sync:devices") {
+        console.log("WS: Syncing devices");
+        setDevices(lastJsonMessage.devices);
+      }
+    }
+  }, [lastJsonMessage]);
+
   React.useEffect(() => {
     fetchUnknownDevices();
     fetchDevices();
@@ -69,7 +92,7 @@ function DevicePage() {
       if (device.mac === selectedDeviceMac) {
         setSelectedDevice(device);
         break;
-      };
+      }
     }
   }, [devices, selectedDeviceMac]);
 
@@ -154,7 +177,7 @@ function DevicePage() {
   /**
    * Device has been updated in the device detail component, sync the parent
    * device list. Note this will likely trigger an update to the selected device.
-   * @param {Object} newDevice 
+   * @param {Object} newDevice
    */
   const onDeviceUpdated = (newDevice) => {
     setDevices(devices.map((d) => (d.mac === newDevice.mac ? newDevice : d)));
