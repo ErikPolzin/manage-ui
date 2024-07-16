@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { ThemeProvider, styled } from "@mui/material/styles";
-import { Dashboard, Router, Public, Error } from "@mui/icons-material";
+import { Dashboard, Router, Public, Error, Person } from "@mui/icons-material";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
@@ -158,17 +158,22 @@ function App() {
                 </FormControl>
               </ListItem>
             ) : null}
-            <ListItemButton key="0" component={Link} to="/" selected={location.pathname === "/"}>
+            <ListItemButton
+              key="dashboard"
+              component={Link}
+              to="/"
+              selected={location.pathname === "/"}
+            >
               <ListItemIcon>
                 <Dashboard />
               </ListItemIcon>
               <ListItemText primary="Dashboard" />
             </ListItemButton>
             <ListItemButton
-              key="2"
+              key="devices"
               component={Link}
               to="/devices"
-              selected={location.pathname === "/devices"}
+              selected={location.pathname.startsWith("/devices")}
             >
               <ListItemIcon>
                 <Router />
@@ -176,10 +181,21 @@ function App() {
               <ListItemText primary="Devices" />
             </ListItemButton>
             <ListItemButton
-              key="3"
+              key="users"
+              component={Link}
+              to="/users"
+              selected={location.pathname.startsWith("/users")}
+            >
+              <ListItemIcon>
+                <Person />
+              </ListItemIcon>
+              <ListItemText primary="Users" />
+            </ListItemButton>
+            <ListItemButton
+              key="services"
               component={Link}
               to="/services"
-              selected={location.pathname === "/services"}
+              selected={location.pathname.startsWith("/services")}
             >
               <ListItemIcon>
                 <Public />
@@ -190,7 +206,7 @@ function App() {
               key="4"
               component={Link}
               to="/alerts"
-              selected={location.pathname === "/alerts"}
+              selected={location.pathname.startsWith("/alerts")}
             >
               <ListItemIcon>
                 <Error />
