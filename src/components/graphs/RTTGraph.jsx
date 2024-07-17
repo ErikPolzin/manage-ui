@@ -4,7 +4,7 @@ import { AreaPlot } from "@mui/x-charts/LineChart";
 import { ChartsXAxis } from "@mui/x-charts/ChartsXAxis";
 import { ChartsYAxis } from "@mui/x-charts/ChartsYAxis";
 import { ChartsReferenceLine } from "@mui/x-charts/ChartsReferenceLine";
-import { histogram, filteredData, BUCKET_SIZES, LABEL_FUNCS, MS_IN } from "./utils";
+import { histogram, filteredData, GRANULARITY, BUCKET_SIZES, LABEL_FUNCS, MS_IN } from "./utils";
 import { fetchAPI } from "../../keycloak";
 
 const RTTGraph = ({ showDays, selectedDevice }) => {
@@ -12,9 +12,11 @@ const RTTGraph = ({ showDays, selectedDevice }) => {
   const [data, setData] = React.useState([]);
   const [loading, setLoading] = React.useState(false);
 
-  const fetchMetrics = () => {
+  React.useEffect(() => {
     setLoading(true);
-    fetchAPI("/metrics/rtt/")
+    let minTimeStamp = Math.round((new Date() - new Date(MS_IN[showDays])) / 1000);
+    let granularity = GRANULARITY[showDays];
+    fetchAPI(`/metrics/rtt/?min_time=${minTimeStamp}&granularity=${granularity}`)
       .then((data) => {
         setMetrics(data);
       })
@@ -24,11 +26,7 @@ const RTTGraph = ({ showDays, selectedDevice }) => {
       .finally(() => {
         setLoading(false);
       });
-  };
-
-  React.useEffect(() => {
-    fetchMetrics();
-  }, []);
+  }, [showDays]);
 
   React.useEffect(() => {
     let minTime = new Date() - new Date(MS_IN[showDays]);

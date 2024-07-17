@@ -5,7 +5,7 @@ import { ChartsXAxis } from "@mui/x-charts/ChartsXAxis";
 import { ChartsYAxis } from "@mui/x-charts/ChartsYAxis";
 import { ChartsReferenceLine } from "@mui/x-charts/ChartsReferenceLine";
 import { axisClasses } from "@mui/x-charts/ChartsAxis";
-import { histogram, filteredData, BUCKET_SIZES, LABEL_FUNCS, MS_IN } from "./utils";
+import { filteredData, histogram, BUCKET_SIZES, LABEL_FUNCS, MS_IN, GRANULARITY } from "./utils";
 import { fetchAPI } from "../../keycloak";
 import { useTheme } from "@mui/material";
 
@@ -15,9 +15,11 @@ const DataUsageGraph = ({ showDays, selectedDevice }) => {
   const [loading, setLoading] = React.useState(false);
   const theme = useTheme();
 
-  const fetchMetrics = () => {
+  React.useEffect(() => {
     setLoading(true);
-    fetchAPI("/metrics/data_usage/")
+    let minTimeStamp = Math.round((new Date() - new Date(MS_IN[showDays])) / 1000);
+    let granularity = GRANULARITY[showDays];
+    fetchAPI(`/metrics/data_usage/?min_time=${minTimeStamp}&granularity=${granularity}`)
       .then((data) => {
         setMetrics(
           data.map((d) => ({
@@ -33,11 +35,7 @@ const DataUsageGraph = ({ showDays, selectedDevice }) => {
       .finally(() => {
         setLoading(false);
       });
-  };
-
-  React.useEffect(() => {
-    fetchMetrics();
-  }, []);
+  }, [showDays]);
 
   React.useEffect(() => {
     let minTime = new Date() - new Date(MS_IN[showDays]);

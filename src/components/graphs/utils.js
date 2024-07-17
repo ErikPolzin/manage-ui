@@ -1,6 +1,6 @@
 const BUCKET_SIZES = {
   day: 36e5, // 1 hour (24 buckets)
-  week: 36e5 * 12, // 12 hours (14 buckets)
+  week: 36e5 * 24, // 24 hours (7 buckets)
   month: 36e5 * 24, // 24 hours (+- 30 buckets)
 };
 
@@ -14,6 +14,12 @@ const MS_IN = {
   day: 36e5 * 24,
   week: 36e5 * 24 * 7,
   month: 36e5 * 24 * 31,
+};
+
+const GRANULARITY = {
+  day: "HOURLY",
+  week: "DAILY",
+  month: "DAILY",
 };
 
 function filteredData(data, minTime, selectedDevice) {
@@ -64,4 +70,12 @@ function mainWidthInPixels(percent) {
   return main.offsetWidth * percent;
 }
 
-export { filteredData, histogram, BUCKET_SIZES, LABEL_FUNCS, MS_IN, mainWidthInPixels };
+export {
+  filteredData,
+  histogram,
+  BUCKET_SIZES,
+  LABEL_FUNCS,
+  MS_IN,
+  GRANULARITY,
+  mainWidthInPixels,
+};
