@@ -25,6 +25,7 @@ import HomePage from "./pages/HomePage";
 import DevicePage from "./pages/DevicePage";
 import ServicesPage from "./pages/ServicesPage";
 import AlertsPage from "./pages/AlertsPage";
+import UsersPage from "./pages/UsersPage";
 import NavBar from "./components/NavBar";
 import theme from "./theme";
 import { usePersistantState } from "./hooks";
@@ -238,6 +239,7 @@ function App() {
                 <Route path="/devices" element={<DevicePage />} />
                 <Route path="/services" element={<ServicesPage />} />
                 <Route path="/alerts" element={<AlertsPage />} />
+                <Route path="/users" element={<UsersPage />} />
               </Routes>
             )}
           </Main>
