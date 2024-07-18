@@ -3,6 +3,8 @@ import StripedDataGrid from "./StripedDataGrid";
 import Tooltip from "@mui/material/Tooltip";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
+import humanizeDuration from "humanize-duration";
+
 
 function DataUsageIndicator({ sentBytes, recvBytes, totalBytes }) {
   const theme = useTheme();
@@ -124,7 +126,7 @@ function ConnectedClientsList({ clients, ...params }) {
       hideFooter
       columns={[
         { field: "mac", headerName: "MAC Address", minWidth: 200 },
-        { field: "username", headerName: "Username", flex: 1 },
+        { field: "user", headerName: "Username", flex: 1 },
         {
           field: "active",
           headerName: "Active",
@@ -133,6 +135,12 @@ function ConnectedClientsList({ clients, ...params }) {
         },
         {
           field: "session_length",
+          headerName: "Session Length",
+          valueGetter: (value, row) =>
+            value ? humanizeDuration(value, { round: true }) : "--",
+        },
+        {
+          field: "end_time",
           headerName: "Session Time",
           minWidth: 300,
           renderCell: (params) => (
