@@ -6,17 +6,18 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
 import ListItemAvatar from "@mui/material/ListItemAvatar";
 import Divider from "@mui/material/Divider";
-import { PieChart } from "@mui/x-charts/PieChart";
-import { blueberryTwilightPalette } from "@mui/x-charts/colorPalettes";
-import { fetchAPI } from "../keycloak";
+import Avatar from "@mui/material/Avatar";
+import { useTheme } from "@mui/material";
 
-const COLOURS = blueberryTwilightPalette();
+import DataUsagePie from "../components/graphs/DataUsagePie";
+import { fetchAPI } from "../keycloak";
 
 function UsersPage() {
   const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
+  const theme = useTheme();
 
-  const fetchUsers = () => {
+  useEffect(() => {
     fetchAPI("/wallet/users/")
       .then((data) => {
         setUsers(data);
@@ -24,61 +25,25 @@ function UsersPage() {
       .catch((error) => {
         console.error("Error fetching users:", error);
       });
-  };
-
-  const sentData = () =>
-    users.map((u) => ({
-      id: u.id,
-      value: u.bytes_sent,
-      label: u.username,
-    }));
-
-  const recvData = () =>
-    users.map((u) => ({
-      id: u.id,
-      value: u.bytes_recv,
-      label: u.username,
-    }));
+  }, []); // Fetch users on page load
 
   const selectedIndex = () => {
     return users.map((u) => u.id).indexOf(selectedUser);
   };
 
-  useEffect(() => {
-    fetchUsers();
-  }, []);
-
   return (
     <Stack direction={{ xs: "column", md: "row-reverse" }}>
-      <Box sx={{ flexGrow: 1, display: "flex", alignItems: "center", justifyItems: "center" }}>
-        <PieChart
-          highlightedItem={selectedIndex() !== -1 && { seriesId: "recv", dataIndex: selectedIndex() }}
-          height={300}
-          width={400}
-          slotProps={{
-            legend: { hidden: true },
-          }}
-          series={[
-            {
-              data: sentData(),
-              id: "sent",
-              outerRadius: 60,
-              cornerRadius: 3,
-              paddingAngle: 1,
-            },
-            {
-              data: recvData(),
-              id: "recv",
-              innerRadius: 70,
-              cornerRadius: 3,
-              paddingAngle: 1,
-              highlightScope: { faded: "series", highlighted: "item" },
-              faded: { additionalRadius: -20, color: "gray" },
-            },
-          ]}
-        />
+      <Box sx={{ display: "flex", alignItems: "center", flexGrow: 1 }}>
+        <DataUsagePie users={users} selectedIndex={selectedIndex()} />
       </Box>
-      <Box sx={{ flexGrow: 2 }}>
+      <Box
+        sx={{
+          [theme.breakpoints.up("md")]: {
+            borderRight: `1px solid ${theme.palette.divider}`,
+            height: "calc(100vh - 64px)",
+          },
+        }}
+      >
         <List>
           {users.map((user, i) => [
             <ListItemButton
@@ -87,7 +52,7 @@ function UsersPage() {
               onClick={(e) => setSelectedUser(selectedUser !== user.id ? user.id : null)}
             >
               <ListItemAvatar>
-                <Box sx={{ bgcolor: COLOURS[i], width: 25, height: 25, borderRadius: "50%" }} />
+                <Avatar sx={{ width: 24, height: 24 }} />
               </ListItemAvatar>
               <ListItemText primary={user.username} />
             </ListItemButton>,
