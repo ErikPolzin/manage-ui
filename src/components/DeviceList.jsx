@@ -153,6 +153,7 @@ function DeviceList({ devices, isLoading, onDelete, onAdd, selectedDevice, onSel
           {
             field: "last_contact",
             headerName: "Last Seen",
+            minWidth: 150,
             valueGetter: (value, row) =>
               value ? humanizeDuration(new Date() - new Date(value), { round: true }) : "Never",
             cellClassName: (params) => (params.value === "Never" ? "disabled" : ""),
@@ -160,6 +161,7 @@ function DeviceList({ devices, isLoading, onDelete, onAdd, selectedDevice, onSel
           {
             field: "created",
             headerName: "Created",
+            minWidth: 200,
             valueGetter: (value, row) => new Date(value).toLocaleString(),
           },
         ]}

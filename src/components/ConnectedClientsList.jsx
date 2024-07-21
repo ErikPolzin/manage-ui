@@ -136,6 +136,7 @@ function ConnectedClientsList({ clients, ...params }) {
         {
           field: "session_length",
           headerName: "Session Length",
+          minWidth: 150,
           valueGetter: (value, row) =>
             value ? humanizeDuration(value, { round: true }) : "--",
         },
