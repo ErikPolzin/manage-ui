@@ -18,7 +18,7 @@ function UsersPage() {
   const theme = useTheme();
 
   useEffect(() => {
-    fetchAPI("/wallet/users/")
+    fetchAPI("/accounts/users/")
       .then((data) => {
         setUsers(data);
       })
