@@ -18,9 +18,11 @@ import {
   Divider,
   CircularProgress,
   ListItem,
+  Button,
 } from "@mui/material";
 import { Routes, Route, Link, useLocation } from "react-router-dom";
 import { useKeycloak } from "@react-keycloak/web";
+import AddMeshDialog from "./components/AddMeshDialog";
 import HomePage from "./pages/HomePage";
 import DevicePage from "./pages/DevicePage";
 import ServicesPage from "./pages/ServicesPage";
@@ -92,6 +94,7 @@ export const MeshContext = React.createContext(null);
 function App() {
   const { keycloak, initialized } = useKeycloak();
   const [open, setOpen] = usePersistantState("drawerOpen", true);
+  const [meshOpen, setMeshOpen] = useState(false);
   const [username, setUsername] = useState("");
   const [initials, setInitials] = useState("");
   const [mesh, setMesh] = usePersistantState("mesh", "");
@@ -145,20 +148,6 @@ function App() {
           </DrawerHeader>
           <Divider />
           <List>
-            {open && meshes !== null ? (
-              <ListItem>
-                <FormControl sx={{ m: 0, width: 200 }} size="small">
-                  <InputLabel>Mesh</InputLabel>
-                  <Select value={mesh} onChange={(e) => setMesh(e.target.value)} label="Mesh">
-                    {meshes.map((m) => (
-                      <MenuItem key={m.name} value={m.name}>
-                        {m.name}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </ListItem>
-            ) : null}
             <ListItemButton
               key="dashboard"
               component={Link}
@@ -215,6 +204,27 @@ function App() {
               <ListItemText primary="Alerts" />
             </ListItemButton>
           </List>
+          {open && meshes !== null ? (
+            <List sx={{ position: "absolute", bottom: 0 }}>
+              <ListItem>
+                <FormControl sx={{ m: 0, width: 200 }} size="small">
+                  <InputLabel>Mesh</InputLabel>
+                  <Select value={mesh} onChange={(e) => setMesh(e.target.value)} label="Mesh">
+                    {meshes.map((m) => (
+                      <MenuItem key={m.name} value={m.name}>
+                        {m.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </ListItem>
+              <ListItem>
+                <Button variant="outlined" onClick={() => setMeshOpen(true)} fullWidth>
+                  Add Mesh
+                </Button>
+              </ListItem>
+            </List>
+          ) : null}
         </StyledDrawer>
         <MeshContext.Provider value={{ mesh, setMesh }}>
           <Main open={open}>
@@ -243,6 +253,7 @@ function App() {
               </Routes>
             )}
           </Main>
+          <AddMeshDialog open={meshOpen} handleClose={() => setMeshOpen(false)}></AddMeshDialog>
         </MeshContext.Provider>
       </Box>
     </ThemeProvider>
