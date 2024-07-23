@@ -218,7 +218,7 @@ function DevicePage() {
           <ToggleButtonGroup
             color="primary"
             value={showDays}
-            onChange={(e, v) => setShowDays(v)}
+            onChange={(e, v) => v !== null && setShowDays(v)}
             exclusive
             size="small"
             aria-label="Date Range"

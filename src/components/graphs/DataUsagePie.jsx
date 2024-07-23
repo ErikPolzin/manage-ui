@@ -52,7 +52,7 @@ function DataUsagePie({ users, selectedIndex }) {
       <ToggleButtonGroup
         color="primary"
         value={dataType}
-        onChange={(e, v) => setDataType(v)}
+        onChange={(e, v) => v !== null && setDataType(v)}
         exclusive
         size="small"
       >
