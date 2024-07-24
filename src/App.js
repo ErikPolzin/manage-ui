@@ -19,6 +19,7 @@ import {
   CircularProgress,
   ListItem,
   Button,
+  ListItemAvatar,
 } from "@mui/material";
 import { Routes, Route, Link, useLocation } from "react-router-dom";
 import { useKeycloak } from "@react-keycloak/web";
@@ -28,6 +29,7 @@ import DevicePage from "./pages/DevicePage";
 import ServicesPage from "./pages/ServicesPage";
 import AlertsPage from "./pages/AlertsPage";
 import UsersPage from "./pages/UsersPage";
+import AccountPage from "./pages/AccountPage";
 import NavBar from "./components/NavBar";
 import theme from "./theme";
 import { usePersistantState } from "./hooks";
@@ -67,7 +69,6 @@ const closedMixin = (theme) => ({
 const DrawerHeader = styled("div")(({ theme }) => ({
   display: "flex",
   alignItems: "center",
-  padding: theme.spacing(0, 1),
   // necessary for content to be below app bar
   ...theme.mixins.toolbar,
 }));
@@ -143,8 +144,16 @@ function App() {
         <NavBar open={open} onMenuClick={toggleDrawer} />
         <StyledDrawer variant="permanent" open={open}>
           <DrawerHeader>
-            <Avatar>{initials}</Avatar>
-            <Typography mx={2}>{username}</Typography>
+            <ListItemButton
+              key="account"
+              component={Link}
+              to="/account"
+            >
+              <ListItemAvatar>
+                <Avatar>{initials}</Avatar>
+              </ListItemAvatar>
+              <ListItemText primary={username} />
+            </ListItemButton>
           </DrawerHeader>
           <Divider />
           <List>
@@ -250,6 +259,7 @@ function App() {
                 <Route path="/services" element={<ServicesPage />} />
                 <Route path="/alerts" element={<AlertsPage />} />
                 <Route path="/users" element={<UsersPage />} />
+                <Route path="/account" element={<AccountPage />} />
               </Routes>
             )}
           </Main>
