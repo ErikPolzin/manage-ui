@@ -2,7 +2,7 @@ import React from "react";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
-import CircularProgress from '@mui/material/CircularProgress';
+import CircularProgress from "@mui/material/CircularProgress";
 import Container from "@mui/material/Container";
 import TextField from "@mui/material/TextField";
 import Checkbox from "@mui/material/Checkbox";
@@ -61,14 +61,20 @@ export default function AccountPage() {
       });
   };
 
-  if (!accountCopy) return <div></div>;
-
   return (
     <Container maxWidth="sm" sx={{ pt: 3 }}>
       {loading || !accountCopy ? (
-        <Box sx={{ display: 'flex', alignItems: "center" }}>
-            <CircularProgress />
-            <Typography>Loading account...</Typography>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            flexDirection: "column",
+            minHeight: "calc(100vh - 64px)",
+          }}
+        >
+          <CircularProgress />
+          <Typography>Loading account...</Typography>
         </Box>
       ) : (
         <Grid container spacing={2}>
