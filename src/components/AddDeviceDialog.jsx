@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { MeshContext } from "../App";
 import {
   Dialog,
@@ -12,50 +12,56 @@ import {
   Select,
   MenuItem,
 } from "@mui/material";
+import { fetchAPI } from "../keycloak";
 
-const DEFAULT_DEVICE = {
-  name: "",
-  mac: "",
-  ip: "",
-  hardware: "tl_eap225_3_o",
-  description: "",
-  last_contact_from_ip: "",
-  created: new Date().toISOString(),
-};
-
-function AddDeviceDialogue({ open, defaults, onClose, onAdd, errors }) {
-  const [newDevice, setNewDevice] = useState(Object.assign({}, DEFAULT_DEVICE));
+export default function AddDeviceDialog({ open, device, onClose, onAdd, onAdopt }) {
   const { mesh } = React.useContext(MeshContext);
+  const [defaultDevice, setDefaultDevice] = React.useState({
+    name: "",
+    mac: "",
+    ip: "",
+    mesh: mesh,
+    hardware: "tl_eap225_3_o",
+    description: "",
+    last_contact_from_ip: "",
+    created: new Date().toISOString(),
+  });
+  const [newDevice, setNewDevice] = React.useState(defaultDevice);
+  const [errors, setErrors] = React.useState([]);
 
   React.useEffect(() => {
-    setNewDevice({
-      ...DEFAULT_DEVICE,
-      mesh: mesh,
-      name: defaults?.name,
-      mac: defaults?.mac,
-      ip: defaults?.from_ip,
-    });
-  }, [defaults, mesh]);
+    setNewDevice(device || defaultDevice);
+  }, [device, defaultDevice]);
 
   const handleChange = (e) => {
     setNewDevice({ ...newDevice, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = () => {
-    onAdd(newDevice);
-  };
-
-  const handleClose = () => {
-    resetForm();
-    onClose();
-  };
-
-  const resetForm = () => {
-    setNewDevice(Object.assign({}, DEFAULT_DEVICE));
+  const addOrAdoptDevice = () => {
+    if (device) {
+      let data = {...newDevice, mesh: mesh};
+      fetchAPI(`/monitoring/devices/${device.mac}/`, "PUT", data)
+        .then((response) => {
+          onAdopt(response);
+          onClose();
+        })
+        .catch((error) => {
+          setErrors(error);
+        });
+    } else {
+      fetchAPI("/monitoring/devices/", "POST", newDevice)
+        .then((response) => {
+          onAdd(response);
+          onClose();
+        })
+        .catch((error) => {
+          setErrors(error);
+        });
+    }
   };
 
   return (
-    <Dialog open={open} onClose={handleClose} onAbort={resetForm}>
+    <Dialog open={open} onClose={onClose} onAbort={onClose}>
       <DialogTitle>Add New Device</DialogTitle>
       <DialogContent>
         <TextField
@@ -67,7 +73,7 @@ function AddDeviceDialogue({ open, defaults, onClose, onAdd, errors }) {
           disabled
           variant="outlined"
           inputProps={{ readOnly: true }}
-          value={newDevice.mesh}
+          value={newDevice.mesh || mesh}
           onChange={handleChange}
           error={Boolean(errors.mesh)}
           helperText={errors.mesh ? errors.mesh.join("\n") : null}
@@ -120,11 +126,9 @@ function AddDeviceDialogue({ open, defaults, onClose, onAdd, errors }) {
         </FormControl>
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleClose}>Cancel</Button>
-        <Button onClick={handleSubmit}>Add</Button>
+        <Button onClick={onClose}>Cancel</Button>
+        <Button onClick={addOrAdoptDevice}>{device ? "Adopt" : "Add"}</Button>
       </DialogActions>
     </Dialog>
   );
 }
-
-export default AddDeviceDialogue;

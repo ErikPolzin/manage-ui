@@ -11,10 +11,25 @@ import IconButton from "@mui/material/IconButton";
 import { alpha } from "@mui/material/styles";
 import { DataGrid, gridClasses, GridRow, GridActionsCellItem } from "@mui/x-data-grid";
 import humanizeDuration from "humanize-duration";
+import AddDeviceDialog from "./AddDeviceDialog";
+import DeleteDeviceDialog from "./DeleteDeviceDialog";
 import ConnectedClientsList from "./ConnectedClientsList";
 
-function DeviceList({ devices, isLoading, onDelete, onAdd, selectedDevice, onSelect, ...props }) {
+function DeviceList({
+  devices,
+  isLoading,
+  selectedDevice,
+  onAdd,
+  onUpdate,
+  onDelete,
+  onSelect,
+  ...props
+}) {
   const [expandedIds, setExpandedIds] = React.useState([]);
+  const [openDeleteDialog, setOpenDeleteDialog] = React.useState(false);
+  const [openAddDialog, setOpenAddDialog] = React.useState(false);
+  const [deviceToDelete, setDeviceToDelete] = React.useState(null);
+  const [deviceToAdd, setDeviceToAdd] = React.useState(null);
 
   function isExpanded(pid) {
     return expandedIds.indexOf(pid) !== -1;
@@ -46,8 +61,35 @@ function DeviceList({ devices, isLoading, onDelete, onAdd, selectedDevice, onSel
     return <GridRow {...params} />;
   }
 
+  /**
+   * Find a device by MAC address.
+   * @param {str} mac Device MAC address
+   * @returns A device or null
+   */
+  const findDevice = (mac) => {
+    for (let device of devices) {
+      if (device.mac === mac) return device;
+    }
+    return null;
+  };
+
+  /**
+   * Handle a change to the selected devices, reported by the data table.
+   * @param {array[str]} model List of selected devices
+   * @returns null
+   */
   const handleSelectionChange = (model) => {
     if (onSelect) onSelect(model.length > 0 ? model[0] : null);
+  };
+
+  const handleDeleteClick = (device) => {
+    setDeviceToDelete(device);
+    setOpenDeleteDialog(true);
+  };
+
+  const handleAddClick = (device) => {
+    setDeviceToAdd(device);
+    setOpenAddDialog(true);
   };
 
   const clearSelection = () => {
@@ -76,12 +118,12 @@ function DeviceList({ devices, isLoading, onDelete, onAdd, selectedDevice, onSel
             {selectedDevice ? (
               <Box sx={{ display: "inline-flex", flexDirection: "row" }}>
                 <Button onClick={clearSelection}>Clear Selection</Button>
-                <IconButton onClick={() => onDelete(selectedDevice)}>
+                <IconButton onClick={() => handleDeleteClick(selectedDevice)}>
                   <DeleteIcon />
                 </IconButton>
               </Box>
             ) : (
-              <IconButton onClick={onAdd}>
+              <IconButton onClick={() => handleAddClick()}>
                 <AddIcon />
               </IconButton>
             )}
@@ -141,6 +183,19 @@ function DeviceList({ devices, isLoading, onDelete, onAdd, selectedDevice, onSel
             headerName: "Status",
             valueGetter: (value, row) => value.toUpperCase(),
             cellClassName: (params) => [params.value.toLowerCase(), "status"],
+            renderCell: (params) =>
+              !params.row.mesh ? (
+                <Button
+                  variant="contained"
+                  fullWidth
+                  size="small"
+                  onClick={() => handleAddClick(findDevice(params.row.mac))}
+                >
+                  Adopt
+                </Button>
+              ) : (
+                <strong>{params.value}</strong>
+              ),
           },
           { field: "mac", headerName: "MAC Address", minWidth: 150, flex: 1 },
           {
@@ -173,8 +228,22 @@ function DeviceList({ devices, isLoading, onDelete, onAdd, selectedDevice, onSel
         }}
         pageSizeOptions={[5, 10]}
         onRowSelectionModelChange={handleSelectionChange}
-        rowSelectionModel={selectedDevice ? [selectedDevice] : []}
+        rowSelectionModel={selectedDevice ? [selectedDevice.mac] : []}
+        isRowSelectable={(params) => params.row.mesh !== null}
         disableMultipleRowSelection
+      />
+      <DeleteDeviceDialog
+        open={openDeleteDialog}
+        onClose={() => setOpenDeleteDialog(false)}
+        onDelete={onDelete}
+        device={deviceToDelete}
+      />
+      <AddDeviceDialog
+        open={openAddDialog}
+        onClose={() => setOpenAddDialog(false)}
+        onAdd={onAdd}
+        onAdopt={onUpdate}
+        device={deviceToAdd}
       />
     </Box>
   );
