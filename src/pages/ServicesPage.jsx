@@ -20,7 +20,7 @@ function ServicesPage() {
   const [editingService, setEditingService] = useState(null);
 
   const fetchServices = () => {
-    fetchAPI("/service_monitor/services/")
+    fetchAPI("/monitoring/services/")
       .then((data) => {
         setServices(data);
       })
@@ -53,7 +53,7 @@ function ServicesPage() {
   const handleConfirmDelete = () => {
     if (!serviceToDelete) return;
 
-    fetchAPI(`/service_monitor/services/${serviceToDelete.id}/`, "DELETE")
+    fetchAPI(`/monitoring/services/${serviceToDelete.id}/`, "DELETE")
       .then(() => {
         setSuccessAlert({ show: true, message: "Service successfully deleted." });
         setOpenDeleteDialogue(false);
@@ -66,7 +66,7 @@ function ServicesPage() {
   };
 
   const handleAddService = (newService) => {
-    fetchAPI("/service_monitor/services/", "POST", newService)
+    fetchAPI("/monitoring/services/", "POST", newService)
       .then(() => {
         setSuccessAlert({ show: true, message: "Device successfully added." });
         setOpenAddDialogue(false);
@@ -79,7 +79,7 @@ function ServicesPage() {
   };
 
   const handleUpdateService = (updatedService) => {
-    fetchAPI(`/service_monitor/services/${updatedService.id}/`, "PUT", updatedService)
+    fetchAPI(`/monitoring/services/${updatedService.id}/`, "PUT", updatedService)
       .then(() => {
         setSuccessAlert({ show: true, message: "Service successfully updated." });
         setOpenEditDialogue(false);
