@@ -203,7 +203,8 @@ function DevicePage() {
         <Grid xs={12} lg={4} xl={3} id="detail-cell">
           <DeviceDetailCard
             device={selectedDevice()}
-            deviceUpdated={handleUpdate}
+            onUpdate={handleUpdate}
+            onClose={() => setSelectedDeviceMac(null)}
             sx={{
               margin: 1,
             }}

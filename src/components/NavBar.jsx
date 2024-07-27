@@ -5,7 +5,7 @@ import { Menu, ChevronLeft } from "@mui/icons-material";
 import { Link } from "react-router-dom";
 import { styled } from "@mui/material/styles";
 
-import LogoutDialogue from "./LogoutDialogue";
+import LogoutDialog from "./dialogs/LogoutDialog";
 
 const StyledNavBar = styled(AppBar, {
   shouldForwardProp: (prop) => prop !== 'open',
@@ -60,7 +60,7 @@ const NavBar = ({ open, onMenuClick }) => {
           Log Out
         </Button>
       </Toolbar>
-      <LogoutDialogue
+      <LogoutDialog
         open={openLogoutDialog}
         handleClose={toggleLogoutDialog}
         handleLogout={handleLogout}

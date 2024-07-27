@@ -5,25 +5,23 @@ import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
-import {
-  Avatar,
-  Typography,
-  ListItemIcon,
-  Box,
-  Drawer,
-  CssBaseline,
-  List,
-  ListItemButton,
-  ListItemText,
-  Divider,
-  CircularProgress,
-  ListItem,
-  Button,
-  ListItemAvatar,
-} from "@mui/material";
+import Avatar from "@mui/material/Avatar";
+import Typography from "@mui/material/Typography";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import Box from "@mui/material/Box";
+import Divider from "@mui/material/Divider";
+import Drawer from "@mui/material/Drawer";
+import CssBaseline from "@mui/material/CssBaseline";
+import List from "@mui/material/List";
+import ListItemButton from "@mui/material/ListItemButton";
+import ListItemText from "@mui/material/ListItemText";
+import CircularProgress from "@mui/material/CircularProgress";
+import ListItem from "@mui/material/ListItem";
+import Button from "@mui/material/Button";
+import ListItemAvatar from "@mui/material/ListItemAvatar";
 import { Routes, Route, Link, useLocation } from "react-router-dom";
 import { useKeycloak } from "@react-keycloak/web";
-import AddMeshDialog from "./components/AddMeshDialog";
+import MeshDialog from "./components/dialogs/MeshDialog";
 import HomePage from "./pages/HomePage";
 import DevicePage from "./pages/DevicePage";
 import ServicesPage from "./pages/ServicesPage";
@@ -263,7 +261,7 @@ function App() {
               </Routes>
             )}
           </Main>
-          <AddMeshDialog open={meshOpen} handleClose={() => setMeshOpen(false)}></AddMeshDialog>
+          <MeshDialog open={meshOpen} onClose={() => setMeshOpen(false)}></MeshDialog>
         </MeshContext.Provider>
       </Box>
     </ThemeProvider>

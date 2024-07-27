@@ -11,8 +11,8 @@ import IconButton from "@mui/material/IconButton";
 import { alpha } from "@mui/material/styles";
 import { DataGrid, gridClasses, GridRow, GridActionsCellItem } from "@mui/x-data-grid";
 import humanizeDuration from "humanize-duration";
-import AddDeviceDialog from "./AddDeviceDialog";
-import DeleteDeviceDialog from "./DeleteDeviceDialog";
+import DeviceDialog from "./dialogs/DeviceDialog";
+import ConfirmDeleteDialog from "./dialogs/ConfirmDeleteDialog";
 import ConnectedClientsList from "./ConnectedClientsList";
 
 function DeviceList({
@@ -27,9 +27,9 @@ function DeviceList({
 }) {
   const [expandedIds, setExpandedIds] = React.useState([]);
   const [openDeleteDialog, setOpenDeleteDialog] = React.useState(false);
-  const [openAddDialog, setOpenAddDialog] = React.useState(false);
+  const [openDeviceDialog, setOpenDeviceDialog] = React.useState(false);
   const [deviceToDelete, setDeviceToDelete] = React.useState(null);
-  const [deviceToAdd, setDeviceToAdd] = React.useState(null);
+  const [deviceToEdit, setDeviceToEdit] = React.useState(null);
 
   function isExpanded(pid) {
     return expandedIds.indexOf(pid) !== -1;
@@ -87,13 +87,14 @@ function DeviceList({
     setOpenDeleteDialog(true);
   };
 
-  const handleAddClick = (device) => {
-    setDeviceToAdd(device);
-    setOpenAddDialog(true);
+  const handleAddClick = () => {
+    setDeviceToEdit(null);
+    setOpenDeviceDialog(true);
   };
 
-  const clearSelection = () => {
-    handleSelectionChange([]);
+  const handleEditClick = (device) => {
+    setDeviceToEdit(device);
+    setOpenDeviceDialog(true);
   };
 
   function DataGridTitle() {
@@ -117,7 +118,6 @@ function DeviceList({
           <Box sx={{ display: "flex", flexGrow: 1, flexDirection: "row-reverse" }}>
             {selectedDevice ? (
               <Box sx={{ display: "inline-flex", flexDirection: "row" }}>
-                <Button onClick={clearSelection}>Clear Selection</Button>
                 <IconButton onClick={() => handleDeleteClick(selectedDevice)}>
                   <DeleteIcon />
                 </IconButton>
@@ -189,7 +189,7 @@ function DeviceList({
                   variant="contained"
                   fullWidth
                   size="small"
-                  onClick={() => handleAddClick(findDevice(params.row.mac))}
+                  onClick={() => handleEditClick(findDevice(params.row.mac))}
                 >
                   Adopt
                 </Button>
@@ -232,18 +232,20 @@ function DeviceList({
         isRowSelectable={(params) => params.row.mesh !== null}
         disableMultipleRowSelection
       />
-      <DeleteDeviceDialog
+      <ConfirmDeleteDialog
         open={openDeleteDialog}
+        model={deviceToDelete}
+        idField="mac"
+        itemType="device"
         onClose={() => setOpenDeleteDialog(false)}
         onDelete={onDelete}
-        device={deviceToDelete}
       />
-      <AddDeviceDialog
-        open={openAddDialog}
-        onClose={() => setOpenAddDialog(false)}
+      <DeviceDialog
+        open={openDeviceDialog}
+        device={deviceToEdit}
+        onClose={() => setOpenDeviceDialog(false)}
         onAdd={onAdd}
-        onAdopt={onUpdate}
-        device={deviceToAdd}
+        onUpdate={onUpdate}
       />
     </Box>
   );

@@ -21,6 +21,7 @@ import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import TextField from "@mui/material/TextField";
 import MenuItem from "@mui/material/MenuItem";
+import IconButton from "@mui/material/IconButton";
 import { useTheme } from "@mui/material";
 // Experimental MUI components
 import LoadingButton from "@mui/lab/LoadingButton";
@@ -36,6 +37,7 @@ import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import BarChartIcon from "@mui/icons-material/BarChart";
 import QuestionMarkIcon from "@mui/icons-material/QuestionMark";
+import CloseIcon from "@mui/icons-material/Close";
 
 function DeviceTabPanel({ children, value, index, ...other }) {
   return (
@@ -73,7 +75,7 @@ function StatusCheck({ passed, title, feedback }) {
   );
 }
 
-function DeviceDetailCard({ device, deviceUpdated, ...props }) {
+function DeviceDetailCard({ device, onUpdate, onClose, ...props }) {
   const theme = useTheme();
   const [tabValue, setTabValue] = React.useState(0);
   const [puttingData, setPuttingData] = React.useState(false);
@@ -96,7 +98,7 @@ function DeviceDetailCard({ device, deviceUpdated, ...props }) {
     setPuttingData(true);
     fetchAPI(`/monitoring/devices/${device.mac}/`, "PUT", deviceCopy)
       .then(() => {
-        if (deviceUpdated) deviceUpdated(deviceCopy);
+        if (onUpdate) onUpdate(deviceCopy);
       })
       .finally(() => {
         setPuttingData(false);
@@ -119,7 +121,10 @@ function DeviceDetailCard({ device, deviceUpdated, ...props }) {
     >
       <AppBar position="static" enableColorOnDark>
         <Toolbar>
-          <Typography variant="h6">{"Device: " + device?.name}</Typography>
+          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>{"Device: " + device?.name}</Typography>
+          <IconButton color="inherit" aria-label="close" onClick={onClose}>
+            <CloseIcon />
+          </IconButton>
         </Toolbar>
         <Tabs
           centered
@@ -156,7 +161,7 @@ function DeviceDetailCard({ device, deviceUpdated, ...props }) {
                       id="device-name"
                       label="Name"
                       name="name"
-                      value={deviceCopy.name}
+                      value={deviceCopy.name || ""}
                       onChange={handleChange}
                       margin="dense"
                       fullWidth
@@ -165,7 +170,7 @@ function DeviceDetailCard({ device, deviceUpdated, ...props }) {
                       id="device-description"
                       label="Description"
                       name="description"
-                      value={deviceCopy.description}
+                      value={deviceCopy.description || ""}
                       onChange={handleChange}
                       multiline
                       rows={4}
@@ -176,7 +181,7 @@ function DeviceDetailCard({ device, deviceUpdated, ...props }) {
                       id="device-hardware"
                       label="Model"
                       name="hardware"
-                      value={deviceCopy.hardware}
+                      value={deviceCopy.hardware || ""}
                       onChange={handleChange}
                       margin="dense"
                       select
@@ -191,7 +196,7 @@ function DeviceDetailCard({ device, deviceUpdated, ...props }) {
                       disabled
                       label="MAC Address"
                       name="mac"
-                      value={deviceCopy.mac}
+                      value={deviceCopy.mac || ""}
                       variant="filled"
                       size="small"
                       margin="dense"
@@ -202,7 +207,7 @@ function DeviceDetailCard({ device, deviceUpdated, ...props }) {
                       disabled
                       label="IP Address"
                       name="ip"
-                      value={deviceCopy.ip}
+                      value={deviceCopy.ip || ""}
                       variant="filled"
                       size="small"
                       margin="dense"

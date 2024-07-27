@@ -23,9 +23,9 @@ function loadScript(src, position, id) {
 const autocompleteService = { current: null };
 const placesService = { current: null };
 
-export default function LocationPicker({ handleChange, ...props }) {
+export default function LocationPicker({ text, name, onChange, onChangeLatLon, ...props }) {
   const [value, setValue] = React.useState(null);
-  const [inputValue, setInputValue] = React.useState("");
+  const [inputValue, setInputValue] = React.useState(text || "");
   const [options, setOptions] = React.useState([]);
   const loaded = React.useRef(false);
 
@@ -47,6 +47,8 @@ export default function LocationPicker({ handleChange, ...props }) {
       }, 400),
     [],
   );
+
+  React.useEffect(() => setInputValue(text), [text])
 
   React.useEffect(() => {
     let active = true;
@@ -100,8 +102,9 @@ export default function LocationPicker({ handleChange, ...props }) {
       onChange={(event, newValue) => {
         setOptions(newValue ? [newValue, ...options] : options);
         setValue(newValue);
+        onChange({ target: {name, value: newValue.description }});
         placesService.current.getDetails({ placeId: newValue.place_id }, (place, status) => {
-          handleChange(place.geometry.location)
+          onChangeLatLon && onChangeLatLon(place.geometry.location)
         });
       }}
       onInputChange={(event, newInputValue) => {
