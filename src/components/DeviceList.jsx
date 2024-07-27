@@ -149,17 +149,29 @@ function DeviceList({
           [`.${gridClasses.cell}.status`]: {
             fontWeight: "bold",
           },
-          [`.${gridClasses.cell}.status.critical`]: {
+          [`.${gridClasses.cell}.health-status.critical`]: {
             color: "purple",
           },
-          [`.${gridClasses.cell}.status.ok`]: {
+          [`.${gridClasses.cell}.health-status.ok`]: {
             color: "green",
           },
-          [`.${gridClasses.cell}.status.warning`]: {
+          [`.${gridClasses.cell}.health-status.warning`]: {
             color: "red",
           },
-          [`.${gridClasses.cell}.status.decent`]: {
+          [`.${gridClasses.cell}.health-status.decent`]: {
             color: "orange",
+          },
+          [`.${gridClasses.cell}.status.unknown`]: {
+            color: "grey",
+          },
+          [`.${gridClasses.cell}.status.offline`]: {
+            color: "red",
+          },
+          [`.${gridClasses.cell}.status.online`]: {
+            color: "green",
+          },
+          [`.${gridClasses.cell}.status.rebooting`]: {
+            color: "cyan",
           },
         }}
         rows={devices}
@@ -183,6 +195,12 @@ function DeviceList({
             headerName: "Status",
             valueGetter: (value, row) => value.toUpperCase(),
             cellClassName: (params) => [params.value.toLowerCase(), "status"],
+          },
+          {
+            field: "health_status",
+            headerName: "Health Status",
+            valueGetter: (value, row) => value.toUpperCase(),
+            cellClassName: (params) => [params.value.toLowerCase(), "health-status"],
             renderCell: (params) =>
               !params.row.mesh ? (
                 <Button
@@ -194,7 +212,7 @@ function DeviceList({
                   Adopt
                 </Button>
               ) : (
-                <strong>{params.value}</strong>
+                <span>{params.value}</span>
               ),
           },
           { field: "mac", headerName: "MAC Address", minWidth: 150, flex: 1 },
