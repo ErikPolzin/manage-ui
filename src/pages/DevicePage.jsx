@@ -114,18 +114,6 @@ function DevicePage() {
   };
 
   /**
-   * Very simple check to see if different MAC addresses are the same
-   * (even if they are in slightly different formats)
-   * @param {str} m1 Mac address number 1
-   * @param {str} m2 Mac address number 2
-   * @returns boolean true if both equivalent
-   */
-  const macEqual = (m1, m2) => {
-    if (typeof m1 !== "string" || typeof m2 !== "string") return false;
-    return m1.replaceAll("-", ":") === m2.replaceAll("-", ":");
-  };
-
-  /**
    * Device has been updated in the device detail component, sync the parent
    * device list. Note this will likely trigger an update to the selected device.
    * @param {Object} newDevice
@@ -133,7 +121,8 @@ function DevicePage() {
   const handleUpdate = (newDevice) => {
     // For some stupid reason django returns MAC addresses in a slightly different
     // format, so I can't check for exact equality here.
-    setDevices(devices.map((d) => (macEqual(d.mac, newDevice.mac) ? newDevice : d)));
+    newDevice.mac = newDevice.mac.replaceAll("-", ":")
+    setDevices(devices.map((d) => (d.mac === newDevice.mac ? newDevice : d)));
   };
 
   return (
