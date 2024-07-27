@@ -16,6 +16,7 @@ import UptimeGraph from "../components/graphs/UptimeGraph";
 import DeviceDetailCard from "../components/DeviceDetailCard";
 import { useQueryState } from "../hooks";
 import { fetchAPI } from "../keycloak";
+import { Container } from "@mui/material";
 
 function GraphTabPanel({ children, value, index, ...other }) {
   return (
@@ -137,7 +138,7 @@ function DevicePage() {
 
   return (
     <Grid container spacing={2}>
-      <Grid xs={12} lg={selectedDeviceMac ? 8 : 12} xl={selectedDeviceMac ? 9 : 12}>
+      <Grid item xs={12} lg={selectedDeviceMac ? 8 : 12} xl={selectedDeviceMac ? 9 : 12}>
         <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
           <Tabs value={tabValue} onChange={(e, v) => setTabValue(v)} centered>
             <Tab label="Data Usage" {...a11yProps(0)} />
@@ -146,58 +147,60 @@ function DevicePage() {
             <Tab label="Uptime" {...a11yProps(3)} />
           </Tabs>
         </Box>
-        <GraphTabPanel value={tabValue} index={0}>
-          <DataUsageGraph showDays={showDays} selectedDevice={selectedDeviceMac} />
-        </GraphTabPanel>
-        <GraphTabPanel value={tabValue} index={1}>
-          <DataRateGraph showDays={showDays} selectedDevice={selectedDeviceMac} />
-        </GraphTabPanel>
-        <GraphTabPanel value={tabValue} index={2}>
-          <RTTGraph showDays={showDays} selectedDevice={selectedDeviceMac} />
-        </GraphTabPanel>
-        <GraphTabPanel value={tabValue} index={3}>
-          <UptimeGraph showDays={showDays} selectedDevice={selectedDeviceMac} />
-        </GraphTabPanel>
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            marginBottom: 2,
-          }}
-        >
-          <ToggleButtonGroup
-            color="primary"
-            value={showDays}
-            onChange={(e, v) => v !== null && setShowDays(v)}
-            exclusive
-            size="small"
-            aria-label="Date Range"
+        <Container maxWidth="lg" disableGutters>
+          <GraphTabPanel value={tabValue} index={0}>
+            <DataUsageGraph showDays={showDays} selectedDevice={selectedDeviceMac} />
+          </GraphTabPanel>
+          <GraphTabPanel value={tabValue} index={1}>
+            <DataRateGraph showDays={showDays} selectedDevice={selectedDeviceMac} />
+          </GraphTabPanel>
+          <GraphTabPanel value={tabValue} index={2}>
+            <RTTGraph showDays={showDays} selectedDevice={selectedDeviceMac} />
+          </GraphTabPanel>
+          <GraphTabPanel value={tabValue} index={3}>
+            <UptimeGraph showDays={showDays} selectedDevice={selectedDeviceMac} />
+          </GraphTabPanel>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              marginBottom: 2,
+            }}
           >
-            <ToggleButton value={"day"}>24 Hours</ToggleButton>
-            <ToggleButton value={"week"}>Week</ToggleButton>
-            <ToggleButton value={"month"}>Month</ToggleButton>
-          </ToggleButtonGroup>
-        </Box>
-        {alert.show && (
-          <Alert severity={alert.type} onClose={handleCloseAlert}>
-            {alert.message}
-          </Alert>
-        )}
-        <DeviceList
-          sx={{
-            marginRight: 2,
-            marginLeft: 2,
-          }}
-          isLoading={loading}
-          devices={devices}
-          selectedDevice={selectedDevice()}
-          onSelect={setSelectedDeviceMac}
-          onUpdate={handleUpdate}
-          onAdd={handleAdd}
-          onDelete={handleDelete}
-        />
+            <ToggleButtonGroup
+              color="primary"
+              value={showDays}
+              onChange={(e, v) => v !== null && setShowDays(v)}
+              exclusive
+              size="small"
+              aria-label="Date Range"
+            >
+              <ToggleButton value={"day"}>24 Hours</ToggleButton>
+              <ToggleButton value={"week"}>Week</ToggleButton>
+              <ToggleButton value={"month"}>Month</ToggleButton>
+            </ToggleButtonGroup>
+          </Box>
+          {alert.show && (
+            <Alert severity={alert.type} onClose={handleCloseAlert}>
+              {alert.message}
+            </Alert>
+          )}
+          <DeviceList
+            sx={{
+              marginRight: 2,
+              marginLeft: 2,
+            }}
+            isLoading={loading}
+            devices={devices}
+            selectedDevice={selectedDevice()}
+            onSelect={setSelectedDeviceMac}
+            onUpdate={handleUpdate}
+            onAdd={handleAdd}
+            onDelete={handleDelete}
+          />
+        </Container>
       </Grid>
       {selectedDeviceMac ? (
         <Grid xs={12} lg={4} xl={3} id="detail-cell">
