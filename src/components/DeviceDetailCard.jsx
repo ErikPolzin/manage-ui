@@ -9,6 +9,7 @@ import { fetchAPI } from "../keycloak";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import CardHeader from "@mui/material/CardHeader";
+import CardActions from "@mui/material/CardActions";
 import AppBar from "@mui/material/AppBar";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
@@ -79,6 +80,7 @@ function DeviceDetailCard({ device, onUpdate, onClose, ...props }) {
   const theme = useTheme();
   const [tabValue, setTabValue] = React.useState(0);
   const [puttingData, setPuttingData] = React.useState(false);
+  const [sendingRebootRequest, setSendingRebootRequest] = React.useState(false);
   const [cellWidth, cellHeight] = useSizeOf("detail-cell");
   const [deviceCopy, setDeviceCopy] = React.useState(device);
 
@@ -97,11 +99,22 @@ function DeviceDetailCard({ device, onUpdate, onClose, ...props }) {
   const putChanges = () => {
     setPuttingData(true);
     fetchAPI(`/monitoring/devices/${device.mac}/`, "PUT", deviceCopy)
-      .then(() => {
-        if (onUpdate) onUpdate(deviceCopy);
+      .then((response) => {
+        if (onUpdate) onUpdate(response);
       })
       .finally(() => {
         setPuttingData(false);
+      });
+  };
+
+  const sendRebootRequest = () => {
+    setSendingRebootRequest(true);
+    fetchAPI(`/monitoring/devices/${device.mac}/`, "PATCH", { reboot_flag: true })
+      .then((response) => {
+        if (onUpdate) onUpdate(response);
+      })
+      .finally(() => {
+        setSendingRebootRequest(false);
       });
   };
 
@@ -121,7 +134,9 @@ function DeviceDetailCard({ device, onUpdate, onClose, ...props }) {
     >
       <AppBar position="static" enableColorOnDark>
         <Toolbar>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>{"Device: " + device?.name}</Typography>
+          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+            {"Device: " + device?.name}
+          </Typography>
           <IconButton color="inherit" aria-label="close" onClick={onClose}>
             <CloseIcon />
           </IconButton>
@@ -227,7 +242,10 @@ function DeviceDetailCard({ device, onUpdate, onClose, ...props }) {
               </Card>
             )}
             <Card variant="outlined" sx={{ marginBottom: 1 }}>
-              <CardHeader subheader={`Status: ${device.status}`} avatar={<QuestionMarkIcon />} />
+              <CardHeader
+                subheader={`Status: ${device.health_status}`}
+                avatar={<QuestionMarkIcon />}
+              />
               <CardContent sx={{ paddingY: 0 }}>
                 <List dense>
                   {device.checks.map((check) => (
@@ -297,6 +315,22 @@ function DeviceDetailCard({ device, onUpdate, onClose, ...props }) {
               </CardContent>
             </Card>
           </DeviceTabPanel>
+          <CardActions sx={{ flexDirection: "column" }}>
+            <LoadingButton
+              fullWidth
+              variant="contained"
+              disabled={device.reboot_flag || device.status === "offline"}
+              onClick={sendRebootRequest}
+              loading={sendingRebootRequest}
+            >
+              Reboot
+            </LoadingButton>
+            {device.reboot_flag && (
+              <Typography variant="caption" color="red" sx={{ alignSelf: "start" }}>
+                Device flagged for reboot
+              </Typography>
+            )}
+          </CardActions>
         </CardContent>
       ) : null}
     </Card>

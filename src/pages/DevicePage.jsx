@@ -138,7 +138,7 @@ function DevicePage() {
 
   return (
     <Grid container spacing={2}>
-      <Grid item xs={12} lg={selectedDeviceMac ? 8 : 12} xl={selectedDeviceMac ? 9 : 12}>
+      <Grid xs={12} lg={selectedDeviceMac ? 8 : 12} xl={selectedDeviceMac ? 9 : 12}>
         <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
           <Tabs value={tabValue} onChange={(e, v) => setTabValue(v)} centered>
             <Tab label="Data Usage" {...a11yProps(0)} />

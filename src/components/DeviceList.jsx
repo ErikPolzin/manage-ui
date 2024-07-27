@@ -9,7 +9,13 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import IconButton from "@mui/material/IconButton";
 import { alpha } from "@mui/material/styles";
-import { DataGrid, gridClasses, GridRow, GridActionsCellItem, useGridApiRef } from "@mui/x-data-grid";
+import {
+  DataGrid,
+  gridClasses,
+  GridRow,
+  GridActionsCellItem,
+  useGridApiRef,
+} from "@mui/x-data-grid";
 import humanizeDuration from "humanize-duration";
 import DeviceDialog from "./dialogs/DeviceDialog";
 import ConfirmDeleteDialog from "./dialogs/ConfirmDeleteDialog";
@@ -39,12 +45,12 @@ function DeviceList({
   const refreshEveryXSeconds = React.useCallback(() => {
     apiRef.current?.forceUpdate();
     apiRef.current?.autosizeColumns();
-  }, [apiRef])
+  }, [apiRef]);
 
   React.useEffect(() => {
     const interval = setInterval(refreshEveryXSeconds, 5000);
     return () => clearInterval(interval);
-}, [refreshEveryXSeconds]);
+  }, [refreshEveryXSeconds]);
 
   // This functionality is available in the MUI pro-plan, but I've
   // jury-rigged it here hehe
