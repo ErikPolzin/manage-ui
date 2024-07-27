@@ -9,7 +9,7 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import IconButton from "@mui/material/IconButton";
 import { alpha } from "@mui/material/styles";
-import { DataGrid, gridClasses, GridRow, GridActionsCellItem } from "@mui/x-data-grid";
+import { DataGrid, gridClasses, GridRow, GridActionsCellItem, useGridApiRef } from "@mui/x-data-grid";
 import humanizeDuration from "humanize-duration";
 import DeviceDialog from "./dialogs/DeviceDialog";
 import ConfirmDeleteDialog from "./dialogs/ConfirmDeleteDialog";
@@ -30,10 +30,21 @@ function DeviceList({
   const [openDeviceDialog, setOpenDeviceDialog] = React.useState(false);
   const [deviceToDelete, setDeviceToDelete] = React.useState(null);
   const [deviceToEdit, setDeviceToEdit] = React.useState(null);
+  const apiRef = useGridApiRef();
 
   function isExpanded(pid) {
     return expandedIds.indexOf(pid) !== -1;
   }
+
+  const refreshEveryXSeconds = React.useCallback(() => {
+    apiRef.current?.forceUpdate();
+    apiRef.current?.autosizeColumns();
+  }, [apiRef])
+
+  React.useEffect(() => {
+    const interval = setInterval(refreshEveryXSeconds, 5000);
+    return () => clearInterval(interval);
+}, [refreshEveryXSeconds]);
 
   // This functionality is available in the MUI pro-plan, but I've
   // jury-rigged it here hehe
@@ -138,6 +149,7 @@ function DeviceList({
       <DataGrid
         slots={{ toolbar: DataGridTitle, row: ExpandableRow }}
         getRowSpacing={(p) => ({ bottom: isExpanded(p.id) ? 200 : 0 })}
+        apiRef={apiRef}
         autoHeight
         sx={{
           "& .MuiDataGrid-cell:focus-within, & .MuiDataGrid-cell:focus": {
@@ -224,8 +236,16 @@ function DeviceList({
             flex: 1,
           },
           {
+            field: "last_ping",
+            headerName: "Last Ping",
+            minWidth: 150,
+            valueGetter: (value, row) =>
+              value ? humanizeDuration(new Date() - new Date(value), { round: true }) : "Never",
+            cellClassName: (params) => (params.value === "Never" ? "disabled" : ""),
+          },
+          {
             field: "last_contact",
-            headerName: "Last Seen",
+            headerName: "Last Report",
             minWidth: 150,
             valueGetter: (value, row) =>
               value ? humanizeDuration(new Date() - new Date(value), { round: true }) : "Never",
