@@ -8,36 +8,25 @@ import ListItem from "@mui/material/ListItem";
 import SvgIcon from "@mui/material/SvgIcon";
 import Typography from "@mui/material/Typography";
 import Collapse from "@mui/material/Collapse";
-import {
-  Info,
-  Warning,
-  Error,
-  CheckCircle,
-  ExpandLess,
-  ExpandMore,
-} from "@mui/icons-material";
+import { Info, Warning, Error, ExpandLess, ExpandMore } from "@mui/icons-material";
 
 const alertIconMap = {
-  Critical: {
+  3: {
     icon: Error,
     color: "error",
   },
-  Warning: {
+  2: {
     icon: Warning,
     color: "warning",
   },
-  Decent: {
+  1: {
     icon: Info,
     color: "default",
   },
-  OK: {
-    icon: CheckCircle,
-    color: "success",
-  },
 };
 
-function AlertItem({ alert }) {
-  let alertIcon = alertIconMap[alert.type];
+function AlertItem({ alert, ...props }) {
+  let alertIcon = alertIconMap[alert.level];
 
   const [open, setOpen] = React.useState(false);
 
@@ -47,26 +36,17 @@ function AlertItem({ alert }) {
   }
 
   return (
-    <div>
+    <div {...props}>
       <ListItemButton onClick={() => setOpen(!open)} disabled={alert.resolved}>
         <ListItemIcon>
           <SvgIcon component={alertIcon.icon} color={alertIcon.color}></SvgIcon>
         </ListItemIcon>
-        <ListItemText secondary={createdTime()} primary={alert.type} />
+        <ListItemText secondary={createdTime()} primary={alert.title} />
         {open ? <ExpandLess /> : <ExpandMore />}
       </ListItemButton>
       <Collapse in={open} timeout="auto" unmountOnExit>
         <ListItem sx={{ backgroundColor: "#eeeeee" }}>
-          <table>
-            <tbody>
-              {alert.text.split("\n").map((text) => (
-                <tr key={text}>
-                  <td style={{ fontWeight: "bold", textAlign: "right" }}>{text.split(":")[0]}</td>
-                  <td>{text.split(":")[1]}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <ListItemText primary={alert.text} />
         </ListItem>
       </Collapse>
     </div>
@@ -102,7 +82,7 @@ function AlertList({ alerts, error }) {
                 </Typography>
               </ListItemText>
               {alerts.map((alert) => (
-                <AlertItem key={alert.id} alert={alert}></AlertItem>
+                <AlertItem alert={alert} key={alert.id}></AlertItem>
               ))}
               <Divider />
             </List>

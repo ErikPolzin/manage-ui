@@ -171,6 +171,7 @@ function DeviceDetailCard({ device, onUpdate, onClose, onDelete, ...props }) {
       {device
         ? [
             <CardContent
+              key="device-content"
               sx={{
                 padding: 1,
                 [theme.breakpoints.up("lg")]: {
@@ -332,14 +333,14 @@ function DeviceDetailCard({ device, onUpdate, onClose, onDelete, ...props }) {
                 </Card>
               </DeviceTabPanel>
             </CardContent>,
-            <Divider />,
+            <Divider key="device-d1" />,
             device.reboot_flag && [
-              <Typography variant="caption" color="red" sx={{ ml: 2 }}>
+              <Typography variant="caption" color="red" sx={{ ml: 2 }} key="device-flags">
                 Device flagged for reboot
               </Typography>,
-              <Divider />
+              <Divider key="device-d2" />
             ],
-            <CardActions>
+            <CardActions key="device-actions">
               <LoadingButton
                 fullWidth
                 variant="text"
