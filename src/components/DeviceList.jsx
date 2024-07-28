@@ -3,12 +3,11 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import LinearProgress from "@mui/material/LinearProgress";
-import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import IconButton from "@mui/material/IconButton";
-import { alpha } from "@mui/material/styles";
+import Divider from "@mui/material/Divider";
 import {
   DataGrid,
   gridClasses,
@@ -18,7 +17,6 @@ import {
 } from "@mui/x-data-grid";
 import humanizeDuration from "humanize-duration";
 import DeviceDialog from "./dialogs/DeviceDialog";
-import ConfirmDeleteDialog from "./dialogs/ConfirmDeleteDialog";
 import ConnectedClientsList from "./ConnectedClientsList";
 
 function DeviceList({
@@ -32,9 +30,7 @@ function DeviceList({
   ...props
 }) {
   const [expandedIds, setExpandedIds] = React.useState([]);
-  const [openDeleteDialog, setOpenDeleteDialog] = React.useState(false);
   const [openDeviceDialog, setOpenDeviceDialog] = React.useState(false);
-  const [deviceToDelete, setDeviceToDelete] = React.useState(null);
   const [deviceToEdit, setDeviceToEdit] = React.useState(null);
   const apiRef = useGridApiRef();
 
@@ -99,11 +95,6 @@ function DeviceList({
     if (onSelect) onSelect(model.length > 0 ? model[0] : null);
   };
 
-  const handleDeleteClick = (device) => {
-    setDeviceToDelete(device);
-    setOpenDeleteDialog(true);
-  };
-
   const handleAddClick = () => {
     setDeviceToEdit(null);
     setOpenDeviceDialog(true);
@@ -116,12 +107,7 @@ function DeviceList({
 
   function DataGridTitle() {
     return (
-      <Box
-        sx={{
-          bgcolor: (theme) =>
-            alpha(theme.palette.primary.main, theme.palette.action.activatedOpacity),
-        }}
-      >
+      <Box>
         <Box
           sx={{
             display: "flex",
@@ -133,20 +119,12 @@ function DeviceList({
         >
           <Typography variant="h6">Devices</Typography>
           <Box sx={{ display: "flex", flexGrow: 1, flexDirection: "row-reverse" }}>
-            {selectedDevice ? (
-              <Box sx={{ display: "inline-flex", flexDirection: "row" }}>
-                <IconButton onClick={() => handleDeleteClick(selectedDevice)}>
-                  <DeleteIcon />
-                </IconButton>
-              </Box>
-            ) : (
-              <IconButton onClick={() => handleAddClick()}>
-                <AddIcon />
-              </IconButton>
-            )}
+            <IconButton onClick={() => handleAddClick()}>
+              <AddIcon />
+            </IconButton>
           </Box>
         </Box>
-        {isLoading ? <LinearProgress /> : null}
+        {isLoading ? <LinearProgress /> : <Divider />}
       </Box>
     );
   }
@@ -275,14 +253,6 @@ function DeviceList({
         rowSelectionModel={selectedDevice ? [selectedDevice.mac] : []}
         isRowSelectable={(params) => params.row.mesh !== null}
         disableMultipleRowSelection
-      />
-      <ConfirmDeleteDialog
-        open={openDeleteDialog}
-        model={deviceToDelete}
-        idField="mac"
-        itemType="device"
-        onClose={() => setOpenDeleteDialog(false)}
-        onDelete={onDelete}
       />
       <DeviceDialog
         open={openDeviceDialog}

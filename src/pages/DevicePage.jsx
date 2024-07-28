@@ -197,6 +197,7 @@ function DevicePage() {
             device={selectedDevice()}
             onUpdate={handleUpdate}
             onClose={() => setSelectedDeviceMac(null)}
+            onDelete={handleDelete}
             sx={{
               margin: 1,
             }}
