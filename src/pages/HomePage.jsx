@@ -95,7 +95,7 @@ const HomePage = () => {
 
   const fetchNodes = () => {
     console.log("setting the nodes");
-    fetchAPI("/monitoring/devices/?fields=lat&fields=lon&fields=name&fields=mac").then((data) => {
+    fetchAPI("/monitoring/devices/?fields=lat&fields=lon&fields=name&fields=mac&fields=mesh_lat&fields=mesh_lon").then((data) => {
       setNodes(data);
     })
     .catch((error) => {
@@ -103,9 +103,10 @@ const HomePage = () => {
     });
   };
   const handleNodePositionChange = (node, lat, lon) => {
+    node.lat = lat;
+    node.lon = lon;
     return fetchAPI(`/monitoring/devices/${node.mac}/`, "PATCH", { lat, lon }).then(() => {
       fetchOverview(); // refresh the overview stats, may have changed
-      fetchNodes();
     })
     .catch((error) => {
       console.log("Error updating device position: " + error);

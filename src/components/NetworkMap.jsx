@@ -31,13 +31,13 @@ function ChangeView({ center }) {
   return null;
 }
 
-function DraggableMarker({ node, defaultPos, handlePositionChange, handleMarkerClick }) {
+function DraggableMarker({ node, handlePositionChange, handleMarkerClick }) {
   const markerRef = useRef(null);
 
   const isPositioned = React.useCallback(() => node.lat && node.lon, [node]);
   const position = React.useCallback(
-    () => (isPositioned() ? [node.lat, node.lon] : defaultPos),
-    [node, defaultPos, isPositioned],
+    () => [node.lat || node.mesh_lat, node.lon || node.mesh_lon],
+    [node.lat, node.lon, node.mesh_lat, node.mesh_lon],
   );
   const updateMarkerClass = React.useCallback(() => {
     const marker = markerRef.current;
@@ -100,9 +100,9 @@ const NetworkMap = ({ nodes, handlePositionChange, style, handleMarkerClick, id 
   const [zoom, setZoom] = React.useState(13);
 
   React.useEffect(() => {
-    let validNodes = nodes.filter((n) => n.lat && n.lon);
-    let avgLat = validNodes.reduce((s, n) => s + n.lat / validNodes.length, 0);
-    let avgLon = validNodes.reduce((s, n) => s + n.lon / validNodes.length, 0);
+    let validNodes = nodes.filter((n) => (n.lat || n.mesh_lat) && (n.lon || n.mesh_lon));
+    let avgLat = validNodes.reduce((s, n) => s + (n.lat || n.mesh_lat) / validNodes.length, 0);
+    let avgLon = validNodes.reduce((s, n) => s + (n.lon || n.mesh_lon) / validNodes.length, 0);
     // Shift the marker if there's only one other, we don't want overlapping nodes
     if (validNodes.length === 1) avgLon += 0.1 / zoom;
     setCenter([avgLat, avgLon]);
@@ -126,7 +126,6 @@ const NetworkMap = ({ nodes, handlePositionChange, style, handleMarkerClick, id 
         <DraggableMarker
           key={node.mac}
           node={node}
-          defaultPos={center}
           handlePositionChange={handlePositionChange}
           handleMarkerClick={handleMarkerClick}
         />
