@@ -42,9 +42,7 @@ const TestProgressTile = ({
   const clickElements = currentTask.clickElements; // the element objects that need to be clicked to complete the round
   const [windowClickCount, setWindowClickCount] = useState(0);
 
-  const progressBarWidth = `calc(${
-    (currentTaskNo / taskNames.length) * 100
-  }% - 4px)`;
+  const progressBarWidth = `calc(${(currentTaskNo / taskNames.length) * 100}% - 4px)`;
 
   // Get the height of the tile
   useLayoutEffect(() => {
@@ -98,9 +96,7 @@ const TestProgressTile = ({
         const inputElement = document.querySelector(textInputElement.elementId);
 
         if (!textInputElement) {
-          console.log(
-            `Input field "${textInputElement.elementId}" not found - ignoring`
-          );
+          console.log(`Input field "${textInputElement.elementId}" not found - ignoring`);
         } else if (inputElement.value !== textInputElement.requiredInput) {
           console.log("Not all required text inputs are correct");
           return;
@@ -152,7 +148,7 @@ const TestProgressTile = ({
 
     const updateTilePosition = () => {
       setTilePosition({
-        top: window.innerHeight - tileHeight,
+        top: document.documentElement.clientHeight - tileHeight,
         left: document.documentElement.clientWidth - tileWidth - 20,
       });
     };
@@ -183,8 +179,9 @@ const TestProgressTile = ({
     top: tilePosition.top,
     left: tilePosition.left,
     pointerEvents: "all",
-    zIndex: 1000,
+    zIndex: 1000000000,
     width: "380px",
+    backgroundColor: "white",
     boxShadow: "0 0 4px 2px rgba(63, 21, 177, 0.2)",
     borderBottomRightRadius: "0px",
     borderBottomLeftRadius: "0px",
@@ -216,11 +213,7 @@ const TestProgressTile = ({
     // }
 
     return (
-      <ListItem
-        key={index}
-        disableGutters
-        sx={{ margin: "0 0", padding: "2.5px 0" }}
-      >
+      <ListItem key={index} disableGutters sx={{ margin: "0 0", padding: "2.5px 0" }}>
         <ListItemIcon style={{ minWidth: "40px" }}>
           {index < currentTaskNo ? (
             <CheckCircleIcon sx={{ color: "#4CAF50", fontSize: "1.2rem" }} />
@@ -245,8 +238,7 @@ const TestProgressTile = ({
                 fontSize: "0.95rem",
                 // textDecoration:
                 //   index < currentTaskNo - 1 ? "line-through" : "none",
-                color:
-                  index < currentTaskNo ? "rgba(0, 0, 0, 0.54)" : "inherit",
+                color: index < currentTaskNo ? "rgba(0, 0, 0, 0.54)" : "inherit",
               }}
             >
               <span class="extra-strike"></span>
@@ -273,11 +265,7 @@ const TestProgressTile = ({
           backgroundColor="#3F15B1"
           padding="12px"
         >
-          <Box
-            display="flex"
-            justifyContent="space-between"
-            alignItems="center"
-          >
+          <Box display="flex" justifyContent="space-between" alignItems="center">
             <Typography
               className="fade-in-text"
               variant={isExpanded ? "subtitle2" : "subtitle1"}
@@ -429,7 +417,7 @@ const TestProgressTile = ({
           top="0"
           left="0"
           style={{
-            zIndex: 1007,
+            zIndex: 1000000007,
             backgroundColor: "rgba(0, 0, 0, 0.2)",
             pointerEvents: "all",
           }}

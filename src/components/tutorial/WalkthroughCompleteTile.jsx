@@ -38,7 +38,7 @@ const WalkthroughCompleteTile = ({
       <Box
         sx={{
           position: "absolute",
-          zIndex: 1000,
+          zIndex: 1000000000,
           pointerEvents: "all",
           width: "400px",
           padding: "16px",
@@ -160,7 +160,7 @@ const WalkthroughCompleteTile = ({
           top="0"
           left="0"
           style={{
-            zIndex: 1007,
+            zIndex: 1000000007,
             backgroundColor: "rgba(0, 0, 0, 0.2)",
             pointerEvents: "all",
           }}

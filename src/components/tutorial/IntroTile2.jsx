@@ -16,7 +16,7 @@ const IntroTile2 = ({ logoSrc, stages, onNext, onExit }) => {
       <Box
         sx={{
           position: "absolute",
-          zIndex: 1000,
+          zIndex: 1000000000,
           pointerEvents: "all",
           width: "400px",
           padding: "16px",

@@ -97,9 +97,7 @@ const Tooltip = ({
 
       // Check if tooltip goes out of viewport on the left
       if (left < 0) {
-        left =
-          (2 * (rect.left + window.scrollX) + rect.width) / 2 -
-          tooltipWidth / 2; // Adjust to fit within the viewport
+        left = (2 * (rect.left + window.scrollX) + rect.width) / 2 - tooltipWidth / 2; // Adjust to fit within the viewport
         arrowLeft = left + tooltipWidth / 2 - arrowSize / 2; // Arrow centered horizontally
 
         top = rect.top + window.scrollY - tooltipHeight - offset; // If tooltip cannot fit on both the left and right, try it on top
@@ -151,10 +149,7 @@ const Tooltip = ({
         console.log("Tooltip top: " + tooltipPosition.top);
         console.log("Target Element top: " + targetAreaPos.top);
         console.log("Window top: " + window.scrollY);
-        console.log(
-          "Window bottom: " +
-            (window.scrollY + document.documentElement.clientHeight)
-        );
+        console.log("Window bottom: " + (window.scrollY + document.documentElement.clientHeight));
 
         // Check first if tooltip or target element higher
         // if tooltip higher, you want to scroll to its top
@@ -211,7 +206,7 @@ const Tooltip = ({
     position: "absolute",
     top: tooltipPosition.top,
     left: tooltipPosition.left,
-    zIndex: 1000,
+    zIndex: 1000000000,
     padding: "16px",
     width: tooltipWidth,
     boxShadow: "0 0 4px 2px rgba(63, 21, 177, 0.2)",
@@ -224,9 +219,7 @@ const Tooltip = ({
         pointerEvents: "all",
         opacity: isVisible ? 1 : 0,
         transition:
-          type === "informative"
-            ? "opacity 0.5s ease-in-out"
-            : "opacity 0.25s ease-in-out",
+          type === "informative" ? "opacity 0.5s ease-in-out" : "opacity 0.25s ease-in-out",
       }}
     >
       <Box
@@ -257,11 +250,7 @@ const Tooltip = ({
               alignItems="center"
             >
               {canGoBack && (
-                <IconButton
-                  onClick={onBack}
-                  size="small"
-                  sx={{ color: "#3F15B1" }}
-                >
+                <IconButton onClick={onBack} size="small" sx={{ color: "#3F15B1" }}>
                   <ArrowBackIcon fontSize="small" />
                 </IconButton>
               )}
@@ -280,12 +269,7 @@ const Tooltip = ({
             </Box>
           </>
         ) : (
-          <Typography
-            variant="body2"
-            fontSize={"1.3rem"}
-            fontWeight={550}
-            textAlign={"center"}
-          >
+          <Typography variant="body2" fontSize={"1.3rem"} fontWeight={550} textAlign={"center"}>
             {formattedContent}
           </Typography>
         )}

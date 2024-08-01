@@ -45,7 +45,7 @@ const TutorialProgressTile = ({
 
   const style = {
     position: "absolute",
-    zIndex: 1000,
+    zIndex: 1000000000,
     pointerEvents: "all",
     width: "400px",
     boxShadow: "0 0 4px 2px rgba(63, 21, 177, 0.2)",
@@ -260,7 +260,7 @@ const TutorialProgressTile = ({
           top="0"
           left="0"
           style={{
-            zIndex: 1007,
+            zIndex: 1000000007,
             backgroundColor: "rgba(0, 0, 0, 0.2)",
             pointerEvents: "all",
           }}

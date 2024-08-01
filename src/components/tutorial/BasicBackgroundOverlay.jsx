@@ -14,7 +14,7 @@ const BasicBackgroundOverlay = ({ focusElement }) => {
       top="0"
       left="0"
       style={{
-        zIndex: 1007,
+        zIndex: 1000000007,
         backgroundColor: "rgba(0, 0, 0, 0.2)",
         pointerEvents: "all",
       }}

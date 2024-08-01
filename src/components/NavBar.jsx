@@ -8,17 +8,17 @@ import { styled } from "@mui/material/styles";
 import LogoutDialog from "./dialogs/LogoutDialog";
 
 const StyledNavBar = styled(AppBar, {
-  shouldForwardProp: (prop) => prop !== 'open',
+  shouldForwardProp: (prop) => prop !== "open",
 })(({ theme, open }) => ({
   zIndex: theme.zIndex.drawer + 1,
-  transition: theme.transitions.create(['width', 'margin'], {
+  transition: theme.transitions.create(["width", "margin"], {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,
   }),
   ...(open && {
     marginLeft: "240px",
     width: `calc(100% - 240px)`,
-    transition: theme.transitions.create(['width', 'margin'], {
+    transition: theme.transitions.create(["width", "margin"], {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.enteringScreen,
     }),
@@ -37,7 +37,7 @@ const NavBar = ({ open, onMenuClick }) => {
     setOpenLogoutDialog(!openLogoutDialog);
   };
   return (
-    <StyledNavBar position="fixed" open={open}>
+    <StyledNavBar position="fixed" open={open} sx={{ zIndex: 902 }}>
       <Toolbar>
         <IconButton
           color="inherit"

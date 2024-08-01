@@ -23,14 +23,17 @@ const Tutorial = ({ tutorialContent, onExit }) => {
   const [walkthroughActive, setWalkthroughActive] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
   const [tooltipChanging, setTooltipChanging] = useState(false);
-  const [walkthroughCompleteIntermission, setWalkthroughCompleteIntermission] = useState(false);
+  const [walkthroughCompleteIntermission, setWalkthroughCompleteIntermission] =
+    useState(false);
 
   const [testActive, setTestActive] = useState(false);
   const [currentTask, setCurrentTask] = useState(0);
   const [taskChanging, setTaskChanging] = useState(false);
 
-  const [stageCompleteIntermission1, setStageCompleteIntermission1] = useState(false);
-  const [stageCompleteIntermission2, setStageCompleteIntermission2] = useState(false);
+  const [stageCompleteIntermission1, setStageCompleteIntermission1] =
+    useState(false);
+  const [stageCompleteIntermission2, setStageCompleteIntermission2] =
+    useState(false);
 
   const [scrollHeight, setScrollHeight] = useState(0); // used to fade component onto screen
 
@@ -182,7 +185,7 @@ const Tutorial = ({ tutorialContent, onExit }) => {
 
   return (
     <Box
-      zIndex={1000}
+      zIndex={1000000000}
       sx={{
         position: "absolute",
         top: "0px",
@@ -239,19 +242,27 @@ const Tutorial = ({ tutorialContent, onExit }) => {
             handleTootlipChange() // rerender tooltip for animation sake
           }
           <TooltipOverlay
-            targetAreaEl={tutorial[currentStage].tooltips[currentStep].targetAreaElement}
+            targetAreaEl={
+              tutorial[currentStage].tooltips[currentStep].targetAreaElement
+            }
           ></TooltipOverlay>
         </>
       )}
       {!tooltipChanging && walkthroughActive && (
         <>
           <TooltipOverlay
-            targetAreaEl={tutorial[currentStage].tooltips[currentStep].targetAreaElement}
+            targetAreaEl={
+              tutorial[currentStage].tooltips[currentStep].targetAreaElement
+            }
           ></TooltipOverlay>
           <Tooltip
             type={tutorial[currentStage].tooltips[currentStep].type}
-            targetEl={tutorial[currentStage].tooltips[currentStep].targetElement}
-            targetAreaEl={tutorial[currentStage].tooltips[currentStep].targetAreaElement}
+            targetEl={
+              tutorial[currentStage].tooltips[currentStep].targetElement
+            }
+            targetAreaEl={
+              tutorial[currentStage].tooltips[currentStep].targetAreaElement
+            }
             title={tutorial[currentStage].tooltips[currentStep].title}
             content={tutorial[currentStage].tooltips[currentStep].content}
             canGoBack={currentStep !== 0}

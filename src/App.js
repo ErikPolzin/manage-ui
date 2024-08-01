@@ -34,8 +34,9 @@ import theme from "./theme";
 import { usePersistantState } from "./hooks";
 import { fetchAPI } from "./keycloak";
 import ResourcesPage from "./pages/ResourcesPage";
-// import Tutorial from "./components/tutorial/Tutorial";
-// import tutorialData from "./tutorialData/tutorialData";
+import Tutorial from "./components/tutorial/Tutorial";
+import tutorialData from "./tutorialData/tutorialData";
+import zIndex from "@mui/material/styles/zIndex";
 
 const drawerWidth = 240;
 
@@ -106,7 +107,7 @@ function App() {
   const [meshes, setMeshes] = useState(null);
   const location = useLocation();
 
-  // const [tutorialActive, setTutorialActive] = useState(false);
+  const [tutorialActive, setTutorialActive] = useState(false);
 
   const toggleDrawer = () => {
     setOpen(!open);
@@ -141,16 +142,17 @@ function App() {
     }
   }, [initialized, keycloak]);
 
-  // const handleExitTutorial = () => {
-  //   setTutorialActive(false);
-  // };
+  const handleExitTutorial = () => {
+    setTutorialActive(false);
+  };
 
   return (
     <ThemeProvider theme={theme}>
+      {/* {tutorialActive && <div style={{ height: "29.5px" }}></div>} */}
       <Box sx={{ display: "flex" }}>
         <CssBaseline />
         <NavBar open={open} onMenuClick={toggleDrawer} />
-        <StyledDrawer variant="permanent" open={open}>
+        <StyledDrawer variant="permanent" open={open} sx={{ zIndex: 901 }}>
           <DrawerHeader>
             <ListItemButton key="account" component={Link} to="/account">
               <ListItemAvatar>
@@ -277,18 +279,17 @@ function App() {
                 <Route path="/account" element={<AccountPage />} />
                 <Route
                   path="/resources"
-                  // element={<ResourcesPage onActivate={() => setTutorialActive(true)} />}
-                  element={<ResourcesPage />}
+                  element={<ResourcesPage onActivate={() => setTutorialActive(true)} />}
                 />
               </Routes>
             )}
           </Main>
           <MeshDialog open={meshOpen} onClose={() => setMeshOpen(false)}></MeshDialog>
         </MeshContext.Provider>
-        {/* {tutorialActive && (
-          <Tutorial tutorialContent={tutorialData} onExit={handleExitTutorial}></Tutorial>
-        )} */}
       </Box>
+      {tutorialActive && (
+        <Tutorial tutorialContent={tutorialData} onExit={handleExitTutorial}></Tutorial>
+      )}
     </ThemeProvider>
   );
 }
