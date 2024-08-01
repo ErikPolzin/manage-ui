@@ -8,6 +8,7 @@ import Select from "@mui/material/Select";
 import Avatar from "@mui/material/Avatar";
 import Typography from "@mui/material/Typography";
 import ListItemIcon from "@mui/material/ListItemIcon";
+import QuizIcon from "@mui/icons-material/Quiz";
 import Box from "@mui/material/Box";
 import Divider from "@mui/material/Divider";
 import Drawer from "@mui/material/Drawer";
@@ -32,6 +33,9 @@ import NavBar from "./components/NavBar";
 import theme from "./theme";
 import { usePersistantState } from "./hooks";
 import { fetchAPI } from "./keycloak";
+import ResourcesPage from "./pages/ResourcesPage";
+// import Tutorial from "./components/tutorial/Tutorial";
+// import tutorialData from "./tutorialData/tutorialData";
 
 const drawerWidth = 240;
 
@@ -102,6 +106,8 @@ function App() {
   const [meshes, setMeshes] = useState(null);
   const location = useLocation();
 
+  // const [tutorialActive, setTutorialActive] = useState(false);
+
   const toggleDrawer = () => {
     setOpen(!open);
   };
@@ -135,6 +141,10 @@ function App() {
     }
   }, [initialized, keycloak]);
 
+  // const handleExitTutorial = () => {
+  //   setTutorialActive(false);
+  // };
+
   return (
     <ThemeProvider theme={theme}>
       <Box sx={{ display: "flex" }}>
@@ -142,11 +152,7 @@ function App() {
         <NavBar open={open} onMenuClick={toggleDrawer} />
         <StyledDrawer variant="permanent" open={open}>
           <DrawerHeader>
-            <ListItemButton
-              key="account"
-              component={Link}
-              to="/account"
-            >
+            <ListItemButton key="account" component={Link} to="/account">
               <ListItemAvatar>
                 <Avatar>{initials}</Avatar>
               </ListItemAvatar>
@@ -210,6 +216,17 @@ function App() {
               </ListItemIcon>
               <ListItemText primary="Alerts" />
             </ListItemButton>
+            <ListItemButton
+              key="5"
+              component={Link}
+              to="/resources"
+              selected={location.pathname.startsWith("/resources")}
+            >
+              <ListItemIcon>
+                <QuizIcon />
+              </ListItemIcon>
+              <ListItemText primary="Resources" />
+            </ListItemButton>
           </List>
           {open && meshes !== null ? (
             <List sx={{ position: "absolute", bottom: 0 }}>
@@ -258,11 +275,19 @@ function App() {
                 <Route path="/alerts" element={<AlertsPage />} />
                 <Route path="/users" element={<UsersPage />} />
                 <Route path="/account" element={<AccountPage />} />
+                <Route
+                  path="/resources"
+                  // element={<ResourcesPage onActivate={() => setTutorialActive(true)} />}
+                  element={<ResourcesPage />}
+                />
               </Routes>
             )}
           </Main>
           <MeshDialog open={meshOpen} onClose={() => setMeshOpen(false)}></MeshDialog>
         </MeshContext.Provider>
+        {/* {tutorialActive && (
+          <Tutorial tutorialContent={tutorialData} onExit={handleExitTutorial}></Tutorial>
+        )} */}
       </Box>
     </ThemeProvider>
   );

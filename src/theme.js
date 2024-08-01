@@ -2,7 +2,7 @@ import { createTheme } from "@mui/material/styles";
 
 const theme = createTheme({
   palette: {
-    mode: "dark",
+    mode: "light",
     primary: {
       light: "#6573c3",
       main: "#3f51b5",
@@ -18,8 +18,8 @@ const theme = createTheme({
     graphs: {
       dataRecv: "#02d5d1",
       dataSent: "#37b3ff",
-      sessionTime: "#1f8127"
-    }
+      sessionTime: "#1f8127",
+    },
   },
 });
 
