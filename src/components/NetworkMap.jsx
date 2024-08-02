@@ -1,6 +1,6 @@
 import React, { useRef } from "react";
 import { useTheme } from "@mui/material/styles";
-import { MapContainer, TileLayer, Marker, useMap } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, useMap, Polyline } from "react-leaflet";
 import Box from "@mui/material/Box";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
@@ -96,25 +96,37 @@ function DraggableMarker({ node, handlePositionChange, handleMarkerClick }) {
   );
 }
 
-const NetworkMap = ({ nodes, handlePositionChange, style, handleMarkerClick, id }) => {
+const NetworkMap = ({ nodes, center, handlePositionChange, style, handleMarkerClick, id }) => {
   const mapRef = useRef(null);
   const theme = useTheme();
-  const [center, setCenter] = React.useState([0, 0]);
   const [zoom, setZoom] = React.useState(13);
 
-  React.useEffect(() => {
-    // We want to center the screen at the average position of the nodes.
-    // If none of the nodes have positions, we center at the average mesh position, or 0.
-    let avgMeshLat = nodes.reduce((s, n) => s + n.mesh_lat / nodes.length, 0);
-    let avgMeshLon = nodes.reduce((s, n) => s + n.mesh_lon / nodes.length, 0);
-    let validNodes = nodes.filter((n) => n.lat && n.lon);
-    let avgLat = validNodes.reduce((s, n) => s + n.lat / validNodes.length, 0);
-    let avgLon = validNodes.reduce((s, n) => s + n.lon / validNodes.length, 0);
-    setCenter([avgLat !== 0 ? avgLat : avgMeshLat, avgLon !== 0 ? avgLon : avgMeshLon]);
-  }, [nodes, zoom]);
+  /**
+   * Generate polyline geometry based on neighbouring nodes
+   * @returns 2d array of neighbour connector line lat/lon
+   */
+  function neighbouringConnections() {
+    let latlngs = [];
+    let nodeMacs = nodes.map(n => n.mac);
+    let seenMacs = new Set();
+    for (let node of nodes) {
+      for (let n of node.neighbours) {
+        // Neighbours may be bi-directional, but we only want to
+        // add one line for each direction.
+        if (seenMacs.has(n)) continue;
+        let nobj = nodes[nodeMacs.indexOf(n)];
+        latlngs.push([
+          [node.lat, node.lon],
+          [nobj.lat, nobj.lon]
+        ])
+        seenMacs.add(node.mac);
+      }
+    }
+    return latlngs;
+  }
 
   return (
-    <Box class={theme.palette.mode}>
+    <Box className={theme.palette.mode}>
       <MapContainer
         center={center}
         zoom={zoom}
@@ -128,6 +140,7 @@ const NetworkMap = ({ nodes, handlePositionChange, style, handleMarkerClick, id 
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
+        <Polyline pathOptions={{color: "red"}} positions={neighbouringConnections()} />
         {nodes.map((node) => (
           <DraggableMarker
             key={node.mac}

@@ -11,6 +11,7 @@ import qs from "qs";
 
 const HomePage = () => {
   const [nodes, setNodes] = React.useState([]);
+  const [center, setCenter] = React.useState([0, 0]);
   const [loading, setLoading] = React.useState(0);
   const [nNodes, setNNodes] = React.useState(0);
   const [nPositionedNodes, setNPositionedNodes] = React.useState(0);
@@ -93,10 +94,18 @@ const HomePage = () => {
   };
 
   const fetchNodes = () => {
-    const fields = ["lat", "lon", "mac", "mesh_lat", "mesh_lon", "is_ap", "status"]
+    const fields = ["lat", "lon", "mac", "mesh_lat", "mesh_lon", "is_ap", "status", "neighbours"];
     fetchAPI(`/monitoring/devices/?${qs.stringify({ fields })}`)
       .then((data) => {
         setNodes(data);
+        // We want to center the screen at the average position of the nodes.
+        // If none of the nodes have positions, we center at the average mesh position, or 0.
+        let avgMeshLat = data.reduce((s, n) => s + n.mesh_lat / data.length, 0);
+        let avgMeshLon = data.reduce((s, n) => s + n.mesh_lon / data.length, 0);
+        let validNodes = data.filter((n) => n.lat && n.lon);
+        let avgLat = validNodes.reduce((s, n) => s + n.lat / validNodes.length, 0);
+        let avgLon = validNodes.reduce((s, n) => s + n.lon / validNodes.length, 0);
+        setCenter([avgLat !== 0 ? avgLat : avgMeshLat, avgLon !== 0 ? avgLon : avgMeshLon]);
       })
       .catch((error) => {
         console.log("Error fetching device locations: " + error);
@@ -141,6 +150,7 @@ const HomePage = () => {
         <NetworkMap
           handlePositionChange={handleNodePositionChange}
           nodes={nodes}
+          center={center}
           style={{ position: "sticky", top: "-150px", height: "70vh" }}
           handleMarkerClick={handleClickedNode}
           id="dashboard-map"
