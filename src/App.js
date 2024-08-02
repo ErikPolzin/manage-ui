@@ -1,6 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { ThemeProvider, styled } from "@mui/material/styles";
-import { Dashboard, Router, Public, Error, Person } from "@mui/icons-material";
+import {
+  Dashboard,
+  Router,
+  Public,
+  Error,
+  Person,
+  Add,
+  Power,
+  PowerOff,
+} from "@mui/icons-material";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
@@ -17,7 +26,7 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
 import CircularProgress from "@mui/material/CircularProgress";
 import ListItem from "@mui/material/ListItem";
-import Button from "@mui/material/Button";
+import Badge from "@mui/material/Badge";
 import ListItemAvatar from "@mui/material/ListItemAvatar";
 import { Routes, Route, Link, useLocation } from "react-router-dom";
 import { useKeycloak } from "@react-keycloak/web";
@@ -30,10 +39,18 @@ import UsersPage from "./pages/UsersPage";
 import AccountPage from "./pages/AccountPage";
 import NavBar from "./components/NavBar";
 import theme from "./theme";
+import useWebSocket, { ReadyState } from "react-use-websocket";
 import { usePersistantState } from "./hooks";
 import { fetchAPI } from "./keycloak";
 
 const drawerWidth = 240;
+const CONNECTION_STATUSES = {
+  [ReadyState.CONNECTING]: "Connecting to API",
+  [ReadyState.OPEN]: "Connected to API",
+  [ReadyState.CLOSING]: "Closing connection",
+  [ReadyState.CLOSED]: "Closed connection",
+  [ReadyState.UNINSTANTIATED]: "Uninstantiated",
+};
 
 const Main = styled("main", {
   shouldForwardProp: (prop) => prop !== "open",
@@ -101,6 +118,17 @@ function App() {
   // an undefined value before meshes are loaded.
   const [meshes, setMeshes] = useState(null);
   const location = useLocation();
+  const [isConnected, setIsConnected] = useState(false);
+  const [connectionStatus, setConnectionStatus] = useState("Unknown");
+  const { readyState } = useWebSocket(`${process.env.REACT_APP_WS_URL}/ws/updates/`, {
+    share: true,
+    shouldReconnect: () => true,
+  });
+
+  React.useEffect(() => {
+    setIsConnected(readyState === ReadyState.OPEN);
+    setConnectionStatus(CONNECTION_STATUSES[readyState]);
+  }, [readyState]);
 
   const toggleDrawer = () => {
     setOpen(!open);
@@ -142,11 +170,7 @@ function App() {
         <NavBar open={open} onMenuClick={toggleDrawer} />
         <StyledDrawer variant="permanent" open={open}>
           <DrawerHeader>
-            <ListItemButton
-              key="account"
-              component={Link}
-              to="/account"
-            >
+            <ListItemButton key="account" component={Link} to="/account">
               <ListItemAvatar>
                 <Avatar>{initials}</Avatar>
               </ListItemAvatar>
@@ -211,10 +235,18 @@ function App() {
               <ListItemText primary="Alerts" />
             </ListItemButton>
           </List>
-          {open && meshes !== null ? (
-            <List sx={{ position: "absolute", bottom: 0 }}>
+          <List sx={{ position: "absolute", bottom: 0, width: "100%" }}>
+            <ListItem>
+              <ListItemIcon>
+                <Badge variant="dot" color={isConnected ? "success" : "error"}>
+                  {isConnected ? <Power /> : <PowerOff />}
+                </Badge>
+              </ListItemIcon>
+              <ListItemText primary={connectionStatus} />
+            </ListItem>
+            {open && meshes !== null ? (
               <ListItem>
-                <FormControl sx={{ m: 0, width: 200 }} size="small">
+                <FormControl fullWidth size="small">
                   <InputLabel>Mesh</InputLabel>
                   <Select value={mesh} onChange={(e) => setMesh(e.target.value)} label="Mesh">
                     {meshes.map((m) => (
@@ -225,13 +257,14 @@ function App() {
                   </Select>
                 </FormControl>
               </ListItem>
-              <ListItem>
-                <Button variant="outlined" onClick={() => setMeshOpen(true)} fullWidth>
-                  Add Mesh
-                </Button>
-              </ListItem>
-            </List>
-          ) : null}
+            ) : null}
+            <ListItemButton onClick={() => setMeshOpen(true)}>
+              <ListItemIcon>
+                <Add color="primary" />
+              </ListItemIcon>
+              <ListItemText primary="Add Mesh" />
+            </ListItemButton>
+          </List>
         </StyledDrawer>
         <MeshContext.Provider value={{ mesh, setMesh }}>
           <Main open={open}>

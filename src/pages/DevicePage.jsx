@@ -51,7 +51,7 @@ function DevicePage() {
   const { lastJsonMessage, readyState } = useWebSocket(
     `${process.env.REACT_APP_WS_URL}/ws/updates/`,
     {
-      share: false,
+      share: true,
       shouldReconnect: () => true,
     },
   );
