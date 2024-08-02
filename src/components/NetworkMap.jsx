@@ -96,16 +96,18 @@ function DraggableMarker({ node, handlePositionChange, handleMarkerClick }) {
 
 const NetworkMap = ({ nodes, handlePositionChange, style, handleMarkerClick, id }) => {
   const mapRef = useRef(null);
-  const [center, setCenter] = React.useState([-33.9221, 18.4231]);
+  const [center, setCenter] = React.useState([0, 0]);
   const [zoom, setZoom] = React.useState(13);
 
   React.useEffect(() => {
-    let validNodes = nodes.filter((n) => (n.lat || n.mesh_lat) && (n.lon || n.mesh_lon));
-    let avgLat = validNodes.reduce((s, n) => s + (n.lat || n.mesh_lat) / validNodes.length, 0);
-    let avgLon = validNodes.reduce((s, n) => s + (n.lon || n.mesh_lon) / validNodes.length, 0);
-    // Shift the marker if there's only one other, we don't want overlapping nodes
-    if (validNodes.length === 1) avgLon += 0.1 / zoom;
-    setCenter([avgLat, avgLon]);
+    // We want to center the screen at the average position of the nodes.
+    // If none of the nodes have positions, we center at the average mesh position, or 0.
+    let avgMeshLat = nodes.reduce((s, n) => s + n.mesh_lat / nodes.length, 0);
+    let avgMeshLon = nodes.reduce((s, n) => s + n.mesh_lon / nodes.length, 0);
+    let validNodes = nodes.filter((n) => n.lat && n.lon);
+    let avgLat = validNodes.reduce((s, n) => s + n.lat / validNodes.length, 0);
+    let avgLon = validNodes.reduce((s, n) => s + n.lon / validNodes.length, 0);
+    setCenter([avgLat !== 0 ? avgLat : avgMeshLat, avgLon !== 0 ? avgLon : avgMeshLon]);
   }, [nodes, zoom]);
 
   return (
