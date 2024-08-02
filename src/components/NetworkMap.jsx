@@ -1,5 +1,7 @@
 import React, { useRef } from "react";
+import { useTheme } from "@mui/material/styles";
 import { MapContainer, TileLayer, Marker, useMap } from "react-leaflet";
+import Box from "@mui/material/Box";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "./NetworkMap.css";
@@ -96,6 +98,7 @@ function DraggableMarker({ node, handlePositionChange, handleMarkerClick }) {
 
 const NetworkMap = ({ nodes, handlePositionChange, style, handleMarkerClick, id }) => {
   const mapRef = useRef(null);
+  const theme = useTheme();
   const [center, setCenter] = React.useState([0, 0]);
   const [zoom, setZoom] = React.useState(13);
 
@@ -111,28 +114,30 @@ const NetworkMap = ({ nodes, handlePositionChange, style, handleMarkerClick, id 
   }, [nodes, zoom]);
 
   return (
-    <MapContainer
-      center={center}
-      zoom={zoom}
-      scrollWheelZoom={false}
-      ref={mapRef}
-      style={{ height: "100%", width: "100%", ...style }}
-      id={id}
-    >
-      <ChangeView center={center} />
-      <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-      />
-      {nodes.map((node) => (
-        <DraggableMarker
-          key={node.mac}
-          node={node}
-          handlePositionChange={handlePositionChange}
-          handleMarkerClick={handleMarkerClick}
+    <Box class={theme.palette.mode}>
+      <MapContainer
+        center={center}
+        zoom={zoom}
+        scrollWheelZoom={false}
+        ref={mapRef}
+        style={{ height: "100%", width: "100%", ...style }}
+        id={id}
+      >
+        <ChangeView center={center} />
+        <TileLayer
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
-      ))}
-    </MapContainer>
+        {nodes.map((node) => (
+          <DraggableMarker
+            key={node.mac}
+            node={node}
+            handlePositionChange={handlePositionChange}
+            handleMarkerClick={handleMarkerClick}
+          />
+        ))}
+      </MapContainer>
+    </Box>
   );
 };
 
