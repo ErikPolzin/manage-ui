@@ -185,7 +185,7 @@ function DeviceList({
             ],
           },
 
-          { field: "name", headerName: "Name", align: "center" },
+          { field: "name", headerName: "Name", align: "center", minWidth: 100 },
           {
             field: "status",
             headerName: "Status",
@@ -222,7 +222,7 @@ function DeviceList({
           {
             field: "last_ping",
             headerName: "Last Ping",
-            minWidth: 150,
+            maxWidth: 150,
             valueGetter: (value, row) =>
               value ? humanizeDuration(new Date() - new Date(value), { round: true }) : "Never",
             cellClassName: (params) => (params.value === "Never" ? "disabled" : ""),
@@ -230,7 +230,7 @@ function DeviceList({
           {
             field: "last_contact",
             headerName: "Last Report",
-            minWidth: 150,
+            maxWidth: 150,
             valueGetter: (value, row) =>
               value ? humanizeDuration(new Date() - new Date(value), { round: true }) : "Never",
             cellClassName: (params) => (params.value === "Never" ? "disabled" : ""),
@@ -238,7 +238,7 @@ function DeviceList({
           {
             field: "created",
             headerName: "Created",
-            minWidth: 200,
+            maxWidth: 200,
             valueGetter: (value, row) => new Date(value).toLocaleString(),
           },
         ]}
