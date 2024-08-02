@@ -1,5 +1,5 @@
 import React, { useRef } from "react";
-import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "./NetworkMap.css";
@@ -81,7 +81,7 @@ function DraggableMarker({ node, handlePositionChange, handleMarkerClick }) {
     [node, handlePositionChange, handleMarkerClick],
   );
 
-  const icon = createNodeIcon("AP", true);
+  const icon = createNodeIcon(node.is_ap ? "AP" : "Node", node.status === "online");
 
   return (
     <Marker

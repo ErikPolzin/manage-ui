@@ -93,10 +93,8 @@ const HomePage = () => {
   };
 
   const fetchNodes = () => {
-    console.log("setting the nodes");
-    fetchAPI(
-      "/monitoring/devices/?fields=lat&fields=lon&fields=name&fields=mac&fields=mesh_lat&fields=mesh_lon",
-    )
+    const fields = ["lat", "lon", "mac", "mesh_lat", "mesh_lon", "is_ap", "status"]
+    fetchAPI(`/monitoring/devices/?${qs.stringify({ fields })}`)
       .then((data) => {
         setNodes(data);
       })
