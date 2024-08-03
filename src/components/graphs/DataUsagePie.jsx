@@ -95,9 +95,15 @@ function DataUsagePie({ accounts }) {
   );
 
   return (
-    <Stack direction={{ xs: "column-reverse", md: "row" }} width="100%" textAlign="center" spacing={2}>
+    <Stack
+      direction={{ xs: "column-reverse", md: "row" }}
+      width="100%"
+      textAlign="center"
+    >
       <Box flexGrow={1}>
-        <Typography variant="h6">Received Data</Typography>
+        <Box sx={{ height: 55, display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <Typography variant="h6">Received Data</Typography>
+        </Box>
         <Divider />
         <PieChart
           // highlightedItem={{ seriesId: "recv-grouped", dataIndex: selectedRecvIndex() }}
@@ -124,7 +130,9 @@ function DataUsagePie({ accounts }) {
         />
       </Box>
       <Box flexGrow={1}>
-        <Typography variant="h6">Sent Data</Typography>
+        <Box sx={{ height: 55, display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <Typography variant="h6">Sent Data</Typography>
+        </Box>
         <Divider />
         <PieChart
           // highlightedItem={{ seriesId: "send-grouped", dataIndex: selectedSendIndex() }}
