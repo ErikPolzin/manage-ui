@@ -14,6 +14,7 @@ import DataRateGraph from "../components/graphs/DataRateGraph";
 import RTTGraph from "../components/graphs/RTTGraph";
 import UptimeGraph from "../components/graphs/UptimeGraph";
 import DeviceDetailCard from "../components/DeviceDetailCard";
+import { MS_IN } from "../components/graphs/utils";
 import { useQueryState } from "../hooks";
 import { fetchAPI } from "../keycloak";
 import { Container } from "@mui/material";
@@ -45,21 +46,17 @@ function DevicePage() {
   const [alert, setAlert] = React.useState({ show: false, message: "", type: "error" });
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState(null);
+  const [minTime, setMinTime] = React.useState(null);
   const [showDays, setShowDays] = React.useState("month");
   const [tabValue, setTabValue] = React.useState(0);
 
-  const { lastJsonMessage, readyState } = useWebSocket(
+  const { lastJsonMessage } = useWebSocket(
     `${process.env.REACT_APP_WS_URL}/ws/updates/`,
     {
       share: true,
       shouldReconnect: () => true,
     },
   );
-
-  // Run when the connection state (readyState) changes
-  React.useEffect(() => {
-    console.log("WS: Connection state changed", readyState);
-  }, [readyState]);
 
   // Run when a new WebSocket message is received (lastJsonMessage)
   React.useEffect(() => {
@@ -73,6 +70,9 @@ function DevicePage() {
       }
     }
   }, [lastJsonMessage]);
+
+  // Sync min time when the user changes the toggle button
+  React.useEffect(() => setMinTime(new Date() - MS_IN[showDays]), [showDays]);
 
   React.useEffect(() => {
     fetchDevices();
@@ -184,6 +184,7 @@ function DevicePage() {
             isLoading={loading}
             devices={devices}
             selectedDevice={selectedDevice()}
+            minTime={minTime}
             onSelect={setSelectedDeviceMac}
             onUpdate={handleUpdate}
             onAdd={handleAdd}

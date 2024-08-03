@@ -1,10 +1,10 @@
+import React from "react";
 import { useTheme } from "@mui/material/styles";
 import StripedDataGrid from "./StripedDataGrid";
 import Tooltip from "@mui/material/Tooltip";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
 import humanizeDuration from "humanize-duration";
-
 
 function DataUsageIndicator({ sentBytes, recvBytes, totalBytes }) {
   const theme = useTheme();
@@ -100,33 +100,76 @@ function ActiveIndicator({ active }) {
   );
 }
 
-function ConnectedClientsList({ clients, ...params }) {
-  function totalBytes() {
-    return clients.reduce((a, c) => a + c.bytes_sent + c.bytes_recv, 0);
-  }
-  function minTime() {
-    return Math.min(...clients.map((c) => c.start_time));
-  }
-  function maxTime() {
-    return Math.max(...clients.map((c) => c.end_time));
-  }
+export default function ConnectedClientsList({
+  clients,
+  minTimeOverride,
+  maxTimeOverride,
+  ...params
+}) {
+  /**
+   * Clients that have ended their session in the currently viewed time range.
+   */
+  const visibleAccounts = React.useCallback(
+    () => clients.filter((c) => new Date(c.acctstoptime || new Date()) > (minTimeOverride || 0)),
+    [clients, minTimeOverride],
+  );
+  /**
+   * Total bytes used by all clients, used to get an indication of how much
+   * data each client has used, proportionally.
+   */
+  const totalBytes = React.useCallback(() => {
+    return visibleAccounts().reduce((a, c) => a + c.acctinputoctets + c.acctoutputoctets, 0);
+  }, [visibleAccounts]);
+  /**
+   * The earliest start time for all clients. Can be overridden by the 'minTimeOverride' prop.
+   */
+  const minTime = React.useCallback(() => {
+    return (
+      minTimeOverride ||
+      new Date(
+        Math.min(
+          ...visibleAccounts()
+            .filter((c) => c.acctstarttime)
+            .map((c) => new Date(c.acctstarttime)),
+        ),
+      )
+    );
+  }, [minTimeOverride, visibleAccounts]);
+  /**
+   * The latest end time for all clients (usually the current time). Can be overridden by the 'maxTimeOverride' prop.
+   */
+  const maxTime = React.useCallback(() => maxTimeOverride || new Date(), [maxTimeOverride]);
   return (
     <StripedDataGrid
+      getRowId={(acc) => acc.radacctid}
       // Nested border looks weird
       sx={{ border: "none" }}
       getRowClassName={(params) => (params.indexRelativeToCurrentPage % 2 === 0 ? "even" : "odd")}
       autosizeOnMount
-      rows={clients.map((c) => ({
-        data_usage: c.bytes_sent + c.bytes_recv,
-        active: new Date() - c.end_time < 1000 * 60 * 10,
-        session_length: c.end_time - c.start_time,
-        ...c,
-      }))}
+      rows={visibleAccounts().map((c) => {
+        // Start time is unix epoch is not specified (shouldn't really ever be the case, but just in case)
+        let acctStartTime = new Date(c.acctstarttime || 0);
+        // End time is now if unspecified
+        let acctStopTime = new Date(c.acctstoptime || new Date());
+        // These date conversions are sending me, JS implicit type conversion sucks!!!
+        let visibleStartTime = new Date(Math.max(minTime(), acctStartTime));
+        let visibleEndTime = new Date(Math.min(maxTime(), acctStopTime));
+        return {
+          ...c,
+          // Total data usage is bytes send plus bytes received
+          data_usage: c.acctinputoctets + c.acctoutputoctets,
+          // A session is active if it has no end time
+          active: !Boolean(c.acctstoptime),
+          start_time: visibleStartTime,
+          end_time: visibleEndTime,
+          session_length: visibleEndTime - visibleStartTime,
+        };
+      })}
       density="compact"
       hideFooter
       columns={[
-        { field: "mac", headerName: "MAC Address", minWidth: 200 },
-        { field: "user", headerName: "Username", flex: 1 },
+        { field: "callingstationid", headerName: "MAC Address", minWidth: 200 },
+        { field: "username", headerName: "Username", flex: 1 },
         {
           field: "active",
           headerName: "Active",
@@ -137,8 +180,7 @@ function ConnectedClientsList({ clients, ...params }) {
           field: "session_length",
           headerName: "Session Length",
           minWidth: 150,
-          valueGetter: (value, row) =>
-            value ? humanizeDuration(value, { round: true }) : "--",
+          valueGetter: (value, row) => (value ? humanizeDuration(value, { round: true }) : "--"),
         },
         {
           field: "end_time",
@@ -159,8 +201,8 @@ function ConnectedClientsList({ clients, ...params }) {
           minWidth: 150,
           renderCell: (params) => (
             <DataUsageIndicator
-              sentBytes={params.row.bytes_sent}
-              recvBytes={params.row.bytes_recv}
+              sentBytes={params.row.acctoutputoctets}
+              recvBytes={params.row.acctinputoctets}
               totalBytes={totalBytes()}
             />
           ),
@@ -170,5 +212,3 @@ function ConnectedClientsList({ clients, ...params }) {
     />
   );
 }
-
-export default ConnectedClientsList;

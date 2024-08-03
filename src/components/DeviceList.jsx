@@ -23,6 +23,7 @@ function DeviceList({
   devices,
   isLoading,
   selectedDevice,
+  minTime,
   onAdd,
   onUpdate,
   onDelete,
@@ -63,6 +64,7 @@ function DeviceList({
           key={`${params.rowId}-clients`}
         >
           <ConnectedClientsList
+            minTimeOverride={minTime}
             clients={params.row.client_sessions.map((c) => ({
               ...c,
               end_time: new Date(c.end_time),
