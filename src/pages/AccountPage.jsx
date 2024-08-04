@@ -78,6 +78,7 @@ export default function AccountPage() {
         </Box>
       ) : (
         <Grid container spacing={2}>
+          <Typography variant="h5">Account for {accountCopy.username}</Typography>
           <Grid item xs={12}>
             <TextField
               type="text"
