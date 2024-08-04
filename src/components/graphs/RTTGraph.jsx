@@ -6,11 +6,13 @@ import { ChartsYAxis } from "@mui/x-charts/ChartsYAxis";
 import { ChartsReferenceLine } from "@mui/x-charts/ChartsReferenceLine";
 import { histogram, filteredData, GRANULARITY, BUCKET_SIZES, LABEL_FUNCS, MS_IN } from "./utils";
 import { fetchAPI } from "../../keycloak";
+import { MeshContext } from "../../context";
 
 const RTTGraph = ({ showDays, selectedDevice }) => {
   const [metrics, setMetrics] = React.useState([]);
   const [data, setData] = React.useState([]);
   const [loading, setLoading] = React.useState(false);
+  const { mesh } = React.useContext(MeshContext);
 
   React.useEffect(() => {
     setLoading(true);
@@ -89,7 +91,14 @@ const RTTGraph = ({ showDays, selectedDevice }) => {
       ]}
     >
       <AreaPlot />
-      <ChartsReferenceLine y={40} label="Warning Level" labelAlign="end" />
+      {mesh &&
+        (mesh.settings.check_rtt ? (
+          <ChartsReferenceLine
+            y={mesh.settings.check_rtt}
+            label="Maximum RTT"
+            labelAlign="end"
+          />
+        ) : null)}
       <ChartsXAxis
         axisId="time"
         label={selectedDevice ? `Round Trip Time for ${selectedDevice}` : "Average Round Trip Time"}

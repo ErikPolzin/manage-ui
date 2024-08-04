@@ -1,5 +1,5 @@
 import React from "react";
-import { ThemeProvider, styled } from "@mui/material/styles";
+import { ThemeProvider } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -12,6 +12,7 @@ import ServicesPage from "./pages/ServicesPage";
 import AlertsPage from "./pages/AlertsPage";
 import UsersPage from "./pages/UsersPage";
 import AccountPage from "./pages/AccountPage";
+import SettingsPage from "./pages/SettingsPage";
 import NavBar from "./components/NavBar";
 import Sidebar from "./components/Sidebar";
 import Toolbar from "@mui/material/Toolbar";
@@ -87,6 +88,7 @@ function App() {
                     <Route path="/alerts" element={<AlertsPage />} />
                     <Route path="/users" element={<UsersPage />} />
                     <Route path="/account" element={<AccountPage />} />
+                    <Route path="/settings" element={<SettingsPage />} />
                   </Routes>
                 )}
               </main>

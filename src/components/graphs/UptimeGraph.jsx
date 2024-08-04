@@ -6,6 +6,7 @@ import { ChartsYAxis } from "@mui/x-charts/ChartsYAxis";
 import { ChartsReferenceLine } from "@mui/x-charts/ChartsReferenceLine";
 import { histogram, filteredData, GRANULARITY, BUCKET_SIZES, LABEL_FUNCS, MS_IN } from "./utils";
 import { fetchAPI } from "../../keycloak";
+import { MeshContext } from "../../context";
 
 const COLOR_MAP = [
   [10, "#FF0000"],
@@ -31,6 +32,7 @@ const UptimeGraph = ({ showDays, selectedDevice }) => {
   const [metrics, setMetrics] = React.useState([]);
   const [data, setData] = React.useState([]);
   const [loading, setLoading] = React.useState(false);
+  const { mesh } = React.useContext(MeshContext);
 
   React.useEffect(() => {
     setLoading(true);
@@ -93,7 +95,20 @@ const UptimeGraph = ({ showDays, selectedDevice }) => {
       ]}
     >
       <BarPlot />
-      <ChartsReferenceLine y={10} label="Warning Level" labelAlign="end" />
+      {mesh &&
+        ((showDays === "week" || showDays === "month") && mesh.settings.check_daily_uptime ? (
+          <ChartsReferenceLine
+            y={mesh.settings.check_daily_uptime}
+            label="Daily Warning Level"
+            labelAlign="end"
+          />
+        ) : showDays === "day" && mesh.settings.check_hourly_uptime ? (
+          <ChartsReferenceLine
+            y={mesh.settings.check_hourly_uptime}
+            label="Hourly Warning Level"
+            labelAlign="end"
+          />
+        ) : null)}
       <ChartsXAxis
         axisId="time"
         label={selectedDevice ? `Uptime for ${selectedDevice}` : "Average Uptime"}
