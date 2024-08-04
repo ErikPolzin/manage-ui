@@ -5,7 +5,7 @@ import Box from "@mui/material/Box";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "./NetworkMap.css";
-import { MeshContext } from "../App";
+import { MeshContext } from "../context";
 
 import icon from "leaflet/dist/images/marker-icon.png";
 import iconShadow from "leaflet/dist/images/marker-shadow.png";

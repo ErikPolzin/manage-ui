@@ -6,7 +6,7 @@ import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import ToggleButton from "@mui/material/ToggleButton";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
-import useWebSocket from "react-use-websocket";
+import Container from "@mui/material/Container";
 
 import DeviceList from "../components/DeviceList";
 import DataUsageGraph from "../components/graphs/DataUsageGraph";
@@ -17,7 +17,7 @@ import DeviceDetailCard from "../components/DeviceDetailCard";
 import { MS_IN } from "../components/graphs/utils";
 import { useQueryState } from "../hooks";
 import { fetchAPI } from "../keycloak";
-import { Container } from "@mui/material";
+import { ApiSocketContext } from "../context";
 
 function GraphTabPanel({ children, value, index, ...other }) {
   return (
@@ -49,14 +49,7 @@ function DevicePage() {
   const [minTime, setMinTime] = React.useState(null);
   const [showDays, setShowDays] = React.useState("month");
   const [tabValue, setTabValue] = React.useState(0);
-
-  const { lastJsonMessage } = useWebSocket(
-    `${process.env.REACT_APP_WS_URL}/ws/updates/`,
-    {
-      share: true,
-      shouldReconnect: () => true,
-    },
-  );
+  const { lastJsonMessage } = React.useContext(ApiSocketContext);
 
   // Run when a new WebSocket message is received (lastJsonMessage)
   React.useEffect(() => {

@@ -6,7 +6,7 @@ import Divider from "@mui/material/Divider";
 import NetworkMap from "../components/NetworkMap";
 import MapNodePopup from "../components/MapNodePopup";
 import OverviewMetric from "../components/OverviewMetric";
-import { MeshContext } from "../App";
+import { MeshContext } from "../context";
 import { useNavigate } from "react-router-dom";
 import qs from "qs";
 
