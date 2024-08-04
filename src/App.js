@@ -113,7 +113,8 @@ function App() {
   const [meshOpen, setMeshOpen] = useState(false);
   const [username, setUsername] = useState("");
   const [initials, setInitials] = useState("");
-  const [mesh, setMesh] = usePersistantState("mesh", "");
+  const [meshName, setMeshName] = usePersistantState("mesh", "");
+  const [mesh, setMesh] = useState(null);
   // Special null state for meshes so that the mesh select doesn't have
   // an undefined value before meshes are loaded.
   const [meshes, setMeshes] = useState(null);
@@ -129,6 +130,15 @@ function App() {
     setIsConnected(readyState === ReadyState.OPEN);
     setConnectionStatus(CONNECTION_STATUSES[readyState]);
   }, [readyState]);
+
+  // Sync the mesh when the selected mesh name changes
+  React.useEffect(() => {
+    if (!meshes || !meshName) {
+      setMesh(null);
+    } else {
+      setMesh(meshes[meshes.map((m) => m.name).indexOf(meshName)]);
+    }
+  }, [meshName, meshes]);
 
   const toggleDrawer = () => {
     setOpen(!open);
@@ -244,20 +254,19 @@ function App() {
               </ListItemIcon>
               <ListItemText primary={connectionStatus} />
             </ListItem>
-            {open && meshes !== null ? (
-              <ListItem>
-                <FormControl fullWidth size="small">
-                  <InputLabel>Mesh</InputLabel>
-                  <Select value={mesh} onChange={(e) => setMesh(e.target.value)} label="Mesh">
-                    {meshes.map((m) => (
-                      <MenuItem key={m.name} value={m.name}>
-                        {m.name}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </ListItem>
-            ) : null}
+            <ListItem>
+              <FormControl fullWidth size="small">
+                <InputLabel>Mesh</InputLabel>
+                <Select value={meshName} onChange={(e) => setMeshName(e.target.value)} label="Mesh">
+                  {/* If meshes haven't been fetched yet just have the active mesh available */}
+                  {(meshes ? meshes : [{name: meshName}]).map((m) => (
+                    <MenuItem key={m.name} value={m.name}>
+                      {m.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </ListItem>
             <ListItemButton onClick={() => setMeshOpen(true)}>
               <ListItemIcon>
                 <Add color="primary" />

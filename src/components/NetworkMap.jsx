@@ -5,6 +5,7 @@ import Box from "@mui/material/Box";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "./NetworkMap.css";
+import { MeshContext } from "../App";
 
 import icon from "leaflet/dist/images/marker-icon.png";
 import iconShadow from "leaflet/dist/images/marker-shadow.png";
@@ -35,11 +36,12 @@ function ChangeView({ center }) {
 
 function DraggableMarker({ node, handlePositionChange, handleMarkerClick }) {
   const markerRef = useRef(null);
+  const { mesh } = React.useContext(MeshContext);
 
   const isPositioned = React.useCallback(() => node.lat && node.lon, [node]);
   const position = React.useCallback(
-    () => [node.lat || node.mesh_lat, node.lon || node.mesh_lon],
-    [node.lat, node.lon, node.mesh_lat, node.mesh_lon],
+    () => [node.lat || mesh?.lat, node.lon || mesh?.lon],
+    [node.lat, node.lon, mesh?.lat, mesh?.lon],
   );
   const updateMarkerClass = React.useCallback(() => {
     const marker = markerRef.current;

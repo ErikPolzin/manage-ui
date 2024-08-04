@@ -24,7 +24,7 @@ export default function DeviceDialog({ open, device, onClose, onAdd, onUpdate })
   const [errors, setErrors] = React.useState({});
 
   React.useEffect(() => {
-    setData({ ...(device || defaultDevice), mesh: mesh });
+    setData({ ...(device || defaultDevice), mesh: mesh?.name });
   }, [device, mesh]);
 
   const handleChange = (e) => {

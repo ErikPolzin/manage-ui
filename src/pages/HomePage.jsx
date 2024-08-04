@@ -6,6 +6,7 @@ import Divider from "@mui/material/Divider";
 import NetworkMap from "../components/NetworkMap";
 import MapNodePopup from "../components/MapNodePopup";
 import OverviewMetric from "../components/OverviewMetric";
+import { MeshContext } from "../App";
 import { useNavigate } from "react-router-dom";
 import qs from "qs";
 
@@ -22,6 +23,8 @@ const HomePage = () => {
   const [nodeCardPosition, setNodeCardPosition] = React.useState({ x: null, y: null });
   //const [mousePosition, setMousePosition] = React.useState({ x: null, y: null });
   const [nodeInfoCardHeight, setNodeInfoCardHeight] = React.useState({ height: 200, set: false });
+  const { mesh } = React.useContext(MeshContext);
+
   let mousePosition = { x: null, y: null };
 
   React.useEffect(() => {
@@ -94,14 +97,14 @@ const HomePage = () => {
   };
 
   const fetchNodes = () => {
-    const fields = ["lat", "lon", "mac", "mesh_lat", "mesh_lon", "is_ap", "status", "neighbours"];
+    const fields = ["lat", "lon", "mac", "is_ap", "status", "neighbours"];
     fetchAPI(`/monitoring/devices/?${qs.stringify({ fields })}`)
       .then((data) => {
         setNodes(data);
         // We want to center the screen at the average position of the nodes.
         // If none of the nodes have positions, we center at the average mesh position, or 0.
-        let avgMeshLat = data.reduce((s, n) => s + n.mesh_lat / data.length, 0);
-        let avgMeshLon = data.reduce((s, n) => s + n.mesh_lon / data.length, 0);
+        let avgMeshLat = data.reduce((s, n) => s + (mesh?.lat || 0) / data.length, 0);
+        let avgMeshLon = data.reduce((s, n) => s + (mesh?.lon || 0) / data.length, 0);
         let validNodes = data.filter((n) => n.lat && n.lon);
         let avgLat = validNodes.reduce((s, n) => s + n.lat / validNodes.length, 0);
         let avgLon = validNodes.reduce((s, n) => s + n.lon / validNodes.length, 0);
