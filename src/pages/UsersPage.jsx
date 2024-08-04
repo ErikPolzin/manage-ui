@@ -42,6 +42,7 @@ function AccountsGroup({ groupName, accounts, onClick, selected, isVoucher, ...p
 
 function UsersPage() {
   const [allAccounts, setAllAccounts] = React.useState([]);
+  const [selectedGroup, setSelectedGroup] = React.useState(null);
   const [selectedAccount, setSelectedAccount] = React.useState(null);
   const [minTime, setMinTime] = React.useState(null);
   const [showDays, setShowDays] = React.useState("all");
@@ -70,13 +71,6 @@ function UsersPage() {
   const accounts = React.useCallback(
     () => allAccounts.filter((acc) => new Date(acc.acctstoptime || new Date()) > (minTime || 0)),
     [allAccounts, minTime],
-  );
-  /**
-   * If an account group is selected, only show data from that account.
-   */
-  const visibleAccounts = React.useCallback(
-    () => accounts().filter((acc) => acc.username === selectedAccount || !selectedAccount),
-    [accounts, selectedAccount],
   );
   /**
    * All the accounts that are associated with a user (e.g. username/password login)
@@ -108,17 +102,21 @@ function UsersPage() {
       <Stack sx={{ width: "100%" }}>
         <Box>
           <DataUsagePie
-            accounts={visibleAccounts()}
+            accounts={accounts()}
             usernames={usernames()}
             vouchernames={vouchernames()}
+            selectedGroup={selectedGroup}
             selectedAccount={selectedAccount}
           />
         </Box>
         <Box>
           <ConnectedClientsList
-            clients={visibleAccounts()}
+            clients={accounts()}
             minTimeOverride={minTime}
             maxTimeOverride={new Date()}
+            onRowSelectionModelChange={(selected) => {
+              selected.length > 0 ? setSelectedAccount(selected[0]) : setSelectedAccount(null);
+            }}
           />
         </Box>
       </Stack>
@@ -162,8 +160,9 @@ function UsersPage() {
               isVoucher={false}
               accounts={accounts().filter((ra) => ra.username === username)}
               key={username}
-              selected={selectedAccount === username}
-              onClick={(e) => setSelectedAccount(selectedAccount !== username ? username : null)}
+              selected={selectedGroup === username}
+              onClick={(e) => setSelectedGroup(selectedGroup !== username ? username : null)}
+              dense
             />
           ))}
         </List>
@@ -174,10 +173,11 @@ function UsersPage() {
               isVoucher={true}
               accounts={accounts().filter((ra) => ra.username === vouchername)}
               key={vouchername}
-              selected={selectedAccount === vouchername}
+              selected={selectedGroup === vouchername}
               onClick={(e) =>
-                setSelectedAccount(selectedAccount !== vouchername ? vouchername : null)
+                setSelectedGroup(selectedGroup !== vouchername ? vouchername : null)
               }
+              dense
             />
           ))}
         </List>

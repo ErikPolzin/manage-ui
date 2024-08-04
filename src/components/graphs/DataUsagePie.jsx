@@ -8,16 +8,19 @@ import { PieChart } from "@mui/x-charts/PieChart";
 import { blueberryTwilightPalette } from "@mui/x-charts/colorPalettes";
 import { lighten } from "@mui/material/styles";
 
-function DataUsagePie({ accounts }) {
+function DataUsagePie({ accounts, selectedAccount, selectedGroup }) {
   const theme = useTheme();
   const colors = blueberryTwilightPalette(theme.palette.mode);
   const [userColorTable, setUserColorTable] = React.useState({});
   const [userIndex, setUserIndex] = React.useState(0);
+  const [highlightGroup, setHighlightGroup] = React.useState(true);
 
   const usernames = React.useCallback(
-    () => Array.from(new Set(accounts.map((ra) => ra.username))),
+    () => [...new Set(accounts.map((ra) => ra.username))],
     [accounts],
   );
+
+  const ids = React.useCallback(() => accounts.map((a) => a.radacctid), [accounts]);
 
   const lightenPercent = React.useCallback(
     (u, acct) => {
@@ -94,20 +97,29 @@ function DataUsagePie({ accounts }) {
     [accounts, usernames, colorForUser],
   );
 
+  React.useEffect(() => setHighlightGroup(true), [selectedGroup]);
+  React.useEffect(() => setHighlightGroup(false), [selectedAccount]);
+
   return (
-    <Stack
-      direction={{ xs: "column-reverse", md: "row" }}
-      width="100%"
-      textAlign="center"
-    >
+    <Stack direction={{ xs: "column-reverse", md: "row" }} width="100%" textAlign="center">
       <Box flexGrow={1}>
         <Box sx={{ height: 55, display: "flex", alignItems: "center", justifyContent: "center" }}>
           <Typography variant="h6">Received Data</Typography>
         </Box>
         <Divider />
         <PieChart
-          // highlightedItem={{ seriesId: "recv-grouped", dataIndex: selectedRecvIndex() }}
           height={300}
+          highlightedItem={
+            highlightGroup
+              ? {
+                  seriesId: "recv-grouped",
+                  dataIndex: usernames().indexOf(selectedGroup),
+                }
+              : {
+                  seriesId: "recv-items",
+                  dataIndex: ids().indexOf(selectedAccount),
+                }
+          }
           series={[
             {
               innerRadius: 0,
@@ -135,7 +147,17 @@ function DataUsagePie({ accounts }) {
         </Box>
         <Divider />
         <PieChart
-          // highlightedItem={{ seriesId: "send-grouped", dataIndex: selectedSendIndex() }}
+          highlightedItem={
+            highlightGroup
+              ? {
+                  seriesId: "send-grouped",
+                  dataIndex: usernames().indexOf(selectedGroup),
+                }
+              : {
+                  seriesId: "send-items",
+                  dataIndex: ids().indexOf(selectedAccount),
+                }
+          }
           height={300}
           series={[
             {
