@@ -31,7 +31,10 @@ function AccountsGroup({ groupName, accounts, onClick, selected, isVoucher, ...p
           )}
         </Avatar>
       </ListItemAvatar>
-      <ListItemText primary={groupName} />
+      <ListItemText
+        primary={groupName}
+        secondary={accounts.length === 1 ? "1 session" : `${accounts.length} sessions`}
+      />
     </ListItemButton>,
     <Divider key={`${groupName}-divider`}></Divider>,
   ];
