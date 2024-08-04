@@ -27,10 +27,17 @@ const createNodeIcon = (type, isOnline) => {
     }) || DefaultIcon
   );
 };
+let lastSetCenter = null;
 
 function ChangeView({ center }) {
   const map = useMap();
-  map.setView(center);
+  // This is a bit hacky, but we only want to force a pan if the center has actually
+  // changed - otherwise the viewer is unexpectedly panned back to the center
+  // when react refreshed the component with the old props (such as just after dragging a node)
+  if (!lastSetCenter || (center[0] !== lastSetCenter[0] && center[1] !== lastSetCenter[1])) {
+    map.setView(center);
+    lastSetCenter = center;
+  }
   return null;
 }
 
@@ -40,8 +47,8 @@ function DraggableMarker({ node, handlePositionChange, handleMarkerClick }) {
 
   const isPositioned = React.useCallback(() => node.lat && node.lon, [node]);
   const position = React.useCallback(
-    () => [node.lat || mesh?.lat, node.lon || mesh?.lon],
-    [node.lat, node.lon, mesh?.lat, mesh?.lon],
+    () => [node.lat || mesh?.lat || 0, node.lon || mesh?.lon || 0],
+    [node.lat, node.lon, mesh],
   );
   const updateMarkerClass = React.useCallback(() => {
     const marker = markerRef.current;
@@ -109,7 +116,7 @@ const NetworkMap = ({ nodes, center, handlePositionChange, style, handleMarkerCl
    */
   function neighbouringConnections() {
     let latlngs = [];
-    let nodeMacs = nodes.map(n => n.mac);
+    let nodeMacs = nodes.map((n) => n.mac);
     let seenMacs = new Set();
     for (let node of nodes) {
       for (let n of node.neighbours) {
@@ -119,8 +126,8 @@ const NetworkMap = ({ nodes, center, handlePositionChange, style, handleMarkerCl
         let nobj = nodes[nodeMacs.indexOf(n)];
         latlngs.push([
           [node.lat, node.lon],
-          [nobj.lat, nobj.lon]
-        ])
+          [nobj.lat, nobj.lon],
+        ]);
         seenMacs.add(node.mac);
       }
     }
@@ -142,7 +149,7 @@ const NetworkMap = ({ nodes, center, handlePositionChange, style, handleMarkerCl
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
-        <Polyline pathOptions={{color: "red"}} positions={neighbouringConnections()} />
+        <Polyline pathOptions={{ color: "red" }} positions={neighbouringConnections()} />
         {nodes.map((node) => (
           <DraggableMarker
             key={node.mac}

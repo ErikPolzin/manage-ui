@@ -103,12 +103,11 @@ const HomePage = () => {
         setNodes(data);
         // We want to center the screen at the average position of the nodes.
         // If none of the nodes have positions, we center at the average mesh position, or 0.
-        let avgMeshLat = data.reduce((s, n) => s + (mesh?.lat || 0) / data.length, 0);
-        let avgMeshLon = data.reduce((s, n) => s + (mesh?.lon || 0) / data.length, 0);
+        let [meshLat, meshLon] = [mesh?.lat || 0, mesh?.lon || 0];
         let validNodes = data.filter((n) => n.lat && n.lon);
         let avgLat = validNodes.reduce((s, n) => s + n.lat / validNodes.length, 0);
         let avgLon = validNodes.reduce((s, n) => s + n.lon / validNodes.length, 0);
-        setCenter([avgLat !== 0 ? avgLat : avgMeshLat, avgLon !== 0 ? avgLon : avgMeshLon]);
+        setCenter([avgLat !== 0 ? avgLat : meshLat, avgLon !== 0 ? avgLon : meshLon]);
       })
       .catch((error) => {
         console.log("Error fetching device locations: " + error);
