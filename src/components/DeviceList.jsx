@@ -15,6 +15,7 @@ import {
   GridActionsCellItem,
   useGridApiRef,
 } from "@mui/x-data-grid";
+import { alpha, useTheme } from "@mui/material";
 import humanizeDuration from "humanize-duration";
 import DeviceDialog from "./dialogs/DeviceDialog";
 import ConnectedClientsList from "./ConnectedClientsList";
@@ -34,6 +35,7 @@ function DeviceList({
   const [openDeviceDialog, setOpenDeviceDialog] = React.useState(false);
   const [deviceToEdit, setDeviceToEdit] = React.useState(null);
   const apiRef = useGridApiRef();
+  const theme = useTheme();
 
   function isExpanded(pid) {
     return expandedIds.indexOf(pid) !== -1;
@@ -171,7 +173,11 @@ function DeviceList({
           [`.${gridClasses.cell}.status.rebooting`]: {
             color: "cyan",
           },
+          "& .device-row--offline": {
+            bgcolor: alpha("#db551b", theme.palette.action.hoverOpacity),
+          },
         }}
+        getRowClassName={(params) => `device-row--${params.row.status}`}
         rows={devices}
         columns={[
           {
