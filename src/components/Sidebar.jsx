@@ -146,7 +146,6 @@ export default function Sidebar({ open }) {
       })
       .catch((error) => {
         console.error("Error fetching meshes: " + error);
-        setMeshes(null);
       });
   };
 
