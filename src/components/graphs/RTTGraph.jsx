@@ -23,7 +23,7 @@ const RTTGraph = ({ showDays, selectedDevice }) => {
         setMetrics(data);
       })
       .catch((error) => {
-        console.log("Error fetching rtt: " + error);
+        console.error("Error fetching rtt: " + error);
       })
       .finally(() => {
         setLoading(false);

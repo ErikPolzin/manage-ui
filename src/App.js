@@ -45,10 +45,14 @@ function App() {
 
   React.useEffect(() => {
     if (keycloak.authenticated) {
-      console.log("User set to: ", keycloak.idTokenParsed);
+      console.log("Loaded credentials for", keycloak.idTokenParsed.preferred_username);
       setUser(keycloak.idTokenParsed);
     }
   }, [keycloak.authenticated, keycloak.idTokenParsed]);
+
+  React.useEffect(() => {
+    if (mesh) console.log("Selected mesh", mesh.name);
+  }, [mesh]);
 
   React.useEffect(() => {
     if (initialized && !keycloak.authenticated) {

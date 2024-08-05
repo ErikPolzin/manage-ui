@@ -32,7 +32,7 @@ const DataRateGraph = ({ showDays, selectedDevice }) => {
         );
       })
       .catch((error) => {
-        console.log("Error fetching data rate: " + error);
+        console.error("Error fetching data rate: " + error);
       })
       .finally(() => {
         setLoading(false);

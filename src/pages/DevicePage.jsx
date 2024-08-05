@@ -55,10 +55,10 @@ function DevicePage() {
   React.useEffect(() => {
     if (lastJsonMessage) {
       if (lastJsonMessage.type === "sync:devices") {
-        console.log("WS: Syncing devices");
+        console.debug("WS: Syncing devices");
         setDevices(lastJsonMessage.devices);
       } else if (lastJsonMessage.type === "sync:device") {
-        console.log("WS: Syncing device");
+        console.debug("WS: Syncing device");
         handleUpdate(lastJsonMessage.device);
       }
     }

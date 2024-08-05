@@ -138,17 +138,13 @@ export default function Sidebar({ open }) {
     }
   }, [meshName, meshes, setMesh]);
 
-  React.useEffect(() => {
-    console.log("Mesh set to:", mesh);
-  }, [mesh]);
-
   const fetchMeshes = () => {
     fetchAPI("/monitoring/meshes/")
       .then((data) => {
         setMeshes(data);
       })
       .catch((error) => {
-        console.log("Error fetching meshes: " + error);
+        console.error("Error fetching meshes: " + error);
         setMeshes(null);
       });
   };

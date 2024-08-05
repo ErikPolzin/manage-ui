@@ -24,7 +24,6 @@ export default function AccountPage() {
 
   React.useEffect(() => {
     setSettingsCopy(settings);
-    console.log(settings);
   }, [settings]);
 
   const handleChange = (e) => {

@@ -43,7 +43,6 @@ const HomePage = () => {
           height: height,
           set: true,
         });
-        console.log("Node info card height found. Set to: " + height);
       } catch (e) {}
     }
   }, [clickedNode]);
@@ -59,7 +58,7 @@ const HomePage = () => {
         setNOnlineNodes(data.n_online_nodes);
       })
       .catch((error) => {
-        console.log("Error fetching overview: " + error);
+        console.error("Error fetching overview: " + error);
       })
       .finally(() => {
         setLoading(false);
@@ -110,7 +109,7 @@ const HomePage = () => {
         setCenter([avgLat !== 0 ? avgLat : meshLat, avgLon !== 0 ? avgLon : meshLon]);
       })
       .catch((error) => {
-        console.log("Error fetching device locations: " + error);
+        console.error("Error fetching device locations: " + error);
       });
   };
   const handleNodePositionChange = (node, lat, lon) => {
@@ -121,20 +120,20 @@ const HomePage = () => {
         fetchOverview(); // refresh the overview stats, may have changed
       })
       .catch((error) => {
-        console.log("Error updating device position: " + error);
+        console.error("Error updating device position: " + error);
       });
   };
 
   const handleClickedNode = (node) => {
     if (node === null) {
-      console.log("Closing node info");
+      console.debug("Closing node info");
       setClickedNode(null);
     } else if (node !== clickedNode) {
-      console.log("Showing node info");
+      console.debug("Showing node info");
       setNodeCardPosition(calculateNodePosition());
       setClickedNode(node);
     } else {
-      console.log("Closing node info");
+      console.debug("Closing node info");
       setNodeCardPosition(calculateNodePosition());
       setClickedNode(null);
     }

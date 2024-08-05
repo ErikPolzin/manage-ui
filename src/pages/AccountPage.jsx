@@ -54,7 +54,7 @@ export default function AccountPage() {
         setAccount(data);
       })
       .catch((error) => {
-        console.error("Error fetching account:", error);
+        console.error("Error updating account:", error);
       })
       .finally(() => {
         setSavingChanges(false);

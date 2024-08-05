@@ -24,7 +24,7 @@ export default function ConfirmDeleteDialog({
           onClose();
         })
         .catch((error) => {
-          console.log("Error deleting object: " + error);
+          console.error("Error deleting object: " + error);
         });
     } else {
       onClose();
