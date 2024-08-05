@@ -36,7 +36,9 @@ import { fetchAPI } from "./keycloak";
 import ResourcesPage from "./pages/ResourcesPage";
 import Tutorial from "./components/tutorial/Tutorial";
 import tutorialData from "./tutorialData/tutorialData";
-import zIndex from "@mui/material/styles/zIndex";
+import ResourceCircle from "./components/tutorial/ResourceCircle";
+import guidesData from "./tutorialData/interactiveGuidesData";
+import infoIconsData from "./tutorialData/infoIconsData";
 
 const drawerWidth = 240;
 
@@ -108,6 +110,7 @@ function App() {
   const location = useLocation();
 
   const [tutorialActive, setTutorialActive] = useState(false);
+  const [resourceCircleEnabled, setResourceCircleEnabled] = useState(true);
 
   const toggleDrawer = () => {
     setOpen(!open);
@@ -279,7 +282,15 @@ function App() {
                 <Route path="/account" element={<AccountPage />} />
                 <Route
                   path="/resources"
-                  element={<ResourcesPage onActivate={() => setTutorialActive(true)} />}
+                  element={
+                    <ResourcesPage
+                      onStartTutorial={() => setTutorialActive(true)}
+                      onChangeResourceCircle={() =>
+                        setResourceCircleEnabled((prevValue) => !prevValue)
+                      }
+                      resourceCircleEnabled={resourceCircleEnabled}
+                    />
+                  }
                 />
               </Routes>
             )}
@@ -289,6 +300,9 @@ function App() {
       </Box>
       {tutorialActive && (
         <Tutorial tutorialContent={tutorialData} onExit={handleExitTutorial}></Tutorial>
+      )}
+      {!tutorialActive && resourceCircleEnabled && (
+        <ResourceCircle guides={guidesData} infoIcons={infoIconsData}></ResourceCircle>
       )}
     </ThemeProvider>
   );

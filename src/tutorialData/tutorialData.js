@@ -1,5 +1,7 @@
 // tutorialData.js
-const tutorial = [
+
+// tutorial information 1
+const tutorialData = [
   {
     stageName: "Basic Navigation",
     tooltips: [
@@ -52,33 +54,6 @@ const tutorial = [
           {
             elementId: "#sidebar-dashboard-page",
             textInputElements: [],
-          },
-        ],
-      },
-      {
-        text: "Click the testing remove button",
-        clickElements: [
-          {
-            elementId: "#el-remove-test-button",
-            textInputElements: [],
-          },
-        ],
-      },
-      {
-        text: "Create a new Mesh device with a MAC of 127:69:0:1",
-        clickElements: [
-          {
-            elementId: "#create-device-button",
-            textInputElements: [
-              {
-                elementId: "#mac-address-inputbox",
-                requiredInput: "127:69:0:1",
-              },
-              {
-                elementId: "#device-type-inputbox",
-                requiredInput: "Mesh type",
-              },
-            ],
           },
         ],
       },
@@ -167,4 +142,169 @@ const tutorial = [
   // Add more stages as needed
 ];
 
-export default tutorial;
+// tutorial information 2
+// const tutorialData = [
+//   {
+//     stageName: "Navigate to Page 1",
+//     startingPage: "/page1",
+//     tooltips: [
+//       {
+//         type: "informative",
+//         page: "/page1",
+//         targetElement: "#sidebar",
+//         targetAreaElement: "#sidebar",
+//         title: "Sidebar Menu",
+//         content:
+//           "This is your sidebar menu. From here, you can navigate to all the main pages in the application.",
+//       },
+//       {
+//         type: "action",
+//         page: "/page1",
+//         targetElement: "#nav-page1",
+//         targetAreaElement: "#nav-page1",
+//         title: "Page 1 Navigation",
+//         content: "Click here to navigate to Page 1.",
+//       },
+//     ],
+//     test: [
+//       {
+//         text: "Open the sidebar menu and navigate to Page 1",
+//         clickElements: [
+//           {
+//             elementId: "#nav-page1",
+//             textInputElements: [],
+//           },
+//         ],
+//       },
+//     ],
+//   },
+//   {
+//     stageName: "Interact with Page 1",
+//     startingPage: "/page1",
+//     tooltips: [
+//       {
+//         type: "informative",
+//         page: "/page1",
+//         targetElement: "#page1-title",
+//         targetAreaElement: "#page1-title",
+//         title: "Page 1 Title",
+//         content: "This is the title of Page 1.",
+//       },
+//       {
+//         type: "informative",
+//         page: "/page1",
+//         targetElement: "#button1",
+//         targetAreaElement: "#button1",
+//         title: "Button 1",
+//         content: "This is Button 1. Click on it to interact with it.",
+//       },
+//       {
+//         type: "informative",
+//         page: "/page1",
+//         targetElement: "#input1",
+//         targetAreaElement: "#input1",
+//         title: "Input 1",
+//         content: "This is Input 1. Enter some text to interact with it.",
+//       },
+//     ],
+//     test: [
+//       {
+//         text: "Click on Button 1",
+//         clickElements: [
+//           {
+//             elementId: "#button1",
+//             textInputElements: [],
+//           },
+//         ],
+//       },
+//       {
+//         text: 'Enter "Sample text" into Input 1, then click button 1',
+//         clickElements: [
+//           {
+//             elementId: "#button1",
+//             textInputElements: [
+//               {
+//                 elementId: "#input1",
+//                 requiredInput: "Sample text",
+//               },
+//             ],
+//           },
+//         ],
+//       },
+//     ],
+//   },
+//   {
+//     stageName: "Interact with Page 2",
+//     startingPage: "/page2",
+//     tooltips: [
+//       {
+//         type: "informative",
+//         page: "/page1",
+//         targetElement: "#nav-page2",
+//         targetAreaElement: "#nav-page2",
+//         title: "Page 2 Navigation",
+//         content: "Click here to navigate to Page 2.",
+//       },
+//       {
+//         type: "informative",
+//         page: "/page2",
+//         targetElement: "#page2-title",
+//         targetAreaElement: "#page2-title",
+//         title: "Page 2 Title",
+//         content: "This is the title of Page 2.",
+//       },
+//       {
+//         type: "informative",
+//         page: "/page2",
+//         targetElement: "#button2",
+//         targetAreaElement: "#button2",
+//         title: "Button 2",
+//         content: "This is Button 2. Click on it to interact with it.",
+//       },
+//       {
+//         type: "informative",
+//         page: "/page2",
+//         targetElement: "#input2",
+//         targetAreaElement: "#input2",
+//         title: "Input 2",
+//         content: "This is Input 2. Enter some text to interact with it.",
+//       },
+//     ],
+//     test: [
+//       {
+//         text: "Open the sidebar menu and navigate to Page 2",
+//         clickElements: [
+//           {
+//             elementId: "#nav-page2",
+//             textInputElements: [],
+//           },
+//         ],
+//       },
+//       {
+//         text: "Click on Button 2",
+//         clickElements: [
+//           {
+//             elementId: "#button2",
+//             textInputElements: [],
+//           },
+//         ],
+//       },
+//       {
+//         text: "Enter text into Input 2",
+//         clickElements: [
+//           {
+//             elementId: "#input2",
+//             textInputElements: [
+//               {
+//                 elementId: "#input2",
+//                 requiredInput: "Another sample text",
+//               },
+//             ],
+//           },
+//         ],
+//       },
+//     ],
+//   },
+// ];
+
+export default tutorialData;

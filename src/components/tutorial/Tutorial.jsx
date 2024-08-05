@@ -10,13 +10,22 @@ import WalkthroughCompleteTile from "./WalkthroughCompleteTile";
 import BasicBackgroundOverlay from "./BasicBackgroundOverlay";
 import IntroTile1 from "./IntroTile1";
 import IntroTile2 from "./IntroTile2";
+import {
+  BrowserRouter as Router,
+  useNavigate,
+  useLocation,
+} from "react-router-dom";
+import TutorialCompleteTile from "./TutorialCompleteTile";
 
-// onActivte will handle the turning on and off of a tutorial
+// onActivate will handle the turning on and off of a tutorial
 const Tutorial = ({ tutorialContent, onExit }) => {
   const tutorial = tutorialContent;
   const tutorialName = "iNethi Manager Tutorial";
   const [startingScreen1, setStartingScreen1] = useState(true);
   const [startingScreen2, setStartingScreen2] = useState(false);
+
+  const navigate = useNavigate();
+  const { pathname: currentPath } = useLocation(); // Destructure pathname from useLocation
 
   const [currentStage, setCurrentStage] = useState(0);
 
@@ -35,6 +44,8 @@ const Tutorial = ({ tutorialContent, onExit }) => {
   const [stageCompleteIntermission2, setStageCompleteIntermission2] =
     useState(false);
 
+  const [tutorialComplete, setTutorialComplete] = useState(false);
+
   const [scrollHeight, setScrollHeight] = useState(0); // used to fade component onto screen
 
   // Fade progress tile in smoothly
@@ -47,6 +58,24 @@ const Tutorial = ({ tutorialContent, onExit }) => {
     window.addEventListener("click", setHeight);
     return () => window.removeEventListener("click", setHeight);
   }, []);
+
+  const navigateToPage = () => {
+    if (navigate) {
+      const targetPage =
+        tutorialContent[currentStage].tooltips[currentStep].page;
+
+      // Only navigate if the target page is different from the current path
+      if (currentPath !== targetPage) {
+        navigate(targetPage);
+      } else {
+        console.log("Already on the correct page:", currentPath);
+      }
+    } else {
+      console.warn(
+        "Navigate function is not available. Are you sure you wrapped your <Tutorial> component in a <Router> component?"
+      );
+    }
+  };
 
   const nextStep = () => {
     const currentTooltips = tutorial[currentStage].tooltips;
@@ -62,18 +91,25 @@ const Tutorial = ({ tutorialContent, onExit }) => {
           ? setWalkthroughCompleteIntermission(true)
           : setStageCompleteIntermission1(true);
       } else {
-        // Tutorial completed
-        console.log("Tutorial completed!");
+        setWalkthroughActive(false);
+
+        if (tutorial[currentStage].test.length > 0) {
+          // if there is a test for your last stage
+          setWalkthroughCompleteIntermission(true);
+        } else {
+          // Tutorial completed
+          console.log("Tutorial completed!");
+          resetTest();
+          setTutorialComplete(true);
+        }
       }
     }
   };
 
   const prevStep = () => {
     if (currentStep > 0) {
-      // set timeout is delaying transition to next tooltip for effect
-      setTimeout(() => {
-        setCurrentStep((prevStep) => prevStep - 1);
-      }, 500);
+      setTooltipChanging(true);
+      setCurrentStep((prevStep) => prevStep - 1);
     }
     console.log("previous step called");
   };
@@ -81,6 +117,7 @@ const Tutorial = ({ tutorialContent, onExit }) => {
   // helps to rerender tooltip for animating new tooltip appearing
   const handleTootlipChange = () => {
     setTimeout(() => {
+      navigateToPage();
       setTooltipChanging(false);
     }, 5);
   };
@@ -96,7 +133,13 @@ const Tutorial = ({ tutorialContent, onExit }) => {
       // Finished all tasks - Test and stage completed
       console.log("Test completed!");
       resetTest();
-      setStageCompleteIntermission1(true);
+      if (currentStage < tutorial.length - 1) {
+        // if not last test of last stage
+        setStageCompleteIntermission1(true);
+      } else {
+        console.log("Tutorial completed!");
+        setTutorialComplete(true);
+      }
     }
   };
 
@@ -115,6 +158,7 @@ const Tutorial = ({ tutorialContent, onExit }) => {
   const handleStartScreen2Next = () => {
     setStartingScreen2(false);
     setWalkthroughActive(true);
+    navigateToPage();
   };
 
   const handleTakeTest = () => {
@@ -126,12 +170,17 @@ const Tutorial = ({ tutorialContent, onExit }) => {
     setWalkthroughCompleteIntermission(false);
     setCurrentStep(0);
     setWalkthroughActive(true);
+    navigateToPage();
   };
 
   const handleSkipTest = () => {
     setWalkthroughCompleteIntermission(false);
     resetTest();
-    setStageCompleteIntermission2(true);
+    if (currentStage < tutorial.length - 1) {
+      setStageCompleteIntermission2(true);
+    } else {
+      setTutorialComplete(true);
+    }
   };
 
   const handleStageContinue2 = () => {
@@ -139,6 +188,7 @@ const Tutorial = ({ tutorialContent, onExit }) => {
     setCurrentStep(0);
     setCurrentStage((prevStage) => prevStage + 1);
     setWalkthroughActive(true);
+    navigateToPage();
   };
 
   const handleStageContinue1 = () => {
@@ -159,11 +209,17 @@ const Tutorial = ({ tutorialContent, onExit }) => {
     setStageCompleteIntermission2(false);
     setCurrentStep(0);
     resetTest();
+    setTutorialComplete(false);
     setWalkthroughActive(true);
+    navigateToPage();
     // and then not updating the stage
   };
 
   const handleSkipStage = () => {
+    if (currentStage + 1 >= tutorial.length - 1) {
+      setStageCompleteIntermission2(false);
+      setTutorialComplete(true);
+    }
     setCurrentStage((prevStage) => prevStage + 1);
     setCurrentStep(0);
     // note tutorial progress tile is still showing
@@ -174,13 +230,26 @@ const Tutorial = ({ tutorialContent, onExit }) => {
     setWalkthroughActive(false);
     resetTest();
     setCurrentStep(0);
-    setStageCompleteIntermission2(true);
-    // note tutorial progress tile is still showing
+    if (currentStage < tutorial.length - 1) {
+      setStageCompleteIntermission2(true);
+    } else {
+      setTutorialComplete(true);
+    }
   };
 
   const resetTest = () => {
     setTestActive(false);
     setCurrentTask(0);
+  };
+
+  const handleRestartTutorial = () => {
+    setWalkthroughCompleteIntermission(false);
+    setWalkthroughActive(false);
+    resetTest();
+    setCurrentStep(0);
+    setCurrentStage(0);
+    setTutorialComplete(false);
+    setStartingScreen1(true);
   };
 
   return (
@@ -330,6 +399,21 @@ const Tutorial = ({ tutorialContent, onExit }) => {
               onRedoStage={handleRedoStage}
               onSkipStage={handleSkipStage}
             />
+          }
+        ></BasicBackgroundOverlay>
+      )}
+
+      {tutorialComplete && (
+        <BasicBackgroundOverlay
+          focusElement={
+            <TutorialCompleteTile
+              tutorialName={tutorialName}
+              prevStageNo={currentStage + 1}
+              prevStageName={tutorial[currentStage].stageName}
+              onExit={handleExitTutorial}
+              onRedoStage={handleRedoStage}
+              onRestartTutorial={handleRestartTutorial}
+            ></TutorialCompleteTile>
           }
         ></BasicBackgroundOverlay>
       )}

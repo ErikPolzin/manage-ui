@@ -1,7 +1,7 @@
-import { Box, Button, CssBaseline, Typography } from "@mui/material";
-import React from "react";
+import { Box, Button, CssBaseline, Switch, Typography } from "@mui/material";
+import React, { useState } from "react";
 
-const ResourcesPage = ({ onActivate }) => {
+const ResourcesPage = ({ onStartTutorial, onChangeResourceCircle, resourceCircleEnabled }) => {
   return (
     <Box id="resources-page" sx={{ padding: 4 }}>
       <CssBaseline id="resources-css-baseline"></CssBaseline>
@@ -23,7 +23,7 @@ const ResourcesPage = ({ onActivate }) => {
       <Button
         id="resources-start-tutorial-button"
         variant="contained"
-        onClick={onActivate}
+        onClick={onStartTutorial}
         sx={{
           backgroundColor: "#3F15B1",
           "&:hover": { backgroundColor: "#31119F" },
@@ -31,6 +31,63 @@ const ResourcesPage = ({ onActivate }) => {
       >
         Start Tutorial
       </Button>
+      <Typography id="resources-subtitle" variant="h6" sx={{ margin: "20px 0 5px 0 " }}>
+        Resource Circle
+      </Typography>
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "flex-start",
+        }}
+      >
+        <Box
+          sx={{
+            flexShrink: 0,
+            marginRight: "5px",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+          }}
+        >
+          <Box
+            sx={{
+              width: `70px`,
+              height: `70px`,
+              borderRadius: "50%",
+              backgroundColor: resourceCircleEnabled ? "#3F15B1" : "#9E9E9E",
+              boxShadow: resourceCircleEnabled ? "0 4px 8px 0 rgba(0, 0, 0, 0.2)" : "none",
+              color: "white",
+              fontSize: "50px",
+              textAlign: "center",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            ?
+          </Box>
+          <Switch
+            checked={resourceCircleEnabled}
+            onChange={onChangeResourceCircle}
+            size="large"
+            sx={{
+              marginTop: "5px",
+              "& .Mui-checked": {
+                color: "#3F15B1", // switch thumb
+              },
+              "& .Mui-checked + .MuiSwitch-track": {
+                backgroundColor: "#3F15B1", // switch track
+              },
+            }}
+          ></Switch>
+        </Box>
+        <Typography id="resources-description" variant="body1" sx={{ marginLeft: "10px" }}>
+          The Resource Circle is a small icon on your screen that provides some great extra features
+          to help learn and understand the application and its functionalities. Some features
+          include interactive guides, search tools, and help icons. Enable and disable it as you
+          please, but this lightweight feature is always ready to help when you need.
+        </Typography>
+      </Box>
     </Box>
   );
 };

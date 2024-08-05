@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { Box, Button, Typography } from "@mui/material";
 
 const IntroTile2 = ({ logoSrc, stages, onNext, onExit }) => {
+  const circleSize = 70;
+  const tileWidth = 400;
   const [isVisible, setIsVisible] = useState(false); // used to fade component onto screen
 
   // Fade progress tile in smoothly
@@ -18,7 +20,7 @@ const IntroTile2 = ({ logoSrc, stages, onNext, onExit }) => {
           position: "absolute",
           zIndex: 1000000000,
           pointerEvents: "all",
-          width: "400px",
+          width: `${tileWidth}px`,
           padding: "16px",
           boxShadow: "0 0 4px 2px rgba(63, 21, 177, 0.2)",
           borderRadius: "5px",
@@ -31,10 +33,10 @@ const IntroTile2 = ({ logoSrc, stages, onNext, onExit }) => {
           className="circle"
           sx={{
             position: "absolute",
-            top: "-50px",
-            left: "150px",
-            width: "100px",
-            height: "100px",
+            top: `-${circleSize / 2}px`,
+            left: `${tileWidth / 2 - circleSize / 2}px`,
+            width: `${circleSize}px`,
+            height: `${circleSize}px`,
             borderRadius: "50%",
             backgroundColor: "#3F15B1",
             display: "flex",
@@ -56,10 +58,10 @@ const IntroTile2 = ({ logoSrc, stages, onNext, onExit }) => {
             display: "block",
             textAlign: "center",
             margin: "auto",
-            marginTop: "50px",
-            marginBottom: "10px",
+            marginTop: `${circleSize / 2 - 6}px`,
+            marginBottom: "3px",
             color: "black",
-            fontSize: "1.3rem",
+            fontSize: "1.2rem",
             fontWeight: 500,
           }}
         >
@@ -68,11 +70,11 @@ const IntroTile2 = ({ logoSrc, stages, onNext, onExit }) => {
         <Typography
           variant="body2"
           sx={{
-            fontSize: "0.85rem",
+            fontSize: "0.8rem",
             display: "block",
             textAlign: "center",
             margin: "auto",
-            marginBottom: "22px",
+            marginBottom: "15px",
             color: "#595959",
           }}
         >
@@ -85,10 +87,16 @@ const IntroTile2 = ({ logoSrc, stages, onNext, onExit }) => {
           flexDirection="column"
           alignItems="center"
           justifyContent="center"
-          marginBottom={"20px"}
+          marginBottom={"15px"}
         >
           {stages.map((stage, index) => (
-            <Typography key={index} variant="h8" component="div" gutterBottom>
+            <Typography
+              key={index}
+              variant="h8"
+              component="div"
+              gutterBottom
+              sx={{ fontSize: "0.95rem", lineHeight: "1.3rem" }}
+            >
               {stage}
             </Typography>
           ))}
@@ -100,7 +108,7 @@ const IntroTile2 = ({ logoSrc, stages, onNext, onExit }) => {
             display: "block",
             width: "60%",
             margin: "auto",
-            marginBottom: "10px",
+            marginBottom: "8px",
             fontSize: "1.1rem",
             lineHeight: "1.3rem",
             backgroundColor: "#3F15B1",
@@ -119,7 +127,7 @@ const IntroTile2 = ({ logoSrc, stages, onNext, onExit }) => {
             display: "block",
             width: "40%",
             margin: "auto",
-            marginBottom: "5px",
+            marginBottom: "0",
             padding: 0,
             color: "#BFBFBF",
             fontSize: "0.8rem",
