@@ -1,5 +1,5 @@
 import React from "react";
-import { MeshContext } from "../../App";
+import { MeshContext } from "../../context";
 import TextField from "@mui/material/TextField";
 import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
@@ -24,7 +24,7 @@ export default function DeviceDialog({ open, device, onClose, onAdd, onUpdate })
   const [errors, setErrors] = React.useState({});
 
   React.useEffect(() => {
-    setData({ ...(device || defaultDevice), mesh: mesh });
+    setData({ ...(device || defaultDevice), mesh: mesh?.name });
   }, [device, mesh]);
 
   const handleChange = (e) => {

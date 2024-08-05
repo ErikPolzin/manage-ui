@@ -1,8 +1,11 @@
 import React, { useRef } from "react";
-import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
+import { useTheme } from "@mui/material/styles";
+import { MapContainer, TileLayer, Marker, useMap, Polyline } from "react-leaflet";
+import Box from "@mui/material/Box";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "./NetworkMap.css";
+import { MeshContext } from "../context";
 
 import icon from "leaflet/dist/images/marker-icon.png";
 import iconShadow from "leaflet/dist/images/marker-shadow.png";
@@ -24,20 +27,28 @@ const createNodeIcon = (type, isOnline) => {
     }) || DefaultIcon
   );
 };
+let lastSetCenter = null;
 
 function ChangeView({ center }) {
   const map = useMap();
-  map.setView(center);
+  // This is a bit hacky, but we only want to force a pan if the center has actually
+  // changed - otherwise the viewer is unexpectedly panned back to the center
+  // when react refreshed the component with the old props (such as just after dragging a node)
+  if (!lastSetCenter || (center[0] !== lastSetCenter[0] && center[1] !== lastSetCenter[1])) {
+    map.setView(center);
+    lastSetCenter = center;
+  }
   return null;
 }
 
 function DraggableMarker({ node, handlePositionChange, handleMarkerClick }) {
   const markerRef = useRef(null);
+  const { mesh } = React.useContext(MeshContext);
 
   const isPositioned = React.useCallback(() => node.lat && node.lon, [node]);
   const position = React.useCallback(
-    () => [node.lat || node.mesh_lat, node.lon || node.mesh_lon],
-    [node.lat, node.lon, node.mesh_lat, node.mesh_lon],
+    () => [node.lat || mesh?.lat || 0, node.lon || mesh?.lon || 0],
+    [node.lat, node.lon, mesh],
   );
   const updateMarkerClass = React.useCallback(() => {
     const marker = markerRef.current;
@@ -81,7 +92,7 @@ function DraggableMarker({ node, handlePositionChange, handleMarkerClick }) {
     [node, handlePositionChange, handleMarkerClick],
   );
 
-  const icon = createNodeIcon("AP", true);
+  const icon = createNodeIcon(node.is_ap ? "AP" : "Node", node.status === "online");
 
   return (
     <Marker
@@ -94,43 +105,61 @@ function DraggableMarker({ node, handlePositionChange, handleMarkerClick }) {
   );
 }
 
-const NetworkMap = ({ nodes, handlePositionChange, style, handleMarkerClick, id }) => {
+const NetworkMap = ({ nodes, center, handlePositionChange, style, handleMarkerClick, id }) => {
   const mapRef = useRef(null);
-  const [center, setCenter] = React.useState([-33.9221, 18.4231]);
+  const theme = useTheme();
   const [zoom, setZoom] = React.useState(13);
 
-  React.useEffect(() => {
-    let validNodes = nodes.filter((n) => (n.lat || n.mesh_lat) && (n.lon || n.mesh_lon));
-    let avgLat = validNodes.reduce((s, n) => s + (n.lat || n.mesh_lat) / validNodes.length, 0);
-    let avgLon = validNodes.reduce((s, n) => s + (n.lon || n.mesh_lon) / validNodes.length, 0);
-    // Shift the marker if there's only one other, we don't want overlapping nodes
-    if (validNodes.length === 1) avgLon += 0.1 / zoom;
-    setCenter([avgLat, avgLon]);
-  }, [nodes, zoom]);
+  /**
+   * Generate polyline geometry based on neighbouring nodes
+   * @returns 2d array of neighbour connector line lat/lon
+   */
+  function neighbouringConnections() {
+    let latlngs = [];
+    let nodeMacs = nodes.map((n) => n.mac);
+    let seenMacs = new Set();
+    for (let node of nodes) {
+      for (let n of node.neighbours) {
+        // Neighbours may be bi-directional, but we only want to
+        // add one line for each direction.
+        if (seenMacs.has(n)) continue;
+        let nobj = nodes[nodeMacs.indexOf(n)];
+        latlngs.push([
+          [node.lat, node.lon],
+          [nobj.lat, nobj.lon],
+        ]);
+        seenMacs.add(node.mac);
+      }
+    }
+    return latlngs;
+  }
 
   return (
-    <MapContainer
-      center={center}
-      zoom={zoom}
-      scrollWheelZoom={false}
-      ref={mapRef}
-      style={{ height: "100%", width: "100%", ...style }}
-      id={id}
-    >
-      <ChangeView center={center} />
-      <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-      />
-      {nodes.map((node) => (
-        <DraggableMarker
-          key={node.mac}
-          node={node}
-          handlePositionChange={handlePositionChange}
-          handleMarkerClick={handleMarkerClick}
+    <Box className={theme.palette.mode}>
+      <MapContainer
+        center={center}
+        zoom={zoom}
+        scrollWheelZoom={false}
+        ref={mapRef}
+        style={{ height: "100%", width: "100%", ...style }}
+        id={id}
+      >
+        <ChangeView center={center} />
+        <TileLayer
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
-      ))}
-    </MapContainer>
+        <Polyline pathOptions={{ color: "red" }} positions={neighbouringConnections()} />
+        {nodes.map((node) => (
+          <DraggableMarker
+            key={node.mac}
+            node={node}
+            handlePositionChange={handlePositionChange}
+            handleMarkerClick={handleMarkerClick}
+          />
+        ))}
+      </MapContainer>
+    </Box>
   );
 };
 

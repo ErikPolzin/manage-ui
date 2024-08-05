@@ -54,7 +54,7 @@ export default function AccountPage() {
         setAccount(data);
       })
       .catch((error) => {
-        console.error("Error fetching account:", error);
+        console.error("Error updating account:", error);
       })
       .finally(() => {
         setSavingChanges(false);
@@ -78,6 +78,7 @@ export default function AccountPage() {
         </Box>
       ) : (
         <Grid container spacing={2}>
+          <Typography variant="h5">Account for {accountCopy.username}</Typography>
           <Grid item xs={12}>
             <TextField
               type="text"

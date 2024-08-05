@@ -64,12 +64,6 @@ function roundDownTo(n, multiple) {
   return multiple * Math.floor(n / multiple);
 }
 
-function mainWidthInPixels(percent) {
-  let main = document.getElementsByTagName("main")[0];
-  console.log(main.offsetWidth);
-  return main.offsetWidth * percent;
-}
-
 export {
   filteredData,
   histogram,
@@ -77,5 +71,4 @@ export {
   LABEL_FUNCS,
   MS_IN,
   GRANULARITY,
-  mainWidthInPixels,
 };

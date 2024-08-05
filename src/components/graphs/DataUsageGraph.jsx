@@ -8,11 +8,13 @@ import { axisClasses } from "@mui/x-charts/ChartsAxis";
 import { filteredData, histogram, BUCKET_SIZES, LABEL_FUNCS, MS_IN, GRANULARITY } from "./utils";
 import { fetchAPI } from "../../keycloak";
 import { useTheme } from "@mui/material";
+import { MeshContext } from "../../context";
 
 const DataUsageGraph = ({ showDays, selectedDevice }) => {
   const [metrics, setMetrics] = React.useState([]);
   const [data, setData] = React.useState([]);
   const [loading, setLoading] = React.useState(false);
+  const { mesh } = React.useContext(MeshContext);
   const theme = useTheme();
 
   React.useEffect(() => {
@@ -30,7 +32,7 @@ const DataUsageGraph = ({ showDays, selectedDevice }) => {
         );
       })
       .catch((error) => {
-        console.log("Error fetching data usage: " + error);
+        console.error("Error fetching data usage: " + error);
       })
       .finally(() => {
         setLoading(false);
@@ -91,7 +93,20 @@ const DataUsageGraph = ({ showDays, selectedDevice }) => {
       }}
     >
       <BarPlot />
-      <ChartsReferenceLine y={5000} label="Warning Level" labelAlign="end" />
+      {mesh &&
+        ((showDays === "week" || showDays === "month") && mesh.settings.check_daily_data_usage ? (
+          <ChartsReferenceLine
+            y={mesh.settings.check_daily_data_usage}
+            label="Daily Warning Level"
+            labelAlign="end"
+          />
+        ) : showDays === "day" && mesh.settings.check_hourly_data_usage ? (
+          <ChartsReferenceLine
+            y={mesh.settings.check_hourly_data_usage}
+            label="Hourly Warning Level"
+            labelAlign="end"
+          />
+        ) : null)}
       <ChartsXAxis
         axisId="time"
         label={selectedDevice ? `Data Usage for ${selectedDevice}` : "Average Data Usage"}

@@ -72,7 +72,7 @@ function StatusCheck({ passed, title, feedback }) {
         {passed === true ? (
           <CheckCircleOutlineIcon color="success" />
         ) : (
-          <CancelOutlinedIcon color="warning" />
+          <CancelOutlinedIcon color={passed === null ? "disabled" : "warning"} />
         )}
       </ListItemIcon>
       <ListItemText primary={title} secondary={feedback} />

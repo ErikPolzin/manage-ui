@@ -1,28 +1,30 @@
 import React from "react";
-import { Gauge, gaugeClasses } from "@mui/x-charts/Gauge";
 import { fetchAPI } from "../keycloak";
 import Stack from "@mui/material/Stack";
 import Box from "@mui/material/Box";
 import Divider from "@mui/material/Divider";
-import Card from "@mui/material/Card";
-import CardContent from "@mui/material/CardContent";
-import CardHeader from "@mui/material/CardHeader";
 import NetworkMap from "../components/NetworkMap";
 import MapNodePopup from "../components/MapNodePopup";
+import OverviewMetric from "../components/OverviewMetric";
+import { MeshContext } from "../context";
 import { useNavigate } from "react-router-dom";
 import qs from "qs";
 
 const HomePage = () => {
   const [nodes, setNodes] = React.useState([]);
+  const [center, setCenter] = React.useState([0, 0]);
   const [loading, setLoading] = React.useState(0);
   const [nNodes, setNNodes] = React.useState(0);
   const [nPositionedNodes, setNPositionedNodes] = React.useState(0);
   const [nUnknownNodes, setNUnknownNodes] = React.useState(0);
   const [nOkNodes, setNOkNodes] = React.useState(0);
+  const [nOnlineNodes, setNOnlineNodes] = React.useState(0);
   const [clickedNode, setClickedNode] = React.useState(null);
   const [nodeCardPosition, setNodeCardPosition] = React.useState({ x: null, y: null });
   //const [mousePosition, setMousePosition] = React.useState({ x: null, y: null });
   const [nodeInfoCardHeight, setNodeInfoCardHeight] = React.useState({ height: 200, set: false });
+  const { mesh } = React.useContext(MeshContext);
+
   let mousePosition = { x: null, y: null };
 
   React.useEffect(() => {
@@ -41,7 +43,6 @@ const HomePage = () => {
           height: height,
           set: true,
         });
-        console.log("Node info card height found. Set to: " + height);
       } catch (e) {}
     }
   }, [clickedNode]);
@@ -54,9 +55,10 @@ const HomePage = () => {
         setNPositionedNodes(data.n_positioned_nodes);
         setNUnknownNodes(data.n_unknown_nodes);
         setNOkNodes(data.n_ok_nodes);
+        setNOnlineNodes(data.n_online_nodes);
       })
       .catch((error) => {
-        console.log("Error fetching overview: " + error);
+        console.error("Error fetching overview: " + error);
       })
       .finally(() => {
         setLoading(false);
@@ -65,7 +67,7 @@ const HomePage = () => {
   const overviewOffset = () => {
     let overviewElement = document.getElementById("overview-stack");
     let navbarHeight = 64;
-    let mapHeight = document.documentElement.clientHeight * 0.6;
+    let mapHeight = document.documentElement.clientHeight * 0.7;
     let overviewHeight = overviewElement ? overviewElement.offsetHeight : 0;
     return window.innerHeight - navbarHeight - mapHeight - overviewHeight - 2;
   };
@@ -94,35 +96,44 @@ const HomePage = () => {
   };
 
   const fetchNodes = () => {
-    console.log("setting the nodes");
-    fetchAPI("/monitoring/devices/?fields=lat&fields=lon&fields=name&fields=mac&fields=mesh_lat&fields=mesh_lon").then((data) => {
-      setNodes(data);
-    })
-    .catch((error) => {
-      console.log("Error fetching device locations: " + error);
-    });
+    const fields = ["lat", "lon", "mac", "is_ap", "status", "neighbours"];
+    fetchAPI(`/monitoring/devices/?${qs.stringify({ fields })}`)
+      .then((data) => {
+        setNodes(data);
+        // We want to center the screen at the average position of the nodes.
+        // If none of the nodes have positions, we center at the average mesh position, or 0.
+        let [meshLat, meshLon] = [mesh?.lat || 0, mesh?.lon || 0];
+        let validNodes = data.filter((n) => n.lat && n.lon);
+        let avgLat = validNodes.reduce((s, n) => s + n.lat / validNodes.length, 0);
+        let avgLon = validNodes.reduce((s, n) => s + n.lon / validNodes.length, 0);
+        setCenter([avgLat !== 0 ? avgLat : meshLat, avgLon !== 0 ? avgLon : meshLon]);
+      })
+      .catch((error) => {
+        console.error("Error fetching device locations: " + error);
+      });
   };
   const handleNodePositionChange = (node, lat, lon) => {
     node.lat = lat;
     node.lon = lon;
-    return fetchAPI(`/monitoring/devices/${node.mac}/`, "PATCH", { lat, lon }).then(() => {
-      fetchOverview(); // refresh the overview stats, may have changed
-    })
-    .catch((error) => {
-      console.log("Error updating device position: " + error);
-    });
+    return fetchAPI(`/monitoring/devices/${node.mac}/`, "PATCH", { lat, lon })
+      .then(() => {
+        fetchOverview(); // refresh the overview stats, may have changed
+      })
+      .catch((error) => {
+        console.error("Error updating device position: " + error);
+      });
   };
 
   const handleClickedNode = (node) => {
     if (node === null) {
-      console.log("Closing node info");
+      console.debug("Closing node info");
       setClickedNode(null);
     } else if (node !== clickedNode) {
-      console.log("Showing node info");
+      console.debug("Showing node info");
       setNodeCardPosition(calculateNodePosition());
       setClickedNode(node);
     } else {
-      console.log("Closing node info");
+      console.debug("Closing node info");
       setNodeCardPosition(calculateNodePosition());
       setClickedNode(null);
     }
@@ -140,7 +151,8 @@ const HomePage = () => {
         <NetworkMap
           handlePositionChange={handleNodePositionChange}
           nodes={nodes}
-          style={{ position: "sticky", top: "-150px", height: "60vh" }}
+          center={center}
+          style={{ position: "sticky", top: "-150px", height: "70vh" }}
           handleMarkerClick={handleClickedNode}
           id="dashboard-map"
         />
@@ -168,83 +180,25 @@ const HomePage = () => {
           sx={{ flexGrow: 1, marginTop: `${overviewOffset()}px`, paddingBottom: 3 }}
           id="overview-stack"
         >
-          <Card variant="outlined" style={{ zIndex: 1000 }}>
-            <CardContent
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                width: "10vw",
-                height: "10vw",
-                mx: "auto",
-              }}
-            >
-              <Gauge
-                value={(nPositionedNodes / nNodes) * 100}
-                sx={{
-                  [`& .${gaugeClasses.valueText}`]: {
-                    fontSize: 20,
-                    transform: "translate(0px, 0px)",
-                  },
-                }}
-                text={() => `${nPositionedNodes} / ${nNodes}`}
-              />
-            </CardContent>
-            <Divider></Divider>
-            <CardHeader subheader={"Geopositioned Nodes"} sx={{ textAlign: "center" }} />
-          </Card>
-          <Card sx={{ borderRadius: 3, zIndex: 1000 }}>
-            <CardContent
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                width: "20vw",
-                height: "15vw",
-                mx: "auto",
-              }}
-            >
-              <Gauge
-                value={(nOkNodes / nNodes) * 100}
-                startAngle={-110}
-                endAngle={110}
-                sx={{
-                  [`& .${gaugeClasses.valueText}`]: {
-                    fontSize: 30,
-                    transform: "translate(0px, 0px)",
-                  },
-                }}
-                text={() => `${nOkNodes} / ${nNodes}`}
-              />
-            </CardContent>
-            <Divider></Divider>
-            <CardHeader title={"OK Nodes"} sx={{ textAlign: "center" }} />
-          </Card>
-          <Card variant="outlined" style={{ zIndex: 1000 }}>
-            <CardContent
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                width: "10vw",
-                height: "10vw",
-                mx: "auto",
-              }}
-            >
-              <Gauge
-                value={(nNodes / (nNodes + nUnknownNodes)) * 100}
-                sx={{
-                  [`& .${gaugeClasses.valueText}`]: {
-                    fontSize: 20,
-                    transform: "translate(0px, 0px)",
-                  },
-                }}
-                text={() => `${nNodes} / ${nNodes + nUnknownNodes}`}
-              />
-            </CardContent>
-            <Divider></Divider>
-            <CardHeader subheader={"Registered Nodes"} sx={{ textAlign: "center" }} />
-          </Card>
+          <OverviewMetric
+            value={nPositionedNodes}
+            total={nNodes}
+            title="Geopositioned Nodes"
+            sx={{ zIndex: 1000 }}
+          />
+          <OverviewMetric value={nOkNodes} total={nNodes} title="OK Nodes" sx={{ zIndex: 1000 }} />
+          <OverviewMetric
+            value={nOnlineNodes}
+            total={nNodes}
+            title="Online Nodes"
+            sx={{ zIndex: 1000 }}
+          />
+          <OverviewMetric
+            value={nNodes}
+            total={nNodes + nUnknownNodes}
+            title="Registered Nodes"
+            sx={{ zIndex: 1000 }}
+          />
         </Stack>
       </Box>
     </Box>

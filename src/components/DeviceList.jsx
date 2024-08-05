@@ -15,6 +15,7 @@ import {
   GridActionsCellItem,
   useGridApiRef,
 } from "@mui/x-data-grid";
+import { alpha, useTheme } from "@mui/material";
 import humanizeDuration from "humanize-duration";
 import DeviceDialog from "./dialogs/DeviceDialog";
 import ConnectedClientsList from "./ConnectedClientsList";
@@ -23,6 +24,7 @@ function DeviceList({
   devices,
   isLoading,
   selectedDevice,
+  minTime,
   onAdd,
   onUpdate,
   onDelete,
@@ -33,6 +35,7 @@ function DeviceList({
   const [openDeviceDialog, setOpenDeviceDialog] = React.useState(false);
   const [deviceToEdit, setDeviceToEdit] = React.useState(null);
   const apiRef = useGridApiRef();
+  const theme = useTheme();
 
   function isExpanded(pid) {
     return expandedIds.indexOf(pid) !== -1;
@@ -63,6 +66,7 @@ function DeviceList({
           key={`${params.rowId}-clients`}
         >
           <ConnectedClientsList
+            minTimeOverride={minTime}
             clients={params.row.client_sessions.map((c) => ({
               ...c,
               end_time: new Date(c.end_time),
@@ -169,7 +173,11 @@ function DeviceList({
           [`.${gridClasses.cell}.status.rebooting`]: {
             color: "cyan",
           },
+          "& .device-row--offline": {
+            bgcolor: alpha("#db551b", theme.palette.action.hoverOpacity),
+          },
         }}
+        getRowClassName={(params) => `device-row--${params.row.status}`}
         rows={devices}
         columns={[
           {
@@ -185,7 +193,7 @@ function DeviceList({
             ],
           },
 
-          { field: "name", headerName: "Name", align: "center" },
+          { field: "name", headerName: "Name", align: "center", minWidth: 100 },
           {
             field: "status",
             headerName: "Status",
@@ -222,7 +230,7 @@ function DeviceList({
           {
             field: "last_ping",
             headerName: "Last Ping",
-            minWidth: 150,
+            maxWidth: 150,
             valueGetter: (value, row) =>
               value ? humanizeDuration(new Date() - new Date(value), { round: true }) : "Never",
             cellClassName: (params) => (params.value === "Never" ? "disabled" : ""),
@@ -230,7 +238,7 @@ function DeviceList({
           {
             field: "last_contact",
             headerName: "Last Report",
-            minWidth: 150,
+            maxWidth: 150,
             valueGetter: (value, row) =>
               value ? humanizeDuration(new Date() - new Date(value), { round: true }) : "Never",
             cellClassName: (params) => (params.value === "Never" ? "disabled" : ""),
@@ -238,7 +246,7 @@ function DeviceList({
           {
             field: "created",
             headerName: "Created",
-            minWidth: 200,
+            maxWidth: 200,
             valueGetter: (value, row) => new Date(value).toLocaleString(),
           },
         ]}

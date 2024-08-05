@@ -6,7 +6,7 @@ import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import ToggleButton from "@mui/material/ToggleButton";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
-import useWebSocket from "react-use-websocket";
+import Container from "@mui/material/Container";
 
 import DeviceList from "../components/DeviceList";
 import DataUsageGraph from "../components/graphs/DataUsageGraph";
@@ -14,9 +14,10 @@ import DataRateGraph from "../components/graphs/DataRateGraph";
 import RTTGraph from "../components/graphs/RTTGraph";
 import UptimeGraph from "../components/graphs/UptimeGraph";
 import DeviceDetailCard from "../components/DeviceDetailCard";
+import { MS_IN } from "../components/graphs/utils";
 import { useQueryState } from "../hooks";
 import { fetchAPI } from "../keycloak";
-import { Container } from "@mui/material";
+import { ApiSocketContext } from "../context";
 
 function GraphTabPanel({ children, value, index, ...other }) {
   return (
@@ -45,34 +46,26 @@ function DevicePage() {
   const [alert, setAlert] = React.useState({ show: false, message: "", type: "error" });
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState(null);
+  const [minTime, setMinTime] = React.useState(null);
   const [showDays, setShowDays] = React.useState("month");
   const [tabValue, setTabValue] = React.useState(0);
-
-  const { lastJsonMessage, readyState } = useWebSocket(
-    `${process.env.REACT_APP_WS_URL}/ws/updates/`,
-    {
-      share: false,
-      shouldReconnect: () => true,
-    },
-  );
-
-  // Run when the connection state (readyState) changes
-  React.useEffect(() => {
-    console.log("WS: Connection state changed", readyState);
-  }, [readyState]);
+  const { lastJsonMessage } = React.useContext(ApiSocketContext);
 
   // Run when a new WebSocket message is received (lastJsonMessage)
   React.useEffect(() => {
     if (lastJsonMessage) {
       if (lastJsonMessage.type === "sync:devices") {
-        console.log("WS: Syncing devices");
+        console.debug("WS: Syncing devices");
         setDevices(lastJsonMessage.devices);
       } else if (lastJsonMessage.type === "sync:device") {
-        console.log("WS: Syncing device");
+        console.debug("WS: Syncing device");
         handleUpdate(lastJsonMessage.device);
       }
     }
   }, [lastJsonMessage]);
+
+  // Sync min time when the user changes the toggle button
+  React.useEffect(() => setMinTime(new Date() - MS_IN[showDays]), [showDays]);
 
   React.useEffect(() => {
     fetchDevices();
@@ -184,6 +177,7 @@ function DevicePage() {
             isLoading={loading}
             devices={devices}
             selectedDevice={selectedDevice()}
+            minTime={minTime}
             onSelect={setSelectedDeviceMac}
             onUpdate={handleUpdate}
             onAdd={handleAdd}
