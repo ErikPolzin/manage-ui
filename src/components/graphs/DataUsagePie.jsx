@@ -105,7 +105,7 @@ function DataUsagePie({ accounts, selectedAccount, selectedGroup }) {
   React.useEffect(() => setHighlightGroup(false), [selectedAccount]);
 
   return (
-    <Stack direction={{ xs: "column-reverse", md: "row" }} width="100%" textAlign="center">
+    <Stack direction={{ xs: "column", md: "row" }} width="100%" textAlign="center">
       <Box flexGrow={1}>
         <Box sx={{ height: 55, display: "flex", alignItems: "center", justifyContent: "center" }}>
           <Typography variant="h6">Received Data</Typography>
@@ -113,6 +113,8 @@ function DataUsagePie({ accounts, selectedAccount, selectedGroup }) {
         <Divider />
         <PieChart
           height={300}
+          // I have no idea why this centers the chart, but it does
+          margin={{ right: 5 }}
           slotProps={{
             legend: {
               hidden: true,
@@ -153,7 +155,6 @@ function DataUsagePie({ accounts, selectedAccount, selectedGroup }) {
               valueFormatter: (d) => formatDataSize(d.value),
             },
           ]}
-          margin={{ top: 20, bottom: 10 }}
         />
       </Box>
       <Box flexGrow={1}>
@@ -178,6 +179,7 @@ function DataUsagePie({ accounts, selectedAccount, selectedGroup }) {
               : null
           }
           height={300}
+          margin={{ right: 5 }}
           slotProps={{
             legend: {
               hidden: true,
@@ -203,7 +205,6 @@ function DataUsagePie({ accounts, selectedAccount, selectedGroup }) {
               valueFormatter: (d) => formatDataSize(d.value),
             },
           ]}
-          margin={{ top: 20, bottom: 10 }}
         />
       </Box>
       <Box flexGrow={1}>
@@ -211,7 +212,7 @@ function DataUsagePie({ accounts, selectedAccount, selectedGroup }) {
           sx={{ height: 55, display: "flex", alignItems: "center", justifyContent: "center" }}
         ></Box>
         <Divider />
-        <List dense>
+        <List dense sx={{ maxHeight: 300, overflowY: "auto" }}>
           {usernames.map((u) => (
             <ListItem key={u}>
               <ListItemIcon>
