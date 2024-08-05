@@ -16,10 +16,10 @@ import SettingsPage from "./pages/SettingsPage";
 import NavBar from "./components/NavBar";
 import Sidebar from "./components/Sidebar";
 import Toolbar from "@mui/material/Toolbar";
-import theme from "./theme";
+import makeTheme from "./theme";
 import useWebSocket from "react-use-websocket";
 import { usePersistantState } from "./hooks";
-import { MeshContext, UserContext, ApiSocketContext } from "./context";
+import { MeshContext, UserContext, ApiSocketContext, ColorModeContext } from "./context";
 
 function App() {
   const { keycloak, initialized } = useKeycloak();
@@ -30,6 +30,14 @@ function App() {
     share: true,
     shouldReconnect: () => true,
   });
+  const [mode, setMode] = usePersistantState("colorMode", "light");
+  const theme = React.useMemo(() => makeTheme(mode), [mode]);
+
+  const colorMode = {
+    toggleColorMode: () => {
+      setMode(mode === "light" ? "dark" : "light");
+    },
+  };
 
   const toggleDrawer = () => {
     setOpen(!open);
@@ -49,54 +57,58 @@ function App() {
   }, [initialized, keycloak]);
 
   return (
-    <ThemeProvider theme={theme}>
-      <ApiSocketContext.Provider value={apiSocket}>
-        <UserContext.Provider value={{ user, setUser }}>
-          <MeshContext.Provider value={{ mesh, setMesh }}>
-            <Box sx={{ display: "flex" }}>
-              <CssBaseline />
-              <NavBar open={open} onMenuClick={toggleDrawer} />
-              <Sidebar open={open} />
-              <main
-                style={{
-                  flexGrow: 1,
-                  minHeight: "calc(100vh - 64px)",
-                  maxWidth: open ? `calc(100vw - 240px)` : "calc(100vw - 65px)",
-                }}
-              >
-                {/* necessary for content to be below app bar */}
-                <Toolbar />
-                {!initialized ? (
-                  <Box
-                    sx={{
-                      width: "100%",
-                      height: "100%",
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <CircularProgress />
-                    <Typography sx={{ marginTop: 1 }}>Checking Keycloak credentials...</Typography>
-                  </Box>
-                ) : (
-                  <Routes>
-                    <Route path="/" element={<HomePage />} />
-                    <Route path="/devices" element={<DevicePage />} />
-                    <Route path="/services" element={<ServicesPage />} />
-                    <Route path="/alerts" element={<AlertsPage />} />
-                    <Route path="/users" element={<UsersPage />} />
-                    <Route path="/account" element={<AccountPage />} />
-                    <Route path="/settings" element={<SettingsPage />} />
-                  </Routes>
-                )}
-              </main>
-            </Box>
-          </MeshContext.Provider>
-        </UserContext.Provider>
-      </ApiSocketContext.Provider>
-    </ThemeProvider>
+    <ColorModeContext.Provider value={colorMode}>
+      <ThemeProvider theme={theme}>
+        <ApiSocketContext.Provider value={apiSocket}>
+          <UserContext.Provider value={{ user, setUser }}>
+            <MeshContext.Provider value={{ mesh, setMesh }}>
+              <Box sx={{ display: "flex" }}>
+                <CssBaseline />
+                <NavBar open={open} onMenuClick={toggleDrawer} />
+                <Sidebar open={open} />
+                <main
+                  style={{
+                    flexGrow: 1,
+                    minHeight: "calc(100vh - 64px)",
+                    maxWidth: open ? `calc(100vw - 240px)` : "calc(100vw - 65px)",
+                  }}
+                >
+                  {/* necessary for content to be below app bar */}
+                  <Toolbar />
+                  {!initialized ? (
+                    <Box
+                      sx={{
+                        width: "100%",
+                        height: "100%",
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <CircularProgress />
+                      <Typography sx={{ marginTop: 1 }}>
+                        Checking Keycloak credentials...
+                      </Typography>
+                    </Box>
+                  ) : (
+                    <Routes>
+                      <Route path="/" element={<HomePage />} />
+                      <Route path="/devices" element={<DevicePage />} />
+                      <Route path="/services" element={<ServicesPage />} />
+                      <Route path="/alerts" element={<AlertsPage />} />
+                      <Route path="/users" element={<UsersPage />} />
+                      <Route path="/account" element={<AccountPage />} />
+                      <Route path="/settings" element={<SettingsPage />} />
+                    </Routes>
+                  )}
+                </main>
+              </Box>
+            </MeshContext.Provider>
+          </UserContext.Provider>
+        </ApiSocketContext.Provider>
+      </ThemeProvider>
+    </ColorModeContext.Provider>
   );
 }
 

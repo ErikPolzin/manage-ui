@@ -6,3 +6,4 @@ export const MeshContext = createContext(null);
 export const UserContext = createContext(null);
 // A socket for updates from the API should only be created once
 export const ApiSocketContext = createContext(null);
+export const ColorModeContext = createContext({ toggleColorMode: () => {} });
