@@ -1,6 +1,8 @@
 import React from "react";
 import { ThemeProvider } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import QuizIcon from "@mui/icons-material/Quiz";
 import Box from "@mui/material/Box";
 import CssBaseline from "@mui/material/CssBaseline";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -19,6 +21,12 @@ import Toolbar from "@mui/material/Toolbar";
 import makeTheme from "./theme";
 import useWebSocket from "react-use-websocket";
 import { usePersistantState } from "./hooks";
+import ResourcesPage from "./pages/ResourcesPage";
+import Tutorial from "./components/tutorial/Tutorial";
+import tutorialData from "./tutorialData/tutorialData";
+import ResourceCircle from "./components/tutorial/ResourceCircle";
+import guidesData from "./tutorialData/interactiveGuidesData";
+import infoIconsData from "./tutorialData/infoIconsData";
 import { MeshContext, UserContext, ApiSocketContext, ColorModeContext } from "./context";
 
 function App() {
@@ -38,6 +46,9 @@ function App() {
       setMode(mode === "light" ? "dark" : "light");
     },
   };
+
+  const [tutorialActive, setTutorialActive] = useState(false);
+  const [resourceCircleEnabled, setResourceCircleEnabled] = useState(true);
 
   const toggleDrawer = () => {
     setOpen(!open);
@@ -59,6 +70,10 @@ function App() {
       keycloak.login();
     }
   }, [initialized, keycloak]);
+
+  const handleExitTutorial = () => {
+    setTutorialActive(false);
+  };
 
   return (
     <ColorModeContext.Provider value={colorMode}>
@@ -104,10 +119,28 @@ function App() {
                       <Route path="/users" element={<UsersPage />} />
                       <Route path="/account" element={<AccountPage />} />
                       <Route path="/settings" element={<SettingsPage />} />
+                      <Route
+                        path="/resources"
+                        element={
+                          <ResourcesPage
+                            onStartTutorial={() => setTutorialActive(true)}
+                            onChangeResourceCircle={() =>
+                              setResourceCircleEnabled((prevValue) => !prevValue)
+                            }
+                            resourceCircleEnabled={resourceCircleEnabled}
+                          />
+                        }
+                      />
                     </Routes>
                   )}
                 </main>
               </Box>
+              {tutorialActive && (
+                <Tutorial tutorialContent={tutorialData} onExit={handleExitTutorial}></Tutorial>
+              )}
+              {!tutorialActive && resourceCircleEnabled && (
+                <ResourceCircle guides={guidesData} infoIcons={infoIconsData}></ResourceCircle>
+              )}
             </MeshContext.Provider>
           </UserContext.Provider>
         </ApiSocketContext.Provider>
