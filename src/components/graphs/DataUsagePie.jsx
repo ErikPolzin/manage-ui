@@ -1,12 +1,17 @@
 import React from "react";
 import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
-import { useTheme } from "@mui/material";
+import ListItem from "@mui/material/ListItem";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemText from "@mui/material/ListItemText";
+import List from "@mui/material/List";
 import Typography from "@mui/material/Typography";
 import Divider from "@mui/material/Divider";
+import { useTheme } from "@mui/material";
 import { PieChart } from "@mui/x-charts/PieChart";
 import { blueberryTwilightPalette } from "@mui/x-charts/colorPalettes";
 import { lighten } from "@mui/material/styles";
+import { formatDataSize } from "../../units";
 
 function DataUsagePie({ accounts, selectedAccount, selectedGroup }) {
   const theme = useTheme();
@@ -34,7 +39,7 @@ function DataUsagePie({ accounts, selectedAccount, selectedGroup }) {
       if (acctsForUser.length === 0) return 0;
       let indexOfAccount = acctsForUser.map((a) => a.radacctid).indexOf(acct);
       // Don't want to brighten more than 90%
-      return Math.min(0.9, indexOfAccount / acctsForUser.length * 0.3);
+      return Math.min(0.9, (indexOfAccount / acctsForUser.length) * 0.3);
     },
     [accounts],
   );
@@ -57,7 +62,7 @@ function DataUsagePie({ accounts, selectedAccount, selectedGroup }) {
       accounts.map((u) => ({
         id: u.radacctid,
         value: u.acctinputoctets,
-        arcLabel: u.username,
+        label: u.username,
         color: colorForUser(u.username, u.radacctid),
       })),
     [accounts, colorForUser],
@@ -69,7 +74,6 @@ function DataUsagePie({ accounts, selectedAccount, selectedGroup }) {
         value: accounts
           .filter((ra) => ra.username === u)
           .reduce((x, y) => x + y.acctinputoctets, 0),
-        arcLabel: u,
         label: u,
         color: colorForUser(u),
       })),
@@ -80,7 +84,7 @@ function DataUsagePie({ accounts, selectedAccount, selectedGroup }) {
       accounts.map((u) => ({
         id: u.radacctid,
         value: u.acctoutputoctets,
-        arcLabel: u.username,
+        label: u.username,
         color: colorForUser(u.username, u.radacctid),
       })),
     [accounts, colorForUser],
@@ -92,7 +96,7 @@ function DataUsagePie({ accounts, selectedAccount, selectedGroup }) {
         value: accounts
           .filter((ra) => ra.username === u)
           .reduce((x, y) => x + y.acctoutputoctets, 0),
-        arcLabel: u,
+        label: u,
         color: colorForUser(u),
       })),
     [accounts, usernames, colorForUser],
@@ -109,6 +113,11 @@ function DataUsagePie({ accounts, selectedAccount, selectedGroup }) {
         <Divider />
         <PieChart
           height={300}
+          slotProps={{
+            legend: {
+              hidden: true,
+            },
+          }}
           highlightedItem={
             highlightGroup
               ? selectedGroupIndex !== -1
@@ -132,6 +141,7 @@ function DataUsagePie({ accounts, selectedAccount, selectedGroup }) {
               highlightScope: { faded: "series", highlighted: "item" },
               faded: { color: "gray" },
               data: recvDataGrouped,
+              valueFormatter: (d) => formatDataSize(d.value),
             },
             {
               innerRadius: 90,
@@ -140,6 +150,7 @@ function DataUsagePie({ accounts, selectedAccount, selectedGroup }) {
               highlightScope: { faded: "series", highlighted: "item" },
               faded: { additionalRadius: -5, color: "gray" },
               data: recvData,
+              valueFormatter: (d) => formatDataSize(d.value),
             },
           ]}
           margin={{ top: 20, bottom: 10 }}
@@ -167,6 +178,11 @@ function DataUsagePie({ accounts, selectedAccount, selectedGroup }) {
               : null
           }
           height={300}
+          slotProps={{
+            legend: {
+              hidden: true,
+            },
+          }}
           series={[
             {
               innerRadius: 0,
@@ -175,6 +191,7 @@ function DataUsagePie({ accounts, selectedAccount, selectedGroup }) {
               highlightScope: { faded: "series", highlighted: "item" },
               faded: { color: "gray" },
               data: sendDataGrouped,
+              valueFormatter: (d) => formatDataSize(d.value),
             },
             {
               innerRadius: 90,
@@ -183,10 +200,29 @@ function DataUsagePie({ accounts, selectedAccount, selectedGroup }) {
               highlightScope: { faded: "series", highlighted: "item" },
               faded: { additionalRadius: -5, color: "gray" },
               data: sendData,
+              valueFormatter: (d) => formatDataSize(d.value),
             },
           ]}
           margin={{ top: 20, bottom: 10 }}
         />
+      </Box>
+      <Box flexGrow={1}>
+        <Box
+          sx={{ height: 55, display: "flex", alignItems: "center", justifyContent: "center" }}
+        ></Box>
+        <Divider />
+        <List dense>
+          {usernames.map((u) => (
+            <ListItem key={u}>
+              <ListItemIcon>
+                <Box
+                  sx={{ width: 20, height: 20, borderRadius: "50%", bgcolor: colorForUser(u) }}
+                />
+              </ListItemIcon>
+              <ListItemText primary={u} />
+            </ListItem>
+          ))}
+        </List>
       </Box>
     </Stack>
   );

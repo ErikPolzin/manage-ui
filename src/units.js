@@ -6,4 +6,14 @@ function formatBitsPerSecond(v) {
     return `${v.toFixed(2)} Mbps`
 }
 
-export { formatBitsPerSecond };
+function formatDataSize(v) {
+    if (v <= 1000) return `${v.toFixed(2)} bytes`;
+    v /= 1000;
+    if (v <= 1000) return `${v.toFixed(2)} KB`;
+    v /= 1000;
+    if (v <= 1000) return `${v.toFixed(2)} MB`;
+    v /= 1000;
+    return `${v.toFixed(2)} GB`
+}
+
+export { formatBitsPerSecond, formatDataSize };
