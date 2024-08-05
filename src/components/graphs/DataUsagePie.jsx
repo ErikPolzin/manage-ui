@@ -14,25 +14,30 @@ function DataUsagePie({ accounts, selectedAccount, selectedGroup }) {
   const [userColorTable, setUserColorTable] = React.useState({});
   const [userIndex, setUserIndex] = React.useState(0);
   const [highlightGroup, setHighlightGroup] = React.useState(true);
-
-  const usernames = React.useCallback(
+  const usernames = React.useMemo(
     () => [...new Set(accounts.map((ra) => ra.username))],
     [accounts],
   );
-
-  const ids = React.useCallback(() => accounts.map((a) => a.radacctid), [accounts]);
-
+  const ids = React.useMemo(() => accounts.map((a) => a.radacctid), [accounts]);
+  const selectedGroupIndex = React.useMemo(
+    () => usernames.indexOf(selectedGroup),
+    [selectedGroup, usernames],
+  );
+  const selectedAccountIndex = React.useMemo(
+    () => ids.indexOf(selectedAccount),
+    [selectedAccount, ids],
+  );
   const lightenPercent = React.useCallback(
     (u, acct) => {
       if (!acct) return 0;
       let acctsForUser = accounts.filter((a) => a.username === u);
       if (acctsForUser.length === 0) return 0;
       let indexOfAccount = acctsForUser.map((a) => a.radacctid).indexOf(acct);
-      return (indexOfAccount + 1) / acctsForUser.length / 2;
+      // Don't want to brighten more than 90%
+      return Math.min(0.9, indexOfAccount / acctsForUser.length * 0.3);
     },
     [accounts],
   );
-
   const colorForUser = React.useCallback(
     (u, acct) => {
       let userColor;
@@ -47,8 +52,7 @@ function DataUsagePie({ accounts, selectedAccount, selectedGroup }) {
     },
     [colors, lightenPercent, userColorTable, userIndex],
   );
-
-  const sendData = React.useCallback(
+  const sendData = React.useMemo(
     () =>
       accounts.map((u) => ({
         id: u.radacctid,
@@ -58,10 +62,9 @@ function DataUsagePie({ accounts, selectedAccount, selectedGroup }) {
       })),
     [accounts, colorForUser],
   );
-
-  const sendDataGrouped = React.useCallback(
+  const sendDataGrouped = React.useMemo(
     () =>
-      usernames().map((u) => ({
+      usernames.map((u) => ({
         id: u,
         value: accounts
           .filter((ra) => ra.username === u)
@@ -72,8 +75,7 @@ function DataUsagePie({ accounts, selectedAccount, selectedGroup }) {
       })),
     [accounts, usernames, colorForUser],
   );
-
-  const recvData = React.useCallback(
+  const recvData = React.useMemo(
     () =>
       accounts.map((u) => ({
         id: u.radacctid,
@@ -83,10 +85,9 @@ function DataUsagePie({ accounts, selectedAccount, selectedGroup }) {
       })),
     [accounts, colorForUser],
   );
-
-  const recvDataGrouped = React.useCallback(
+  const recvDataGrouped = React.useMemo(
     () =>
-      usernames().map((u) => ({
+      usernames.map((u) => ({
         id: u,
         value: accounts
           .filter((ra) => ra.username === u)
@@ -96,7 +97,6 @@ function DataUsagePie({ accounts, selectedAccount, selectedGroup }) {
       })),
     [accounts, usernames, colorForUser],
   );
-
   React.useEffect(() => setHighlightGroup(true), [selectedGroup]);
   React.useEffect(() => setHighlightGroup(false), [selectedAccount]);
 
@@ -111,14 +111,18 @@ function DataUsagePie({ accounts, selectedAccount, selectedGroup }) {
           height={300}
           highlightedItem={
             highlightGroup
+              ? selectedGroupIndex !== -1
+                ? {
+                    seriesId: "recv-grouped",
+                    dataIndex: selectedGroupIndex,
+                  }
+                : null
+              : selectedAccountIndex !== -1
               ? {
-                  seriesId: "recv-grouped",
-                  dataIndex: usernames().indexOf(selectedGroup),
-                }
-              : {
                   seriesId: "recv-items",
-                  dataIndex: ids().indexOf(selectedAccount),
+                  dataIndex: selectedAccountIndex,
                 }
+              : null
           }
           series={[
             {
@@ -126,16 +130,16 @@ function DataUsagePie({ accounts, selectedAccount, selectedGroup }) {
               outerRadius: 90,
               id: "recv-grouped",
               highlightScope: { faded: "series", highlighted: "item" },
-              faded: { additionalRadius: -10, color: "gray" },
-              data: recvDataGrouped(),
+              faded: { color: "gray" },
+              data: recvDataGrouped,
             },
             {
-              innerRadius: 95,
+              innerRadius: 90,
               outerRadius: 120,
               id: "recv-items",
               highlightScope: { faded: "series", highlighted: "item" },
-              faded: { additionalRadius: -10, color: "gray" },
-              data: recvData(),
+              faded: { additionalRadius: -5, color: "gray" },
+              data: recvData,
             },
           ]}
           margin={{ top: 20, bottom: 10 }}
@@ -149,14 +153,18 @@ function DataUsagePie({ accounts, selectedAccount, selectedGroup }) {
         <PieChart
           highlightedItem={
             highlightGroup
+              ? selectedGroupIndex !== -1
+                ? {
+                    seriesId: "send-grouped",
+                    dataIndex: selectedGroupIndex,
+                  }
+                : null
+              : selectedAccountIndex !== -1
               ? {
-                  seriesId: "send-grouped",
-                  dataIndex: usernames().indexOf(selectedGroup),
-                }
-              : {
                   seriesId: "send-items",
-                  dataIndex: ids().indexOf(selectedAccount),
+                  dataIndex: selectedAccountIndex,
                 }
+              : null
           }
           height={300}
           series={[
@@ -165,16 +173,16 @@ function DataUsagePie({ accounts, selectedAccount, selectedGroup }) {
               outerRadius: 90,
               id: "send-grouped",
               highlightScope: { faded: "series", highlighted: "item" },
-              faded: { additionalRadius: -10, color: "gray" },
-              data: sendDataGrouped(),
+              faded: { color: "gray" },
+              data: sendDataGrouped,
             },
             {
-              innerRadius: 95,
+              innerRadius: 90,
               outerRadius: 120,
               id: "send-items",
               highlightScope: { faded: "series", highlighted: "item" },
-              faded: { additionalRadius: -10, color: "gray" },
-              data: sendData(),
+              faded: { additionalRadius: -5, color: "gray" },
+              data: sendData,
             },
           ]}
           margin={{ top: 20, bottom: 10 }}
