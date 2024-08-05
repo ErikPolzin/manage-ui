@@ -27,6 +27,7 @@ import AddIcon from "@mui/icons-material/Add";
 import PowerIcon from "@mui/icons-material/Power";
 import PowerOffIcon from "@mui/icons-material/PowerOff";
 import SettingsIcon from "@mui/icons-material/Settings";
+import QuizIcon from "@mui/icons-material/Quiz";
 // Custom components
 import MeshDialog from "./dialogs/MeshDialog";
 import { usePersistantState } from "../hooks";
@@ -230,6 +231,17 @@ export default function Sidebar({ open }) {
         </ListItemButton>
         <ListItemButton
           key="5"
+          component={Link}
+          to="/resources"
+          selected={location.pathname.startsWith("/resources")}
+        >
+          <ListItemIcon>
+            <QuizIcon />
+          </ListItemIcon>
+          <ListItemText primary="Resources" />
+        </ListItemButton>
+        <ListItemButton
+          key="6"
           component={Link}
           to="/settings"
           selected={location.pathname.startsWith("/settings")}

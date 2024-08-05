@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import { useKeycloak } from "@react-keycloak/web";
 import { AppBar, Toolbar, Button, Avatar, IconButton, Typography, useTheme } from "@mui/material";
 import { Menu, ChevronLeft } from "@mui/icons-material";
-import Brightness4Icon from '@mui/icons-material/Brightness4';
-import Brightness7Icon from '@mui/icons-material/Brightness7';
+import Brightness4Icon from "@mui/icons-material/Brightness4";
+import Brightness7Icon from "@mui/icons-material/Brightness7";
 import { Link } from "react-router-dom";
 import { styled } from "@mui/material/styles";
 
@@ -42,7 +42,7 @@ const NavBar = ({ open, onMenuClick }) => {
     setOpenLogoutDialog(!openLogoutDialog);
   };
   return (
-    <StyledNavBar position="fixed" open={open} sx={{ zIndex: 902 }}>
+    <StyledNavBar position="fixed" open={open}>
       <Toolbar>
         <IconButton
           color="inherit"
@@ -62,7 +62,7 @@ const NavBar = ({ open, onMenuClick }) => {
           CommuNethi
         </Typography>
         <IconButton onClick={toggleColorMode} color="inherit">
-          {theme.palette.mode === 'dark' ? <Brightness7Icon /> : <Brightness4Icon />}
+          {theme.palette.mode === "dark" ? <Brightness7Icon /> : <Brightness4Icon />}
         </IconButton>
         <Button color="inherit" onClick={handleLogout}>
           Log Out

@@ -1,8 +1,6 @@
 import React from "react";
 import { ThemeProvider } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import QuizIcon from "@mui/icons-material/Quiz";
 import Box from "@mui/material/Box";
 import CssBaseline from "@mui/material/CssBaseline";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -47,8 +45,8 @@ function App() {
     },
   };
 
-  const [tutorialActive, setTutorialActive] = useState(false);
-  const [resourceCircleEnabled, setResourceCircleEnabled] = useState(true);
+  const [tutorialActive, setTutorialActive] = React.useState(false);
+  const [resourceCircleEnabled, setResourceCircleEnabled] = React.useState(true);
 
   const toggleDrawer = () => {
     setOpen(!open);
