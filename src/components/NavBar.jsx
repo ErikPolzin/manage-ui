@@ -45,6 +45,7 @@ const NavBar = ({ open, onMenuClick }) => {
     <StyledNavBar position="fixed" open={open}>
       <Toolbar>
         <IconButton
+          id="open-drawer-button"
           color="inherit"
           aria-label="open drawer"
           onClick={onMenuClick}

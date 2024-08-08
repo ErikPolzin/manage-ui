@@ -3,23 +3,15 @@ import { Box } from "@mui/system";
 import React, { useEffect, useState } from "react";
 import TooltipOverlay from "./TooltipOverlay";
 import Tooltip from "./Tooltip";
-import {
-  BrowserRouter as Router,
-  useNavigate,
-  useLocation,
-} from "react-router-dom";
+import { BrowserRouter as Router, useNavigate, useLocation } from "react-router-dom";
 
 const InteractiveGuide = ({ guide, onExit, onComplete }) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [tooltipChanging, setTooltipChanging] = useState(true);
   const [walkthroughActive, setWalkthroughActive] = useState(true);
 
-  const [scrollHeight, setScrollHeight] = useState(
-    document.documentElement.scrollHeight
-  );
-  const [scrollWidth, setScrollWidth] = useState(
-    document.documentElement.scrollHeight
-  );
+  const [scrollHeight, setScrollHeight] = useState(document.documentElement.scrollHeight);
+  const [scrollWidth, setScrollWidth] = useState(document.documentElement.scrollHeight);
 
   const navigate = useNavigate();
   const { pathname: currentPath } = useLocation(); // Destructure pathname from useLocation
@@ -53,7 +45,7 @@ const InteractiveGuide = ({ guide, onExit, onComplete }) => {
       }
     } else {
       console.warn(
-        "Navigate function is not available. Are you sure you wrapped your <Tutorial> component in a <Router> component?"
+        "Navigate function is not available. Are you sure you wrapped your <Tutorial> component in a <Router> component?",
       );
     }
   };
@@ -62,7 +54,7 @@ const InteractiveGuide = ({ guide, onExit, onComplete }) => {
     const tooltips = guide.tooltips;
     if (currentStep < tooltips.length - 1) {
       // Move to next tooltip
-      setTooltipChanging(true);
+      // setTooltipChanging(true);
       setCurrentStep((prevStep) => prevStep + 1);
     } else {
       // Guide completed
@@ -73,7 +65,7 @@ const InteractiveGuide = ({ guide, onExit, onComplete }) => {
 
   const prevStep = () => {
     if (currentStep > 0) {
-      setTooltipChanging(true);
+      // setTooltipChanging(true);
       setCurrentStep((prevStep) => prevStep - 1);
     }
     console.log("previous step called");

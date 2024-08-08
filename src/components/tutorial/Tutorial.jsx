@@ -10,11 +10,7 @@ import WalkthroughCompleteTile from "./WalkthroughCompleteTile";
 import BasicBackgroundOverlay from "./BasicBackgroundOverlay";
 import IntroTile1 from "./IntroTile1";
 import IntroTile2 from "./IntroTile2";
-import {
-  BrowserRouter as Router,
-  useNavigate,
-  useLocation,
-} from "react-router-dom";
+import { BrowserRouter as Router, useNavigate, useLocation } from "react-router-dom";
 import TutorialCompleteTile from "./TutorialCompleteTile";
 
 // onActivate will handle the turning on and off of a tutorial
@@ -32,17 +28,14 @@ const Tutorial = ({ tutorialContent, onExit }) => {
   const [walkthroughActive, setWalkthroughActive] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
   const [tooltipChanging, setTooltipChanging] = useState(false);
-  const [walkthroughCompleteIntermission, setWalkthroughCompleteIntermission] =
-    useState(false);
+  const [walkthroughCompleteIntermission, setWalkthroughCompleteIntermission] = useState(false);
 
   const [testActive, setTestActive] = useState(false);
   const [currentTask, setCurrentTask] = useState(0);
   const [taskChanging, setTaskChanging] = useState(false);
 
-  const [stageCompleteIntermission1, setStageCompleteIntermission1] =
-    useState(false);
-  const [stageCompleteIntermission2, setStageCompleteIntermission2] =
-    useState(false);
+  const [stageCompleteIntermission1, setStageCompleteIntermission1] = useState(false);
+  const [stageCompleteIntermission2, setStageCompleteIntermission2] = useState(false);
 
   const [tutorialComplete, setTutorialComplete] = useState(false);
 
@@ -61,8 +54,7 @@ const Tutorial = ({ tutorialContent, onExit }) => {
 
   const navigateToPage = () => {
     if (navigate) {
-      const targetPage =
-        tutorialContent[currentStage].tooltips[currentStep].page;
+      const targetPage = tutorialContent[currentStage].tooltips[currentStep].page;
 
       // Only navigate if the target page is different from the current path
       if (currentPath !== targetPage) {
@@ -72,7 +64,7 @@ const Tutorial = ({ tutorialContent, onExit }) => {
       }
     } else {
       console.warn(
-        "Navigate function is not available. Are you sure you wrapped your <Tutorial> component in a <Router> component?"
+        "Navigate function is not available. Are you sure you wrapped your <Tutorial> component in a <Router> component?",
       );
     }
   };
@@ -81,7 +73,7 @@ const Tutorial = ({ tutorialContent, onExit }) => {
     const currentTooltips = tutorial[currentStage].tooltips;
     if (currentStep < currentTooltips.length - 1) {
       // Move to next tooltip
-      setTooltipChanging(true);
+      //setTooltipChanging(true);
       setCurrentStep((prevStep) => prevStep + 1);
     } else {
       if (currentStage < tutorial.length - 1) {
@@ -108,7 +100,7 @@ const Tutorial = ({ tutorialContent, onExit }) => {
 
   const prevStep = () => {
     if (currentStep > 0) {
-      setTooltipChanging(true);
+      //setTooltipChanging(true);
       setCurrentStep((prevStep) => prevStep - 1);
     }
     console.log("previous step called");
@@ -311,27 +303,19 @@ const Tutorial = ({ tutorialContent, onExit }) => {
             handleTootlipChange() // rerender tooltip for animation sake
           }
           <TooltipOverlay
-            targetAreaEl={
-              tutorial[currentStage].tooltips[currentStep].targetAreaElement
-            }
+            targetAreaEl={tutorial[currentStage].tooltips[currentStep].targetAreaElement}
           ></TooltipOverlay>
         </>
       )}
       {!tooltipChanging && walkthroughActive && (
         <>
           <TooltipOverlay
-            targetAreaEl={
-              tutorial[currentStage].tooltips[currentStep].targetAreaElement
-            }
+            targetAreaEl={tutorial[currentStage].tooltips[currentStep].targetAreaElement}
           ></TooltipOverlay>
           <Tooltip
             type={tutorial[currentStage].tooltips[currentStep].type}
-            targetEl={
-              tutorial[currentStage].tooltips[currentStep].targetElement
-            }
-            targetAreaEl={
-              tutorial[currentStage].tooltips[currentStep].targetAreaElement
-            }
+            targetEl={tutorial[currentStage].tooltips[currentStep].targetElement}
+            targetAreaEl={tutorial[currentStage].tooltips[currentStep].targetAreaElement}
             title={tutorial[currentStage].tooltips[currentStep].title}
             content={tutorial[currentStage].tooltips[currentStep].content}
             canGoBack={currentStep !== 0}

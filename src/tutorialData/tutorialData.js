@@ -4,34 +4,32 @@
 const tutorialData = [
   {
     stageName: "Basic Navigation",
+    startingPage: "/",
     tooltips: [
       {
-        type: "informative",
-        targetElement: "#resources-title",
-        targetAreaElement: "#resources-title",
-        title: "Resource Tile",
-        content: "This is the page title that tells you the title of the page",
+        type: "action",
+        page: "/",
+        targetElement: "#open-drawer-button",
+        targetAreaElement: "#open-drawer-button",
+        title: "",
+        content: "Click on the sidebar icon to open/close the sidebar",
       },
       {
         type: "informative",
-        targetElement: "#resources-subtitle",
-        targetAreaElement: "#resources-subtitle",
-        title: "Subtitle",
-        content: "Subtitles give you a great  indication of what is coming next",
+        page: "/",
+        targetElement: "#sidebar-styled-drawer",
+        targetAreaElement: "#sidebar-styled-drawer",
+        title: "Sidebar",
+        content:
+          "The sidebar menu is your main source of navigation.\nHere you can find and navigate to all the different pages in the application.",
       },
       {
         type: "action",
-        targetElement: "#resources-subtitle",
-        targetAreaElement: "#resources-subtitle",
+        page: "/",
+        targetElement: "#open-drawer-button",
+        targetAreaElement: "#open-drawer-button",
         title: "",
-        content: "Click on the resource subtitle",
-      },
-      {
-        type: "informative",
-        targetElement: "#resources-description",
-        targetAreaElement: "#resources-description",
-        title: "Last Element",
-        content: "This is the last element of stage 1. It is the body that explains the tutorial",
+        content: "Close the sidebar.",
       },
     ],
     test: [
@@ -39,20 +37,29 @@ const tutorialData = [
         text: "Open the menu sidebar",
         clickElements: [
           {
-            elementId: "#menu-sidebar",
+            elementId: "#open-drawer-button",
             textInputElements: [],
           },
         ],
       },
       {
-        text: "Navigate to the devices and dashboard page please",
+        text: "Navigate to the devices page",
         clickElements: [
           {
-            elementId: "#sidebar-devices-page",
+            elementId: "#sidebar-devices-item",
+            textInputElements: [],
+          },
+        ],
+      },
+      {
+        text: "Navigate to the users and alerts page",
+        clickElements: [
+          {
+            elementId: "#sidebar-users-item",
             textInputElements: [],
           },
           {
-            elementId: "#sidebar-dashboard-page",
+            elementId: "#sidebar-alerts-item",
             textInputElements: [],
           },
         ],
@@ -60,21 +67,51 @@ const tutorialData = [
     ],
   },
   {
-    stageName: "Mapping Nodes",
+    stageName: "The Dashboard",
     tooltips: [
       {
         type: "informative",
-        targetElement: "#create-device-button",
-        targetAreaElement: "#create-device-button",
-        title: "Feature 4",
-        content: "This is the first feature of Stage 2.",
+        page: "/",
+        targetElement: "#home-page",
+        targetAreaElement: "#home-page",
+        title: "The Dashboard Page",
+        content:
+          "The dashboard page is like your home page, your starting page.\nThere are two main features to notice on the dashboard...",
       },
       {
         type: "informative",
-        targetElement: "#device-type-inputbox",
-        targetAreaElement: "#device-type-inputbox",
-        title: "Feature 5",
-        content: "This is the second feature of Stage 2.",
+        page: "/",
+        targetElement: "#dashboard-map",
+        targetAreaElement: "#dashboard-map",
+        title: "Map",
+        content:
+          "The first feature is the map. This map shows all the existing nodes in your network and where they are located.\nFeel free to scroll around the map and look for Ocean View!",
+      },
+      {
+        type: "informative",
+        page: "/",
+        targetElement: "#overview-stack",
+        targetAreaElement: "#overview-stack",
+        title: "Node Information",
+        content:
+          "The second feature is the basic, yet important overview information about the nodes.\n4 important pieces of node information health are given",
+      },
+      {
+        type: "informative",
+        page: "/",
+        targetElement: "#overview-stack-geopositioned",
+        targetAreaElement: "#overview-stack-geopositioned",
+        title: "Geopositioned Nodes",
+        content: "Geopositioned nodes are all the nodes that we have set a location for.",
+      },
+      {
+        type: "informative",
+        page: "/",
+        targetElement: "#overview-stack-online",
+        targetAreaElement: "#overview-stack-online",
+        title: "Online Nodes",
+        content:
+          "These are the nodes that are actually currently up and running - the nodes that are online.",
       },
     ],
     test: [],
@@ -84,6 +121,7 @@ const tutorialData = [
     tooltips: [
       {
         type: "informative",
+        page: "/",
         targetElement: "#element5",
         targetAreaElement: "#element5",
         title: "Feature 6",
@@ -91,6 +129,7 @@ const tutorialData = [
       },
       {
         type: "informative",
+        page: "/",
         targetElement: "#element6",
         targetAreaElement: "#element6",
         title: "Feature 7",
@@ -104,6 +143,7 @@ const tutorialData = [
     tooltips: [
       {
         type: "informative",
+        page: "/",
         targetElement: "#element7",
         targetAreaElement: "#element7",
         title: "Feature 8",
@@ -111,6 +151,7 @@ const tutorialData = [
       },
       {
         type: "informative",
+        page: "/",
         targetElement: "#element0",
         targetAreaElement: "#element0",
         title: "Feature 9",
@@ -124,6 +165,7 @@ const tutorialData = [
     tooltips: [
       {
         type: "informative",
+        page: "/",
         targetElement: "#element8",
         targetAreaElement: "#element8",
         title: "Feature 10",
@@ -131,6 +173,7 @@ const tutorialData = [
       },
       {
         type: "informative",
+        page: "/",
         targetElement: "#element7",
         targetAreaElement: "#element7",
         title: "Feature 11",

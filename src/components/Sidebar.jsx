@@ -157,7 +157,7 @@ export default function Sidebar({ open }) {
   }, [initialized, keycloak.authenticated]);
 
   return (
-    <StyledDrawer variant="permanent" open={open}>
+    <StyledDrawer id="sidebar-styled-drawer" variant="permanent" open={open}>
       <DrawerHeader>
         {user && (
           <ListItemButton dense key="account" component={Link} to="/account">
@@ -174,6 +174,7 @@ export default function Sidebar({ open }) {
       <MeshDialog open={meshOpen} onClose={() => setMeshOpen(false)}></MeshDialog>
       <List>
         <ListItemButton
+          id="sidebar-dashboard-item"
           key="dashboard"
           component={Link}
           to="/"
@@ -185,6 +186,7 @@ export default function Sidebar({ open }) {
           <ListItemText primary="Dashboard" />
         </ListItemButton>
         <ListItemButton
+          id="sidebar-devices-item"
           key="devices"
           component={Link}
           to="/devices"
@@ -196,6 +198,7 @@ export default function Sidebar({ open }) {
           <ListItemText primary="Devices" />
         </ListItemButton>
         <ListItemButton
+          id="sidebar-users-item"
           key="users"
           component={Link}
           to="/users"
@@ -207,6 +210,7 @@ export default function Sidebar({ open }) {
           <ListItemText primary="Users" />
         </ListItemButton>
         <ListItemButton
+          id="sidebar-services-item"
           key="services"
           component={Link}
           to="/services"
@@ -218,6 +222,7 @@ export default function Sidebar({ open }) {
           <ListItemText primary="Services" />
         </ListItemButton>
         <ListItemButton
+          id="sidebar-alerts-item"
           key="4"
           component={Link}
           to="/alerts"
@@ -229,6 +234,7 @@ export default function Sidebar({ open }) {
           <ListItemText primary="Alerts" />
         </ListItemButton>
         <ListItemButton
+          id="sidebar-resources-item"
           key="5"
           component={Link}
           to="/resources"
@@ -240,6 +246,7 @@ export default function Sidebar({ open }) {
           <ListItemText primary="Resources" />
         </ListItemButton>
         <ListItemButton
+          id="sidebar-settings-item"
           key="6"
           component={Link}
           to="/settings"

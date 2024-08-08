@@ -147,7 +147,7 @@ const HomePage = () => {
 
   return (
     <Box>
-      <Box onMouseMove={handleMouseMove}>
+      <Box id="home-page" onMouseMove={handleMouseMove}>
         <NetworkMap
           handlePositionChange={handleNodePositionChange}
           nodes={nodes}
@@ -181,19 +181,28 @@ const HomePage = () => {
           id="overview-stack"
         >
           <OverviewMetric
+            id="overview-stack-geopositioned"
             value={nPositionedNodes}
             total={nNodes}
             title="Geopositioned Nodes"
             sx={{ zIndex: 1000 }}
           />
-          <OverviewMetric value={nOkNodes} total={nNodes} title="OK Nodes" sx={{ zIndex: 1000 }} />
           <OverviewMetric
+            id="overview-stack-ok"
+            value={nOkNodes}
+            total={nNodes}
+            title="OK Nodes"
+            sx={{ zIndex: 1000 }}
+          />
+          <OverviewMetric
+            id="overview-stack-online"
             value={nOnlineNodes}
             total={nNodes}
             title="Online Nodes"
             sx={{ zIndex: 1000 }}
           />
           <OverviewMetric
+            id="overview-stack-registered"
             value={nNodes}
             total={nNodes + nUnknownNodes}
             title="Registered Nodes"
