@@ -22,20 +22,11 @@ const GRANULARITY = {
   month: "DAILY",
 };
 
-function filteredData(data, minTime, selectedDevice) {
-  return data
-    .map((item) => ({
-      ...item,
-      created: new Date(item.created).getTime(),
-    }))
-    .filter((item) => minTime <= item.created)
-    .filter((item) => !selectedDevice || item.mac === selectedDevice)
-    .sort((a, b) => a.created - b.created);
-}
-
-function histogram(data, minTime, bucketWidth, keys, combineStrategy = "sum") {
+function histogram(data, showDays, keys, combineStrategy = "sum") {
   let output = [];
   let maxTime = new Date().getTime();
+  let minTime = new Date() - MS_IN[showDays];
+  let bucketWidth = BUCKET_SIZES[showDays];
   let bucketStart = roundDownTo(minTime, bucketWidth);
   let i = 0;
   while (bucketStart < maxTime) {
@@ -64,11 +55,4 @@ function roundDownTo(n, multiple) {
   return multiple * Math.floor(n / multiple);
 }
 
-export {
-  filteredData,
-  histogram,
-  BUCKET_SIZES,
-  LABEL_FUNCS,
-  MS_IN,
-  GRANULARITY,
-};
+export { histogram, BUCKET_SIZES, LABEL_FUNCS, MS_IN, GRANULARITY };

@@ -5,13 +5,13 @@ import { ChartsXAxis } from "@mui/x-charts/ChartsXAxis";
 import { ChartsYAxis } from "@mui/x-charts/ChartsYAxis";
 import { ChartsReferenceLine } from "@mui/x-charts/ChartsReferenceLine";
 import { axisClasses } from "@mui/x-charts/ChartsAxis";
-import { filteredData, histogram, BUCKET_SIZES, LABEL_FUNCS, MS_IN, GRANULARITY } from "./utils";
+import { histogram, LABEL_FUNCS, MS_IN, GRANULARITY } from "./utils";
 import { fetchAPI } from "../../keycloak";
 import { useTheme } from "@mui/material";
 import { MeshContext } from "../../context";
+import qs from "qs";
 
 const DataUsageGraph = ({ showDays, selectedDevice }) => {
-  const [metrics, setMetrics] = React.useState([]);
   const [data, setData] = React.useState([]);
   const [loading, setLoading] = React.useState(false);
   const { mesh } = React.useContext(MeshContext);
@@ -19,16 +19,23 @@ const DataUsageGraph = ({ showDays, selectedDevice }) => {
 
   React.useEffect(() => {
     setLoading(true);
-    let minTimeStamp = Math.round((new Date() - new Date(MS_IN[showDays])) / 1000);
-    let granularity = GRANULARITY[showDays];
-    fetchAPI(`/metrics/data_usage/?min_time=${minTimeStamp}&granularity=${granularity}`)
+    let params = {
+      min_time: Math.round((new Date() - new Date(MS_IN[showDays])) / 1000),
+      granularity: GRANULARITY[showDays],
+      mac: selectedDevice,
+    };
+    fetchAPI(`/metrics/data_usage/?${qs.stringify(params)}`)
       .then((data) => {
-        setMetrics(
-          data.map((d) => ({
-            ...d,
-            rx_bytes: Math.abs(d.rx_bytes / 1048576),
-            tx_bytes: Math.abs(d.tx_bytes / 1048576),
-          })),
+        setData(
+          histogram(
+            data.map((d) => ({
+              created: new Date(d.created).getTime(),
+              rx_bytes: Math.abs(d.rx_bytes / 1048576),
+              tx_bytes: Math.abs(d.tx_bytes / 1048576),
+            })),
+            showDays,
+            ["rx_bytes", "tx_bytes"],
+          ),
         );
       })
       .catch((error) => {
@@ -37,14 +44,7 @@ const DataUsageGraph = ({ showDays, selectedDevice }) => {
       .finally(() => {
         setLoading(false);
       });
-  }, [showDays]);
-
-  React.useEffect(() => {
-    let minTime = new Date() - new Date(MS_IN[showDays]);
-    let fdata = filteredData(metrics, minTime, selectedDevice);
-    let hdata = histogram(fdata, minTime, BUCKET_SIZES[showDays], ["rx_bytes", "tx_bytes"], "sum");
-    setData(hdata);
-  }, [metrics, showDays, selectedDevice]);
+  }, [showDays, selectedDevice]);
 
   return (
     <ResponsiveChartContainer

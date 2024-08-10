@@ -4,31 +4,39 @@ import { AreaPlot } from "@mui/x-charts/LineChart";
 import { ChartsXAxis } from "@mui/x-charts/ChartsXAxis";
 import { ChartsYAxis } from "@mui/x-charts/ChartsYAxis";
 import { axisClasses } from "@mui/x-charts/ChartsAxis";
-import { histogram, filteredData, GRANULARITY, BUCKET_SIZES, LABEL_FUNCS, MS_IN } from "./utils";
+import { histogram, GRANULARITY, LABEL_FUNCS, MS_IN } from "./utils";
 import { ChartsReferenceLine } from "@mui/x-charts/ChartsReferenceLine";
 import { fetchAPI } from "../../keycloak";
 import { useTheme } from "@mui/material";
 import { MeshContext } from "../../context";
+import qs from "qs";
 
 const DataRateGraph = ({ showDays, selectedDevice }) => {
   const theme = useTheme();
-  const [metrics, setMetrics] = React.useState([]);
   const [data, setData] = React.useState([]);
   const [loading, setLoading] = React.useState(false);
   const { mesh } = React.useContext(MeshContext);
 
   React.useEffect(() => {
     setLoading(true);
-    let minTimeStamp = Math.round((new Date() - new Date(MS_IN[showDays])) / 1000);
-    let granularity = GRANULARITY[showDays];
-    fetchAPI(`/metrics/data_rate/?min_time=${minTimeStamp}&granularity=${granularity}`)
+    let params = {
+      min_time: Math.round((new Date() - new Date(MS_IN[showDays])) / 1000),
+      granularity: GRANULARITY[showDays],
+      mac: selectedDevice,
+    };
+    fetchAPI(`/metrics/data_rate/?${qs.stringify(params)}`)
       .then((data) => {
-        setMetrics(
-          data.map((d) => ({
-            ...d,
-            rx_rate: Math.abs(d.rx_rate / 1000),
-            tx_rate: Math.abs(d.tx_rate / 1000),
-          })),
+        setData(
+          histogram(
+            data.map((d) => ({
+              created: new Date(d.created).getTime(),
+              rx_rate: Math.abs(d.rx_rate / 1000),
+              tx_rate: Math.abs(d.tx_rate / 1000),
+            })),
+            showDays,
+            ["rx_rate", "tx_rate"],
+            "avg"
+          ),
         );
       })
       .catch((error) => {
@@ -37,14 +45,7 @@ const DataRateGraph = ({ showDays, selectedDevice }) => {
       .finally(() => {
         setLoading(false);
       });
-  }, [showDays]);
-
-  React.useEffect(() => {
-    let minTime = new Date() - new Date(MS_IN[showDays]);
-    let fdata = filteredData(metrics, minTime, selectedDevice);
-    let hdata = histogram(fdata, minTime, BUCKET_SIZES[showDays], ["rx_rate", "tx_rate"], "avg");
-    setData(hdata);
-  }, [metrics, showDays, selectedDevice]);
+  }, [showDays, selectedDevice]);
 
   return (
     <ResponsiveChartContainer
