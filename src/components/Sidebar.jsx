@@ -13,6 +13,7 @@ import ListItem from "@mui/material/ListItem";
 import Badge from "@mui/material/Badge";
 import ListItemAvatar from "@mui/material/ListItemAvatar";
 import Drawer from "@mui/material/Drawer";
+import Box from "@mui/material/Box";
 import { styled } from "@mui/material/styles";
 import { useLocation, Link } from "react-router-dom";
 import { ReadyState } from "react-use-websocket";
@@ -258,6 +259,7 @@ export default function Sidebar({ open }) {
           <ListItemText primary="Settings" />
         </ListItemButton>
       </List>
+      <Box sx={{ flexGrow: 1}} />
       <List>
         <ListItem>
           <ListItemIcon>
