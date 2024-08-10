@@ -19,6 +19,7 @@ export default function GenericDialog({
   onError,
   onUpdate,
   onClose,
+  onReset,
   onAdd,
   typeName = "Item",
   addVerb = "Add",
@@ -26,6 +27,7 @@ export default function GenericDialog({
   idField = "id",
 }) {
   const [loading, setLoading] = React.useState(false);
+
   const isModified = React.useCallback(() => {
     return JSON.stringify(originalData) !== JSON.stringify(data);
   }, [originalData, data]);
@@ -41,14 +43,16 @@ export default function GenericDialog({
       .finally(() => setLoading(false));
   };
 
+  const resetAndClose = () => onReset() || onClose();
+
   return (
-    <Dialog open={open} onClose={onClose} maxWidth={"sm"} fullWidth>
+    <Dialog open={open} onClose={resetAndClose} maxWidth={"sm"} fullWidth>
       <DialogTitle>
         {originalData ? `${editVerb} ${typeName}` : `${addVerb} New ${typeName}`}
       </DialogTitle>
       <IconButton
         aria-label="close"
-        onClick={onClose}
+        onClick={resetAndClose}
         sx={{
           position: "absolute",
           right: 8,

@@ -32,10 +32,16 @@ export default function DeviceDialog({ open, device, onClose, onAdd, onUpdate })
     setErrors({ ...errors, [e.target.name]: null });
   };
 
+  const handleReset = () => {
+    setData({ ...defaultDevice, mesh: mesh?.name });
+    setErrors({});
+  };
+
   return (
     <GenericDialog
       open={open}
       onClose={onClose}
+      onReset={handleReset}
       data={data}
       baseUrl="/monitoring/devices/"
       originalData={device}

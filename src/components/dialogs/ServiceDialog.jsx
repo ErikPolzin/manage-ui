@@ -27,10 +27,16 @@ export default function ServiceDialog({ open, service, onClose, onAdd, onUpdate 
     setErrors({ ...errors, [e.target.name]: null });
   };
 
+  const handleReset = () => {
+    setData(defaultService);
+    setErrors({});
+  };
+
   return (
     <GenericDialog
       open={open}
       onClose={onClose}
+      onReset={handleReset}
       data={data}
       originalData={service}
       typeName="Service"

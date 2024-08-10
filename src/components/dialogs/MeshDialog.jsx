@@ -23,16 +23,23 @@ export default function MeshDialog({ open, mesh, onClose, onAdd, onUpdate }) {
 
   const handleChange = (e) => {
     setData({ ...data, [e.target.name]: e.target.value });
+    setErrors({ ...errors, [e.target.name]: null });
   };
 
   const handleLocationChange = (loc) => {
     setData({ ...data, lat: loc.lat, lon: loc.lng });
   };
 
+  const handleReset = () => {
+    setData(defaultMesh);
+    setErrors({});
+  };
+
   return (
     <GenericDialog
       open={open}
       onClose={onClose}
+      onReset={handleReset}
       data={data}
       baseUrl="/monitoring/meshes/"
       originalData={mesh}
