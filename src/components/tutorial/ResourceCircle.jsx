@@ -1,10 +1,4 @@
-import {
-  CssBaseline,
-  Icon,
-  IconButton,
-  Switch,
-  Typography,
-} from "@mui/material";
+import { CssBaseline, Icon, IconButton, Switch, Typography } from "@mui/material";
 import { Box } from "@mui/system";
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import ExploreIcon from "@mui/icons-material/Explore";
@@ -14,13 +8,10 @@ import CloseIcon from "@mui/icons-material/Close";
 import InteractiveGuideCard from "./InteractiveGuideCard";
 import InteractiveGuide from "./InteractiveGuide";
 import InfoIcon from "./InfoIcon";
-import {
-  BrowserRouter as Router,
-  useNavigate,
-  useLocation,
-} from "react-router-dom";
+import { BrowserRouter as Router, useNavigate, useLocation } from "react-router-dom";
+import { usePersistantState } from "../../hooks";
 
-const ResourceCircle = ({ guides, infoIcons }) => {
+const ResourceCircle = ({ circleIconName, guides, infoIcons }) => {
   const circleSize = 60;
   const circlePos = { bottom: 20, right: 20 };
   const circleMenuHeight = circleSize * 0.85;
@@ -28,14 +19,13 @@ const ResourceCircle = ({ guides, infoIcons }) => {
   const popupBoxHeight = 300;
 
   const [isOpen, setIsOpen] = useState(false);
-  const [interactiveGuidesMenuOpen, setInteractiveGuidesMenuOpen] =
-    useState(true);
+  const [interactiveGuidesMenuOpen, setInteractiveGuidesMenuOpen] = useState(true);
   const [searchToolMenuOpen, setSearchToolMenuOpen] = useState(false);
   const [helpIconsMenuOpen, setHelpIconsMenuOpen] = useState(false);
 
   const circleMenuRef = useRef(null);
 
-  const [helpIconsEnabled, setHelpIconsEnabled] = useState(false);
+  const [helpIconsEnabled, setHelpIconsEnabled] = usePersistantState("helpIconsEnabled", false);
   const [guideActive, setGuideActive] = useState({
     active: false,
     guide: null,
@@ -44,12 +34,8 @@ const ResourceCircle = ({ guides, infoIcons }) => {
   // const navigate = useNavigate();
   const { pathname: currentPath } = useLocation(); // Destructure pathname from useLocation
 
-  const [scrollHeight, setScrollHeight] = useState(
-    document.documentElement.scrollHeight
-  );
-  const [scrollWidth, setScrollWidth] = useState(
-    document.documentElement.scrollHeight
-  );
+  const [scrollHeight, setScrollHeight] = useState(document.documentElement.scrollHeight);
+  const [scrollWidth, setScrollWidth] = useState(document.documentElement.scrollHeight);
 
   // Get height and width of entire page (including scroll)
   useEffect(() => {
@@ -87,31 +73,28 @@ const ResourceCircle = ({ guides, infoIcons }) => {
     progress: 0,
   }));
 
-  const interactiveGuidesMenuDisplay = interactiveGuides.reduce(
-    (acc, guide) => {
-      if (guide.page === currentPath) {
-        acc.push(
-          <Box
-            key={guide.name}
-            onClick={() => handleGuideClick(guide)}
-            sx={{
-              position: "relative",
-              width: "100%",
-              marginBottom: "15px",
-            }}
-          >
-            <InteractiveGuideCard
-              guideNo={acc.length + 1} // Sequential index
-              guideName={guide.name}
-              progress={guide.progress}
-            />
-          </Box>
-        );
-      }
-      return acc;
-    },
-    []
-  );
+  const interactiveGuidesMenuDisplay = interactiveGuides.reduce((acc, guide) => {
+    if (guide.page === currentPath) {
+      acc.push(
+        <Box
+          key={guide.name}
+          onClick={() => handleGuideClick(guide)}
+          sx={{
+            position: "relative",
+            width: "100%",
+            marginBottom: "15px",
+          }}
+        >
+          <InteractiveGuideCard
+            guideNo={acc.length + 1} // Sequential index
+            guideName={guide.name}
+            progress={guide.progress}
+          />
+        </Box>,
+      );
+    }
+    return acc;
+  }, []);
 
   const interactiveGuidesMenuDisplayOnOtherPages = interactiveGuides
     .filter((guide) => guide.page !== currentPath)
@@ -170,7 +153,7 @@ const ResourceCircle = ({ guides, infoIcons }) => {
   };
 
   const handleHelpIconChange = () => {
-    setHelpIconsEnabled((prevValue) => !prevValue);
+    setHelpIconsEnabled(!helpIconsEnabled);
   };
 
   const handleGuideClick = (guide) => {
@@ -215,9 +198,21 @@ const ResourceCircle = ({ guides, infoIcons }) => {
               backgroundColor: "#3F15B1",
               cursor: "pointer",
               boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2)",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              color: "white",
+              fontSize: circleSize - 20,
             }}
           >
-            <img></img>
+            {circleIconName && (
+              <img
+                alt=""
+                src={circleIconName}
+                style={{ width: "80%", height: "80%", maxWidth: "80%", maxHeight: "80%" }}
+              ></img>
+            )}
+            {circleIconName ? "" : "?"}
             <Box
               id="circle-exit-overlay"
               onClick={(e) => {
@@ -261,9 +256,7 @@ const ResourceCircle = ({ guides, infoIcons }) => {
               alignItems: "center",
               justifyContent: "center",
               position: "fixed",
-              bottom: `${
-                circlePos.bottom + (circleSize - circleMenuHeight) / 2
-              }px`,
+              bottom: `${circlePos.bottom + (circleSize - circleMenuHeight) / 2}px`,
               right: circlePos.right + circleSize - circleMenuHeight / Math.PI,
               height: `${circleMenuHeight}px`,
               borderBottomLeftRadius: "100px",
@@ -307,14 +300,10 @@ const ResourceCircle = ({ guides, infoIcons }) => {
                   height: "100%",
                   padding: "0 12px",
                   margin: "0 1px 0 0",
-                  backgroundColor: interactiveGuidesMenuOpen
-                    ? "#DFD6FA"
-                    : "transparent",
+                  backgroundColor: interactiveGuidesMenuOpen ? "#DFD6FA" : "transparent",
                   borderRadius: "100px",
                   color: interactiveGuidesMenuOpen ? "#3F15B1" : "#262626",
-                  border: interactiveGuidesMenuOpen
-                    ? "2px solid #3F15B1"
-                    : "2px solid transparent",
+                  border: interactiveGuidesMenuOpen ? "2px solid #3F15B1" : "2px solid transparent",
                   cursor: "pointer",
                 }}
               >
@@ -324,9 +313,7 @@ const ResourceCircle = ({ guides, infoIcons }) => {
                   sx={{
                     color: interactiveGuidesMenuOpen ? "#3F15B1" : "#262626",
                     "&:hover": {
-                      backgroundColor: interactiveGuidesMenuOpen
-                        ? "transparent"
-                        : "",
+                      backgroundColor: interactiveGuidesMenuOpen ? "transparent" : "",
                     },
                   }}
                 >
@@ -343,14 +330,10 @@ const ResourceCircle = ({ guides, infoIcons }) => {
                   height: "100%",
                   padding: "0 12px",
                   margin: "0 1px 0 1px",
-                  backgroundColor: searchToolMenuOpen
-                    ? "#DFD6FA"
-                    : "transparent",
+                  backgroundColor: searchToolMenuOpen ? "#DFD6FA" : "transparent",
                   borderRadius: "100px",
                   color: searchToolMenuOpen ? "#3F15B1" : "#262626",
-                  border: searchToolMenuOpen
-                    ? "2px solid #3F15B1"
-                    : "2px solid transparent",
+                  border: searchToolMenuOpen ? "2px solid #3F15B1" : "2px solid transparent",
                   cursor: "pointer",
                   pointerEvents: isOpen ? "all" : "none",
                 }}
@@ -378,14 +361,10 @@ const ResourceCircle = ({ guides, infoIcons }) => {
                   height: "100%",
                   padding: "0 12px",
                   margin: "0 0 0 1px",
-                  backgroundColor: helpIconsMenuOpen
-                    ? "#DFD6FA"
-                    : "transparent",
+                  backgroundColor: helpIconsMenuOpen ? "#DFD6FA" : "transparent",
                   borderRadius: "100px",
                   color: helpIconsMenuOpen ? "#3F15B1" : "#262626",
-                  border: helpIconsMenuOpen
-                    ? "2px solid #3F15B1"
-                    : "2px solid transparent",
+                  border: helpIconsMenuOpen ? "2px solid #3F15B1" : "2px solid transparent",
                   cursor: "pointer",
                 }}
               >
@@ -441,12 +420,9 @@ const ResourceCircle = ({ guides, infoIcons }) => {
                 borderRadius: "10px",
                 padding: "18px",
                 backgroundColor: "white",
-                pointerEvents:
-                  interactiveGuidesMenuOpen && isOpen ? "all" : "none",
+                pointerEvents: interactiveGuidesMenuOpen && isOpen ? "all" : "none",
                 opacity: interactiveGuidesMenuOpen ? 1 : 0,
-                transition: interactiveGuidesMenuOpen
-                  ? "opacity 0.3s ease-out"
-                  : "none",
+                transition: interactiveGuidesMenuOpen ? "opacity 0.3s ease-out" : "none",
               }}
             >
               <Typography
@@ -540,9 +516,7 @@ const ResourceCircle = ({ guides, infoIcons }) => {
                 backgroundColor: "white",
                 pointerEvents: searchToolMenuOpen && isOpen ? "all" : "none",
                 opacity: searchToolMenuOpen ? 1 : 0,
-                transition: searchToolMenuOpen
-                  ? "opacity 0.3s ease-out"
-                  : "none",
+                transition: searchToolMenuOpen ? "opacity 0.3s ease-out" : "none",
               }}
             >
               <Typography
@@ -578,9 +552,7 @@ const ResourceCircle = ({ guides, infoIcons }) => {
                 backgroundColor: "white",
                 pointerEvents: helpIconsMenuOpen && isOpen ? "all" : "none",
                 opacity: helpIconsMenuOpen ? 1 : 0,
-                transition: helpIconsMenuOpen
-                  ? "opacity 0.3s ease-out"
-                  : "none",
+                transition: helpIconsMenuOpen ? "opacity 0.3s ease-out" : "none",
               }}
             >
               <Typography
@@ -602,9 +574,8 @@ const ResourceCircle = ({ guides, infoIcons }) => {
                   lineHeight: "1rem",
                 }}
               >
-                Help icons provide details about different features and
-                elements. Click on them for more information and insight into
-                the application's functionality.
+                Help icons provide details about different features and elements. Click on them for
+                more information and insight into the application's functionality.
               </Typography>
               <Switch
                 checked={helpIconsEnabled}

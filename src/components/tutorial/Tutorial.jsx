@@ -14,7 +14,7 @@ import { BrowserRouter as Router, useNavigate, useLocation } from "react-router-
 import TutorialCompleteTile from "./TutorialCompleteTile";
 
 // onActivate will handle the turning on and off of a tutorial
-const Tutorial = ({ tutorialContent, onExit }) => {
+const Tutorial = ({ logoSrc, tutorialContent, onExit }) => {
   const tutorial = tutorialContent;
   const tutorialName = "iNethi Manager Tutorial";
   const [startingScreen1, setStartingScreen1] = useState(true);
@@ -39,7 +39,7 @@ const Tutorial = ({ tutorialContent, onExit }) => {
 
   const [tutorialComplete, setTutorialComplete] = useState(false);
 
-  const [scrollHeight, setScrollHeight] = useState(0); // used to fade component onto screen
+  const [scrollHeight, setScrollHeight] = useState(0);
 
   // Fade progress tile in smoothly
   useEffect(() => {
@@ -119,7 +119,7 @@ const Tutorial = ({ tutorialContent, onExit }) => {
 
     if (currentTask < currentTasks.length - 1) {
       // All click elements complete - Move to next task
-      setTaskChanging(true);
+      //setTaskChanging(true);
       setCurrentTask((prevTask) => prevTask + 1);
     } else {
       // Finished all tasks - Test and stage completed
@@ -248,6 +248,7 @@ const Tutorial = ({ tutorialContent, onExit }) => {
     <Box
       zIndex={1000000000}
       sx={{
+        // backgroundColor: "rgba(88, 250, 200, 0.3)",
         position: "absolute",
         top: "0px",
         left: "0px",
@@ -273,7 +274,7 @@ const Tutorial = ({ tutorialContent, onExit }) => {
           <BasicBackgroundOverlay
             focusElement={
               <IntroTile1
-                logoSrc={"iNethiLogoWhite.png"}
+                logoSrc={logoSrc}
                 tutorialName={"CommuNethi"}
                 description={
                   "This interactive tutorial will walk you through the application, helping you to gain a clear understanding of how it works."
@@ -288,7 +289,7 @@ const Tutorial = ({ tutorialContent, onExit }) => {
         <BasicBackgroundOverlay
           focusElement={
             <IntroTile2
-              logoSrc={"iNethiLogoWhite.png"}
+              logoSrc={logoSrc}
               stages={tutorial.map((stage) => stage.stageName)}
               onNext={handleStartScreen2Next}
               onExit={handleExitTutorial}

@@ -17,6 +17,7 @@ const Tooltip = ({
   onExit,
   tooltipNo,
   totalTooltips,
+  headerHeight = 30,
 }) => {
   const [tooltipPosition, setTooltipPosition] = useState({ top: 0, left: 0 });
   const [tooltipArrowPosition, setTooltipArrowPosition] = useState({
@@ -101,6 +102,10 @@ const Tooltip = ({
       // Default tooltip positioning: right of the target area and vertically centered
       let top = rect.top + window.scrollY + rect.height / 2 - tooltipHeight / 2;
       let left = rect.left + window.scrollX + rect.width + offset;
+      let minSpaceOver = {
+        side: "right",
+        amount: left + tooltipWidth - document.documentElement.clientWidth,
+      };
 
       // Default arrow positioning: pointing left, centered vertically
       let arrowTop = top + tooltipHeight / 2 - arrowSize / 2;
@@ -111,6 +116,11 @@ const Tooltip = ({
         position = "left";
         left = rect.left + window.scrollX - tooltipWidth - offset; // Reposition to the left of the target area
         arrowLeft = left + tooltipWidth - arrowSize / 2; // Arrow pointing right
+
+        if (minSpaceOver.amount > Math.abs(left)) {
+          minSpaceOver.amount = Math.abs(left);
+          minSpaceOver.side = "left";
+        }
       }
 
       // Check if tooltip goes out of viewport on the left
@@ -137,11 +147,29 @@ const Tooltip = ({
             rect.top + window.scrollY + rect.height + offset + tooltipHeight >
             window.scrollY + document.documentElement.clientHeight
           ) {
-            top = window.scrollY + document.documentElement.clientHeight - tooltipHeight; // Place tooltip on bottom but visible
-          } else {
+            if (minSpaceOver.side === "right") {
+              // Tooltip positioning: right side of the page area and vertically centered
+              top = rect.top + window.scrollY + rect.height / 2 - tooltipHeight / 2;
+              left = window.scrollX - rect.width - offset;
+
+              // Arrow positioning: pointing left, centered vertically
+              arrowTop = top + tooltipHeight / 2 - arrowSize / 2;
+              arrowLeft = left - arrowSize / 2;
+            } else if (minSpaceOver.side === "left") {
+              // Tooltip positioning: left side of the page area and vertically centered
+              top = rect.top + window.scrollY + rect.height / 2 - tooltipHeight / 2;
+              left = offset;
+
+              // Arrow positioning: pointing right, centered vertically
+              arrowTop = top + tooltipHeight / 2 - arrowSize / 2;
+              arrowLeft = tooltipWidth + offset - arrowSize / 2;
+            }
+            //top = window.scrollY + document.documentElement.clientHeight - tooltipHeight; // Place tooltip on bottom but visible
+          } // else if its positioned directly below
+          else {
             top = rect.top + window.scrollY + rect.height + offset;
           }
-          arrowTop = top - arrowSize / 2; // Arrow pointing up
+          //arrowTop = top - arrowSize / 2; // Arrow pointing up
         }
       }
 
@@ -200,7 +228,7 @@ const Tooltip = ({
               window.scrollY + document.documentElement.clientHeight
           ) {
             // scroll to tooltip top
-            scrollPos = tooltipPosition.top - offsetTop;
+            scrollPos = tooltipPosition.top - offsetTop - headerHeight;
           }
         }
         // else if target element is higher, you want to scroll to its top
@@ -212,7 +240,7 @@ const Tooltip = ({
               window.scrollY + document.documentElement.clientHeight
           ) {
             // scroll to target area top
-            scrollPos = targetAreaPos.top - offsetTop;
+            scrollPos = targetAreaPos.top - offsetTop - headerHeight;
           }
         }
       }
