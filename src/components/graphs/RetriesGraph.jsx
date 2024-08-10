@@ -2,7 +2,7 @@ import * as React from "react";
 import { BarChart } from "@mui/x-charts/BarChart";
 import { fetchAPI } from "../../keycloak";
 
-const RETRIES_BRACKETS = [1000, 2000, 5000, 10000];
+const RETRIES_BRACKETS = [25, 50, 75, 100];
 const BRACKET_COLORS = ["#28b550", "#57a334", "#80a334", "#a38234", "#a35034"];
 const GREY_COLOR = "#adadad";
 const H24 = 1000 * 60 * 60 * 24;
@@ -55,7 +55,7 @@ const RetriesGraph = ({ deviceMac }) => {
       // segments will appear either greenish or reddish depending on how
       // many TX retries took place
       for (let i = 1; i < data.length; i++) {
-        let bracket = bracketIndex(data[i].tx_retries);
+        let bracket = bracketIndex(data[i].tx_retries_perc);
         if (bracket !== currentBracket || i === data.length - 1) {
           series.push({
             data: [new Date(data[i].created).getTime() - currentTime],
