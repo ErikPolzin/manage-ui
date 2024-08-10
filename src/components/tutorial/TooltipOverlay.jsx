@@ -1,14 +1,14 @@
 import React, { useEffect, useLayoutEffect, useState } from "react";
-import { throttle } from "lodash";
 import { Box } from "@mui/material";
 
-const TooltipOverlay = ({ targetAreaEl }) => {
+const TooltipOverlay = ({ targetAreaEl, areaClickable = true }) => {
   const [targetAreaPos, setTargetAreaPos] = useState({
     left: 0,
     top: 0,
     width: 0,
     height: 0,
   });
+  const [targetElementFound, setTargetElementFound] = useState(false);
   const svgViewBoxDimensions = {
     right: document.documentElement.scrollWidth,
     bottom: document.documentElement.scrollHeight,
@@ -31,18 +31,14 @@ const TooltipOverlay = ({ targetAreaEl }) => {
   useLayoutEffect(() => {
     const updateTargetAreaPosition = () => {
       const targetAreaElement = document.querySelector(targetAreaEl);
-      if (!targetAreaElement) return;
+      if (!targetAreaElement) {
+        setTargetElementFound(false);
+        return;
+      }
+      setTargetElementFound(true);
 
       // Position the target area highlight
       const rect = targetAreaElement.getBoundingClientRect();
-
-      // console.log(
-      //   "Element position: ",
-      //   rect.left,
-      //   rect.top,
-      //   rect.width,
-      //   rect.height
-      // );
 
       // converting these values to the svg viewBox dimensions you are working in
       setTargetAreaPos({
@@ -77,76 +73,81 @@ const TooltipOverlay = ({ targetAreaEl }) => {
         left: 0,
         width: parentDimensions.right,
         height: parentDimensions.bottom,
-        pointerEvents: "none", // ensures elements in inner rectangle are clickable
+        backgroundColor: targetElementFound ? "transparent" : "rgba(0, 0, 0, 0.2)",
+        pointerEvents: areaClickable ? "none" : "all", // ensures elements in inner rectangle are clickable
       }}
     >
       {/* Outer rectangles on the top, left, right, and bottom that blocks pointer events */}
-      <Box
-        id="topRect"
-        sx={{
-          position: "absolute",
-          left: 0,
-          top: 0,
-          width: "100%",
-          height: Math.max(targetAreaPos.top - areaOffset, 0) + "px",
-          backgroundColor: "rgba(0, 0, 0, 0.2)",
-          pointerEvents: "all", // elements behind overlay not clickable
-          transition:
-            "width 0.5s ease-in-out, height 0.5s ease-in-out, left 0.5s ease-in-out, top 0.5s ease-in-out",
-        }}
-      />
-      <Box
-        id="leftRect"
-        sx={{
-          position: "absolute",
-          left: 0,
-          top: targetAreaPos.top - areaOffset + "px",
-          width: Math.max(targetAreaPos.left - areaOffset, 0) + "px",
-          height: Math.max(targetAreaPos.height + 2 * areaOffset, 0) + "px",
-          backgroundColor: "rgba(0, 0, 0, 0.2)",
-          pointerEvents: "all", // elements behind overlay not clickable
-          transition:
-            "width 0.5s ease-in-out, height 0.5s ease-in-out, left 0.5s ease-in-out, top 0.5s ease-in-out",
-        }}
-      />
+      {targetElementFound && (
+        <>
+          <Box
+            id="topRect"
+            sx={{
+              position: "absolute",
+              left: 0,
+              top: 0,
+              width: "100%",
+              height: Math.max(targetAreaPos.top - areaOffset, 0) + "px",
+              backgroundColor: "rgba(0, 0, 0, 0.2)",
+              pointerEvents: "all", // elements behind overlay not clickable
+              transition:
+                "width 0.5s ease-in-out, height 0.5s ease-in-out, left 0.5s ease-in-out, top 0.5s ease-in-out",
+            }}
+          />
+          <Box
+            id="leftRect"
+            sx={{
+              position: "absolute",
+              left: 0,
+              top: targetAreaPos.top - areaOffset + "px",
+              width: Math.max(targetAreaPos.left - areaOffset, 0) + "px",
+              height: Math.max(targetAreaPos.height + 2 * areaOffset, 0) + "px",
+              backgroundColor: "rgba(0, 0, 0, 0.2)",
+              pointerEvents: "all", // elements behind overlay not clickable
+              transition:
+                "width 0.5s ease-in-out, height 0.5s ease-in-out, left 0.5s ease-in-out, top 0.5s ease-in-out",
+            }}
+          />
 
-      <Box
-        id="rightRect"
-        sx={{
-          position: "absolute",
-          left: `${targetAreaPos.left + targetAreaPos.width + areaOffset}px`,
-          top: `${targetAreaPos.top - areaOffset}px`,
-          width: `${Math.max(
-            document.documentElement.clientWidth -
-              (targetAreaPos.left + targetAreaPos.width + areaOffset),
-            0,
-          )}px`,
-          height: `${Math.max(targetAreaPos.height + 2 * areaOffset, 0)}px`,
-          backgroundColor: "rgba(0, 0, 0, 0.2)",
-          pointerEvents: "all", // elements behind overlay not clickable
-          transition:
-            "width 0.5s ease-in-out, height 0.5s ease-in-out, left 0.5s ease-in-out, top 0.5s ease-in-out",
-        }}
-      />
+          <Box
+            id="rightRect"
+            sx={{
+              position: "absolute",
+              left: `${targetAreaPos.left + targetAreaPos.width + areaOffset}px`,
+              top: `${targetAreaPos.top - areaOffset}px`,
+              width: `${Math.max(
+                document.documentElement.clientWidth -
+                  (targetAreaPos.left + targetAreaPos.width + areaOffset),
+                0,
+              )}px`,
+              height: `${Math.max(targetAreaPos.height + 2 * areaOffset, 0)}px`,
+              backgroundColor: "rgba(0, 0, 0, 0.2)",
+              pointerEvents: "all", // elements behind overlay not clickable
+              transition:
+                "width 0.5s ease-in-out, height 0.5s ease-in-out, left 0.5s ease-in-out, top 0.5s ease-in-out",
+            }}
+          />
 
-      <Box
-        id="bottomRect"
-        sx={{
-          position: "absolute",
-          left: `0px`,
-          top: `${targetAreaPos.top + targetAreaPos.height + areaOffset}px`,
-          width: "100%",
-          height: `${Math.max(
-            document.documentElement.scrollHeight -
-              (targetAreaPos.top + targetAreaPos.height + areaOffset),
-            0,
-          )}px`,
-          backgroundColor: "rgba(0, 0, 0, 0.2)",
-          pointerEvents: "all", // elements behind overlay not clickable
-          transition:
-            "width 0.5s ease-in-out, height 0.5s ease-in-out, left 0.5s ease-in-out, top 0.5s ease-in-out",
-        }}
-      />
+          <Box
+            id="bottomRect"
+            sx={{
+              position: "absolute",
+              left: `0px`,
+              top: `${targetAreaPos.top + targetAreaPos.height + areaOffset}px`,
+              width: "100%",
+              height: `${Math.max(
+                document.documentElement.scrollHeight -
+                  (targetAreaPos.top + targetAreaPos.height + areaOffset),
+                0,
+              )}px`,
+              backgroundColor: "rgba(0, 0, 0, 0.2)",
+              pointerEvents: "all", // elements behind overlay not clickable
+              transition:
+                "width 0.5s ease-in-out, height 0.5s ease-in-out, left 0.5s ease-in-out, top 0.5s ease-in-out",
+            }}
+          />
+        </>
+      )}
     </Box>
 
     // <svg

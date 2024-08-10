@@ -7,15 +7,9 @@ import ReplayIcon from "@mui/icons-material/Replay";
 import FastForwardIcon from "@mui/icons-material/FastForward";
 import { Box, fontSize } from "@mui/system";
 import "./TutorialHeader.css";
+import ConfirmationPopup from "./ConfirmationPopup";
 
-const TutorialHeader = ({
-  tutorialName,
-  stages,
-  stageNo,
-  onExit,
-  onRedoStage,
-  onSkipStage,
-}) => {
+const TutorialHeader = ({ tutorialName, stages, stageNo, onExit, onRedoStage, onSkipStage }) => {
   const headerHeight = 29.5;
   const dropDownWidth = 280;
   const [dropDownMenuPosition, setDropDownMenuPosition] = useState({
@@ -27,31 +21,18 @@ const TutorialHeader = ({
   const [confirmationPopupOpen, setConfirmationPopupOpen] = useState(false);
   const [confirmationAction, setConfirmationAction] = useState(null);
 
-  const [windowClickCount, setWindowClickCount] = useState(0); // used to call use effect on every window click
   const [clickedElement, setClickedElement] = useState(null); // used to call use effect on every window click
   const headerRef = useRef(null);
 
-  // Assists with closing of menu when a click outside occurs
+  // Close menu when a click outside occurs
   useEffect(() => {
     const handleWindowClick = (event) => {
-      setWindowClickCount((prevCount) => prevCount + 1);
       setClickedElement(event);
     };
 
-    window.addEventListener("click", handleWindowClick);
-
-    return () => {
-      window.removeEventListener("click", handleWindowClick);
-    };
-  }, []);
-
-  // Close menu when click outside occurs
-  useEffect(() => {
-    //console.log(headerRef.current);
-
     const closeMenu = () => {
-      //console.log(headerRef.current.contains(clickedElement.target));
       if (
+        isOpen &&
         headerRef.current &&
         clickedElement &&
         !headerRef.current.contains(clickedElement.target)
@@ -60,8 +41,15 @@ const TutorialHeader = ({
       }
     };
 
+    window.addEventListener("click", handleWindowClick);
+
+    // Call closeMenu immediately in case the click occurs before the event listener is removed
     closeMenu();
-  }, [windowClickCount]);
+
+    return () => {
+      window.removeEventListener("click", handleWindowClick);
+    };
+  }, [clickedElement]);
 
   // Reset positions on resize
   useEffect(() => {
@@ -183,11 +171,7 @@ const TutorialHeader = ({
             disableRipple
             sx={{ padding: "0 0 0 10px" }}
           >
-            {isOpen ? (
-              <CloseIcon fontSize="small" />
-            ) : (
-              <MenuIcon fontSize="small" />
-            )}
+            {isOpen ? <CloseIcon fontSize="small" /> : <MenuIcon fontSize="small" />}
           </IconButton>
           <Typography
             variant="h8"
@@ -312,55 +296,20 @@ const TutorialHeader = ({
           </Button>
         </Box>
       </Box>
-      {/* Confirmation Popup */}
       {confirmationPopupOpen && (
-        <Box
-          position="fixed"
-          display="flex"
-          justifyContent="center"
-          alignItems="center"
-          width="100%"
-          height="100%"
-          top="0"
-          left="0"
-          style={{ zIndex: 1000000007, backgroundColor: "rgba(0, 0, 0, 0.2)" }}
-        >
-          <Box
-            className="confirmation-container"
-            backgroundColor="white"
-            padding={"12px 18px"}
-            borderRadius={"3px"}
-          >
-            <Typography variant="h6">Confirm {confirmationAction}</Typography>
-            <Typography variant="body1" style={{ marginTop: "10px" }}>
-              Are you sure you want to{" "}
-              {confirmationAction === "Exit"
-                ? "exit the tutorial?"
-                : confirmationAction.toLowerCase() + " Stage " + (stageNo + 1)}
-            </Typography>
-            <Box
-              className="conformation-popup-actions"
-              display="flex"
-              justifyContent="flex-end"
-              marginTop="20px"
-            >
-              <Button
-                onClick={() => handleCloseConfirmationPopup(false)}
-                color="primary"
-                sx={{ padding: 0, marginRight: "20px" }}
-              >
-                Cancel
-              </Button>
-              <Button
-                onClick={() => handleCloseConfirmationPopup(true)}
-                color="primary"
-                sx={{ padding: 0 }}
-              >
-                Confirm
-              </Button>
-            </Box>
-          </Box>
-        </Box>
+        <ConfirmationPopup
+          title={`Confirm ${confirmationAction}`}
+          description={`Are you sure you want to 
+      ${
+        confirmationAction === "Exit"
+          ? "exit the tutorial?"
+          : confirmationAction.toLowerCase() + " Stage " + (stageNo + 1)
+      }`}
+          cancelBtnText={"Cancel"}
+          confirmBtnText={"Confirm"}
+          onCancel={() => handleCloseConfirmationPopup(false)}
+          onConfirm={() => handleCloseConfirmationPopup(true)}
+        ></ConfirmationPopup>
       )}
     </Box>
   );

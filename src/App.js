@@ -134,10 +134,18 @@ function App() {
                 </main>
               </Box>
               {tutorialActive && (
-                <Tutorial tutorialContent={tutorialData} onExit={handleExitTutorial}></Tutorial>
+                <Tutorial
+                  logoSrc={"/images/iNethiLogoWhite.png"}
+                  tutorialContent={tutorialData}
+                  onExit={handleExitTutorial}
+                ></Tutorial>
               )}
               {!tutorialActive && resourceCircleEnabled && (
-                <ResourceCircle guides={guidesData} infoIcons={infoIconsData}></ResourceCircle>
+                <ResourceCircle
+                  circleIconName={"/images/iNethiLogoWhite.png"}
+                  guides={guidesData}
+                  infoIcons={infoIconsData}
+                ></ResourceCircle>
               )}
             </MeshContext.Provider>
           </UserContext.Provider>

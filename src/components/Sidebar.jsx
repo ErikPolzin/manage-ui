@@ -172,7 +172,7 @@ export default function Sidebar({ open }) {
       </DrawerHeader>
       <Divider />
       <MeshDialog open={meshOpen} onClose={() => setMeshOpen(false)}></MeshDialog>
-      <List>
+      <List sx={{ overflowY: "auto" }}>
         <ListItemButton
           id="sidebar-dashboard-item"
           key="dashboard"
@@ -258,7 +258,7 @@ export default function Sidebar({ open }) {
           <ListItemText primary="Settings" />
         </ListItemButton>
       </List>
-      <List sx={{ position: "absolute", bottom: 0, width: "100%" }}>
+      <List>
         <ListItem>
           <ListItemIcon>
             <Badge variant="dot" color={isConnected ? "success" : "error"}>

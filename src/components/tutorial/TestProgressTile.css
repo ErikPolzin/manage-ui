@@ -1,127 +1,38 @@
-/* Strike Through Classes */
-.strike-through-animate-task-1 {
-  position: relative;
-  display: inline-block;
-  &::after {
-    content: "";
-    position: absolute;
-    left: 0%;
-    bottom: calc(50% - 1.5px);
-    width: 100%;
-    height: 1px;
-    opacity: 0.6;
-    background: black;
-    animation: strikeThrough 1.5s normal;
-  }
-}
-
-.strike-through-animate-task-2 {
-  position: relative;
-  display: inline-block;
-}
-
-.strike-through-animate-task-2::before,
-.strike-through-animate-task-2::after {
-  content: "";
-  position: absolute;
-  left: 0%;
-  width: 100%;
-  height: 1px;
-  opacity: 0.6;
-  background: black;
-  animation: strikeThrough 1.5s normal;
-}
-
-.strike-through-animate-task-2::before {
-  bottom: calc(25% - 1px);
-}
-
-.strike-through-animate-task-2::after {
-  bottom: calc(75% - 1px);
-}
-
-.strike-through-animate-task-3 {
-  position: relative;
-  display: inline-block;
-}
-
-.strike-through-animate-task-3::before,
-.strike-through-animate-task-3::after,
-.strike-through-animate-task-3 .extra-strike::after {
-  content: "";
-  position: absolute;
-  left: 0%;
-  width: 100%;
-  height: 1px;
-  opacity: 0.6;
-  background: black;
-  animation: strikeThrough 1.5s normal;
-}
-
-.strike-through-animate-task-3::before {
-  bottom: calc(16.67% - 1px); /* Adjusted for three lines */
-}
-
-.strike-through-animate-task-3::after {
-  bottom: calc(50% - 1px); /* Adjusted for three lines */
-}
-
-.strike-through-animate-task-3 .extra-strike::after {
-  content: "";
-  position: absolute;
-  bottom: calc(83.33% - 1px); /* Adjusted for three lines */
-  left: 0%;
-  width: 100%;
-  height: 1px;
-  opacity: 0.6;
-  background: black;
-  animation: strikeThrough 1.5s normal;
-}
-
-@keyframes strikeThrough {
-  from {
-    width: 0;
-  }
-  to {
-    width: 100%;
-  }
-}
-
 /* Text color change */
 .change-color {
-  animation: changeColor 2s 1.8s normal forwards;
+  animation: changeColor 3s 1s normal forwards;
 }
 @keyframes changeColor {
   0% {
     color: #bdbdbd;
   }
 
-  25% {
+  14.29% {
     color: #4caf50;
   }
 
-  50% {
+  28.57% {
+    color: #bdbdbd;
+  }
+
+  42.89% {
+    color: #4caf50;
+  }
+
+  57.14% {
+    color: #bdbdbd;
+  }
+
+  71.43% {
+    color: #4caf50;
+  }
+
+  85.71% {
     color: #bdbdbd;
   }
 
   100% {
     color: #4caf50;
-  }
-}
-
-/* Progress bar */
-.progress-grow {
-  animation: growWidth 1.5s 0.3s normal backwards;
-}
-
-@keyframes growWidth {
-  0% {
-    width: 0px;
-  }
-
-  100% {
-    /* width: 100%; */
-    width: var(--target-width);
   }
 }
 

@@ -2,13 +2,9 @@ import React, { useState, useEffect } from "react";
 import { Box, Button, Typography } from "@mui/material";
 import ReplayIcon from "@mui/icons-material/Replay";
 import FastForwardIcon from "@mui/icons-material/FastForward";
+import ConfirmationPopup from "./ConfirmationPopup";
 
-const WalkthroughCompleteTile = ({
-  stageNo,
-  onTakeTest,
-  onRedoWalkthrough,
-  onSkip,
-}) => {
+const WalkthroughCompleteTile = ({ stageNo, onTakeTest, onRedoWalkthrough, onSkip }) => {
   const [confirmationPopupOpen, setConfirmationPopupOpen] = useState(false);
   const [confirmationAction, setConfirmationAction] = useState(null);
   const [isVisible, setIsVisible] = useState(false); // used to fade component onto screen
@@ -75,8 +71,7 @@ const WalkthroughCompleteTile = ({
             color: "#404040",
           }}
         >
-          A test is ready for you to solidify the skills you've learned in the
-          walkthrough.
+          A test is ready for you to solidify the skills you've learned in the walkthrough.
         </Typography>
 
         <Button
@@ -96,12 +91,7 @@ const WalkthroughCompleteTile = ({
         >
           Take the Stage {stageNo} Test
         </Button>
-        <Box
-          display="flex"
-          justifyContent="space-between"
-          alignItems="center"
-          width={"100%"}
-        >
+        <Box display="flex" justifyContent="space-between" alignItems="center" width={"100%"}>
           <Button
             size="small"
             startIcon={<ReplayIcon fontSize="0.6rem" />}
@@ -148,59 +138,21 @@ const WalkthroughCompleteTile = ({
           </Button>
         </Box>
       </Box>
-      {/* Confirmation Popup */}
+
       {confirmationPopupOpen && (
-        <Box
-          position="fixed"
-          display="flex"
-          justifyContent="center"
-          alignItems="center"
-          width="100%"
-          height="100%"
-          top="0"
-          left="0"
-          style={{
-            zIndex: 1000000007,
-            backgroundColor: "rgba(0, 0, 0, 0.2)",
-            pointerEvents: "all",
-          }}
-        >
-          <Box
-            className="confirmation-container"
-            backgroundColor="white"
-            padding={"12px 18px"}
-            borderRadius={"3px"}
-          >
-            <Typography variant="h6">Confirm {confirmationAction}</Typography>
-            <Typography variant="body1" style={{ marginTop: "10px" }}>
-              Are you sure you want to{" "}
-              {confirmationAction === "Skip"
-                ? `skip the test and move to Stage ${stageNo + 1}?`
-                : `redo the Stage ${stageNo} walkthrough?`}
-            </Typography>
-            <Box
-              className="conformation-popup-actions"
-              display="flex"
-              justifyContent="flex-end"
-              marginTop="20px"
-            >
-              <Button
-                onClick={() => handleCloseConfirmationPopup(false)}
-                color="primary"
-                sx={{ padding: 0, marginRight: "20px" }}
-              >
-                Cancel
-              </Button>
-              <Button
-                onClick={() => handleCloseConfirmationPopup(true)}
-                color="primary"
-                sx={{ padding: 0 }}
-              >
-                Confirm
-              </Button>
-            </Box>
-          </Box>
-        </Box>
+        <ConfirmationPopup
+          title={`Confirm ${confirmationAction}`}
+          description={`Are you sure you want to 
+      ${
+        confirmationAction === "Skip"
+          ? `skip the test and move to Stage ${stageNo + 1}?`
+          : `redo the Stage ${stageNo} walkthrough?`
+      }`}
+          cancelBtnText={"Cancel"}
+          confirmBtnText={"Confirm"}
+          onCancel={() => handleCloseConfirmationPopup(false)}
+          onConfirm={() => handleCloseConfirmationPopup(true)}
+        ></ConfirmationPopup>
       )}
     </>
   );

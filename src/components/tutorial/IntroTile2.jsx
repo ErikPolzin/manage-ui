@@ -78,8 +78,8 @@ const IntroTile2 = ({ logoSrc, stages, onNext, onExit }) => {
             color: "#595959",
           }}
         >
-          There are {stages.length} stages in the tutorial. Stages end with a
-          test to help assess and solidify your new knowledge.
+          There are {stages.length} stages in the tutorial. Stages end with a test to help assess
+          and solidify your new knowledge.
         </Typography>
         <Box
           id="stages"

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Box, Button, Typography, Paper } from "@mui/material";
 import ReplayIcon from "@mui/icons-material/Replay";
+import ConfirmationPopup from "./ConfirmationPopup";
 
 const TutorialCompleteTile = ({
   tutorialName,
@@ -72,7 +73,7 @@ const TutorialCompleteTile = ({
           }}
         >
           <img
-            src="OrangeCorrectTickCircle.png"
+            src="/images/OrangeCorrectTickCircle.png"
             alt="Well done tick"
             style={{ maxWidth: "100%", maxHeight: "100%", height: "auto" }} // Ensure image is responsive
           />
@@ -102,109 +103,67 @@ const TutorialCompleteTile = ({
             Finish Tutorial
           </Button>
         </Box>
-        <Box
-          display="flex"
-          justifyContent="space-between"
-          alignItems="center"
-          width={"95%"}
-        >
-          <Button
-            size="small"
-            startIcon={<ReplayIcon fontSize="0.7rem" />}
-            onClick={() => handleOpenConfirmationPopup("Restart")}
-            sx={{
-              color: "#BFBFBF",
-              fontSize: "0.7rem",
-              backgroundColor: "transparent",
-              "&:hover": {
-                color: "#858585",
+        <Box display="flex" justifyContent="center" alignItems="center">
+          <Box display="flex" justifyContent="space-between" alignItems="center" width={"95%"}>
+            <Button
+              size="small"
+              startIcon={<ReplayIcon fontSize="0.7rem" />}
+              onClick={() => handleOpenConfirmationPopup("Restart")}
+              sx={{
+                color: "#BFBFBF",
+                fontSize: "0.7rem",
                 backgroundColor: "transparent",
+                "&:hover": {
+                  color: "#858585",
+                  backgroundColor: "transparent",
+                  border: "none",
+                  boxShadow: "none",
+                },
                 border: "none",
                 boxShadow: "none",
-              },
-              border: "none",
-              boxShadow: "none",
-              textTransform: "none",
-            }}
-          >
-            Restart tutorial
-          </Button>
-          <Button
-            size="small"
-            endIcon={<ReplayIcon fontSize="0.7rem" />}
-            onClick={() => handleOpenConfirmationPopup("Redo")}
-            sx={{
-              color: "#BFBFBF",
-              fontSize: "0.7rem",
-              backgroundColor: "transparent",
-              "&:hover": {
-                color: "#858585",
-                backgroundColor: "transparent",
-                border: "none",
-                boxShadow: "none",
-              },
-              border: "none",
-              boxShadow: "none",
-              textTransform: "none",
-            }}
-          >
-            Redo stage
-          </Button>
-        </Box>
-      </Paper>
-      {/* Confirmation Popup */}
-      {confirmationPopupOpen && (
-        <Box
-          position="fixed"
-          display="flex"
-          justifyContent="center"
-          alignItems="center"
-          width="100%"
-          height="100%"
-          top="0"
-          left="0"
-          style={{
-            zIndex: 1000000007,
-            backgroundColor: "rgba(0, 0, 0, 0.2)",
-            pointerEvents: "all",
-          }}
-        >
-          <Box
-            className="confirmation-container"
-            backgroundColor="white"
-            padding={"12px 18px"}
-            borderRadius={"3px"}
-          >
-            <Typography variant="h6">Confirm {confirmationAction}</Typography>
-            <Typography variant="body1" style={{ marginTop: "10px" }}>
-              Are you sure you want to{" "}
-              {confirmationAction === "Restart"
-                ? "restart the tutorial?"
-                : `redo stage ${prevStageNo}: ${prevStageName}`}
-            </Typography>
-            <Box
-              className="conformation-popup-actions"
-              display="flex"
-              justifyContent="flex-end"
-              marginTop="20px"
+                textTransform: "none",
+              }}
             >
-              <Button
-                onClick={() => handleCloseConfirmationPopup(false)}
-                color="primary"
-                sx={{ padding: 0, marginRight: "20px" }}
-              >
-                Cancel
-              </Button>
-              <Button
-                onClick={() => handleCloseConfirmationPopup(true)}
-                color="primary"
-                sx={{ padding: 0 }}
-              >
-                Confirm
-              </Button>
-            </Box>
+              Restart tutorial
+            </Button>
+            <Button
+              size="small"
+              endIcon={<ReplayIcon fontSize="0.7rem" />}
+              onClick={() => handleOpenConfirmationPopup("Redo")}
+              sx={{
+                color: "#BFBFBF",
+                fontSize: "0.7rem",
+                backgroundColor: "transparent",
+                "&:hover": {
+                  color: "#858585",
+                  backgroundColor: "transparent",
+                  border: "none",
+                  boxShadow: "none",
+                },
+                border: "none",
+                boxShadow: "none",
+                textTransform: "none",
+              }}
+            >
+              Redo stage
+            </Button>
           </Box>
         </Box>
+      </Paper>
+      {confirmationPopupOpen && (
+        <ConfirmationPopup
+          title={`Confirm ${confirmationAction}`}
+          description={`Are you sure you want to 
+      ${
+        confirmationAction === "Restart"
+          ? "restart the tutorial?"
+          : `redo stage ${prevStageNo}: ${prevStageName}`
+      }`}
+          cancelBtnText={"Cancel"}
+          confirmBtnText={"Confirm"}
+          onCancel={() => handleCloseConfirmationPopup(false)}
+          onConfirm={() => handleCloseConfirmationPopup(true)}
+        ></ConfirmationPopup>
       )}
     </>
   );

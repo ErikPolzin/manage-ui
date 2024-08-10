@@ -5,6 +5,7 @@ import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 import ReplayIcon from "@mui/icons-material/Replay";
 import FastForwardIcon from "@mui/icons-material/FastForward";
 import "./TutorialProgressTile.css";
+import ConfirmationPopup from "./ConfirmationPopup";
 
 const TutorialProgressTile = ({
   tutorialName,
@@ -172,12 +173,7 @@ const TutorialProgressTile = ({
           alignItems="center"
           marginBottom="3px"
         >
-          <Box
-            display="flex"
-            justifyContent="center"
-            alignItems="center"
-            marginBottom={"5px"}
-          >
+          <Box display="flex" justifyContent="center" alignItems="center" marginBottom={"5px"}>
             <Button
               variant="contained"
               className="buttons-appear"
@@ -194,12 +190,7 @@ const TutorialProgressTile = ({
               Start Stage {nextStageNo + 1}
             </Button>
           </Box>
-          <Box
-            display="flex"
-            justifyContent="space-between"
-            alignItems="center"
-            width={"95%"}
-          >
+          <Box display="flex" justifyContent="space-between" alignItems="center" width={"95%"}>
             <Button
               className="buttons-appear"
               size="small"
@@ -248,64 +239,26 @@ const TutorialProgressTile = ({
         </Box>
       </Paper>
 
-      {/* Confirmation Popup */}
       {confirmationPopupOpen && (
-        <Box
-          position="fixed"
-          display="flex"
-          justifyContent="center"
-          alignItems="center"
-          width="100%"
-          height="100%"
-          top="0"
-          left="0"
-          style={{
-            zIndex: 1000000007,
-            backgroundColor: "rgba(0, 0, 0, 0.2)",
-            pointerEvents: "all",
-          }}
-        >
-          <Box
-            className="confirmation-container"
-            backgroundColor="white"
-            padding={"12px 18px"}
-            borderRadius={"3px"}
-          >
-            <Typography variant="h6">Confirm {confirmationAction}</Typography>
-            <Typography variant="body1" style={{ marginTop: "10px" }}>
-              Are you sure you want to{" "}
-              {confirmationAction === "Exit"
-                ? "exit the tutorial?"
-                : confirmationAction.toLowerCase() + " Stage "}{" "}
-              {confirmationAction === "Skip"
-                ? nextStageNo + 1
-                : confirmationAction === "Redo"
-                ? nextStageNo
-                : ""}
-            </Typography>
-            <Box
-              className="conformation-popup-actions"
-              display="flex"
-              justifyContent="flex-end"
-              marginTop="20px"
-            >
-              <Button
-                onClick={() => handleCloseConfirmationPopup(false)}
-                color="primary"
-                sx={{ padding: 0, marginRight: "20px" }}
-              >
-                Cancel
-              </Button>
-              <Button
-                onClick={() => handleCloseConfirmationPopup(true)}
-                color="primary"
-                sx={{ padding: 0 }}
-              >
-                Confirm
-              </Button>
-            </Box>
-          </Box>
-        </Box>
+        <ConfirmationPopup
+          title={`Confirm ${confirmationAction}`}
+          description={`Are you sure you want to 
+      ${
+        confirmationAction === "Exit"
+          ? "exit the tutorial?"
+          : confirmationAction.toLowerCase() + " Stage "
+      }${
+            confirmationAction === "Skip"
+              ? nextStageNo + 1
+              : confirmationAction === "Redo"
+              ? nextStageNo
+              : ""
+          }`}
+          cancelBtnText={"Cancel"}
+          confirmBtnText={"Confirm"}
+          onCancel={() => handleCloseConfirmationPopup(false)}
+          onConfirm={() => handleCloseConfirmationPopup(true)}
+        ></ConfirmationPopup>
       )}
     </>
   );

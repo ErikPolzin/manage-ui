@@ -49,7 +49,7 @@ const StageCompleteCard = ({ stageNo, stageName, onContinue }) => {
         }}
       >
         <img
-          src="OrangeCorrectTickCircle.png"
+          src="/images/OrangeCorrectTickCircle.png"
           alt="Well done tick"
           style={{ maxWidth: "100%", maxHeight: "100%", height: "auto" }} // Ensure image is responsive
         />
