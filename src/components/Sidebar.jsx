@@ -173,7 +173,8 @@ export default function Sidebar({ open }) {
       </DrawerHeader>
       <Divider />
       <MeshDialog open={meshOpen} onClose={() => setMeshOpen(false)}></MeshDialog>
-      <List sx={{ overflowY: "auto" }}>
+      {/* Not sure why setting overflowY seems to reset overflowX as well, manually override */}
+      <List sx={{ overflowY: "auto", overflowX: "hidden" }}>
         <ListItemButton
           id="sidebar-dashboard-item"
           key="dashboard"
@@ -269,7 +270,8 @@ export default function Sidebar({ open }) {
           </ListItemIcon>
           <ListItemText primary={connectionStatus} />
         </ListItem>
-        <ListItem>
+        {/* Only display mesh picker is sidebar is expanded, looks weird otherwise */}
+        {open && <ListItem>
           <FormControl fullWidth size="small">
             <InputLabel>Mesh</InputLabel>
             <Select value={meshName} onChange={(e) => setMeshName(e.target.value)} label="Mesh">
@@ -281,7 +283,7 @@ export default function Sidebar({ open }) {
               ))}
             </Select>
           </FormControl>
-        </ListItem>
+        </ListItem>}
         <ListItemButton onClick={() => setMeshOpen(true)}>
           <ListItemIcon>
             <AddIcon color="primary" />

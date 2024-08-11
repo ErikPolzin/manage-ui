@@ -37,7 +37,7 @@ function AlertItem({ alert, ...props }) {
 
   return (
     <div {...props}>
-      <ListItemButton onClick={() => setOpen(!open)} disabled={alert.resolved}>
+      <ListItemButton onClick={() => setOpen(!open)} disabled={alert.status === 4}>
         <ListItemIcon>
           <SvgIcon component={alertIcon.icon} color={alertIcon.color}></SvgIcon>
         </ListItemIcon>
