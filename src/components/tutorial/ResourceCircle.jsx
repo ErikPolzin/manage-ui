@@ -1,4 +1,4 @@
-import { CssBaseline, Icon, IconButton, Switch, Typography } from "@mui/material";
+import { CssBaseline, IconButton, Switch, Typography } from "@mui/material";
 import { Box } from "@mui/system";
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import ExploreIcon from "@mui/icons-material/Explore";
@@ -8,7 +8,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import InteractiveGuideCard from "./InteractiveGuideCard";
 import InteractiveGuide from "./InteractiveGuide";
 import InfoIcon from "./InfoIcon";
-import { BrowserRouter as Router, useNavigate, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { usePersistantState } from "../../hooks";
 
 const ResourceCircle = ({ circleIconName, guides, infoIcons }) => {
@@ -53,18 +53,6 @@ const ResourceCircle = ({ circleIconName, guides, infoIcons }) => {
       window.removeEventListener("resize", setPageDimensions);
     };
   }, []);
-
-  const formattedInfoIcons = infoIcons.map((infoIcon, index) => {
-    return (
-      <InfoIcon
-        targetEl={infoIcon.targetElement}
-        title={infoIcon.title}
-        body={infoIcon.body}
-        transitionTime={Math.random() * (0.8 - 0.2) + 0.2}
-        delayTime={Math.random() * 0.3}
-      ></InfoIcon>
-    );
-  });
 
   // to track progress of interactive guides - change to guides.map
   const interactiveGuides = guides.map((guide, index) => ({
@@ -596,7 +584,17 @@ const ResourceCircle = ({ circleIconName, guides, infoIcons }) => {
           </Box>
         </Box>
       )}
-      {helpIconsEnabled && !guideActive.active && formattedInfoIcons}
+      {helpIconsEnabled &&
+        !guideActive.active &&
+        infoIcons.map((infoIcon) => (
+          <InfoIcon
+            targetEl={infoIcon.targetElement}
+            title={infoIcon.title}
+            body={infoIcon.body}
+            transitionTime={Math.random() * (0.8 - 0.2) + 0.2}
+            delayTime={Math.random() * 0.3}
+          ></InfoIcon>
+        ))}
       {guideActive.active && (
         <InteractiveGuide
           guide={guideActive.guide}
