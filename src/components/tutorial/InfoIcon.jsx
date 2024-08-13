@@ -12,9 +12,30 @@ const InfoIcon = ({ targetEl, title, body, transitionTime = 0.3, delayTime = 0 }
   });
   const [infoBoxPos, setInfoBoxPos] = useState({ top: 0, left: 0 });
   const [targetElementFound, setTargetElementFound] = useState(false);
+  const [attachedTofixedElement, setAttachedTofixedElement] = useState(false);
+  const [visible, setVisible] = useState(true);
 
   const [clickedElement, setClickedElement] = useState(null); // used to call use effect on every window click
   const iconRef = useRef(null);
+
+  // Refresh icon position at regular intervals
+  const [refreshInterval, setRefreshInterval] = useState(new Date());
+  const [refreshIntervalValue, setRefreshIntervalValue] = useState(500);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setRefreshInterval(new Date());
+    }, refreshIntervalValue);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    if (attachedTofixedElement) {
+      console.log("updating node");
+      updatePositions();
+    }
+  }, [refreshInterval]);
 
   // Close menu when a click outside occurs
   useEffect(() => {
@@ -35,7 +56,6 @@ const InfoIcon = ({ targetEl, title, body, transitionTime = 0.3, delayTime = 0 }
 
     window.addEventListener("click", handleWindowClick);
 
-    // Call closeMenu immediately in case the click occurs before the event listener is removed
     closeMenu();
 
     return () => {
@@ -43,23 +63,85 @@ const InfoIcon = ({ targetEl, title, body, transitionTime = 0.3, delayTime = 0 }
     };
   }, [clickedElement]);
 
+  // Icon positioning and displaying logic
   const updatePositions = () => {
     const targetElement = document.querySelector(targetEl);
     if (!targetElement) {
       setTargetElementFound(false);
+      setInfoIconPos({
+        top: document.documentElement.clientHeight + window.scrollY - infoIconSize,
+        left: document.documentElement.clientWidth + window.scrollX - infoIconSize,
+      });
       return;
     }
 
     setTargetElementFound(true);
     const rect = targetElement.getBoundingClientRect();
 
-    const left =
-      rect.left + window.scrollX + rect.width - infoIconSize > document.documentElement.scrollWidth
-        ? rect.left + window.scrollX + rect.width - infoIconSize
-        : rect.left + window.scrollX + rect.width - infoIconSize / 2;
+    // Is the target element out of visible sight to the user
+    const hiddenByScrollableContainer = (element) => {
+      while (element) {
+        const style = window.getComputedStyle(element);
+        if (
+          style.overflow === "scroll" ||
+          style.overflow === "auto" ||
+          style.overflowY === "scroll" ||
+          style.overflowY === "auto" ||
+          style.overflowX === "scroll" ||
+          style.overflowX === "auto"
+        ) {
+          const containerRect = element.getBoundingClientRect();
+          // if the element is within the visible area of the container, continue to verify visibility in the rest of its ancestors
+          if (
+            rect.bottom > containerRect.top &&
+            rect.top < containerRect.bottom &&
+            rect.right > containerRect.left &&
+            rect.left < containerRect.right
+          ) {
+          }
+          // If not visible, immediately set visible to false
+          else {
+            return false;
+          }
+        }
+        element = element.parentElement; // Move up to the parent element
+      }
+      return true; // Visible in all its parent containers
+    };
+    setVisible(hiddenByScrollableContainer(targetElement.parentElement));
+
+    // Is the target element (or any of its parents) positioned fixed
+    const hasFixedPosition = (element) => {
+      while (element) {
+        const style = window.getComputedStyle(element);
+        if (style.position === "fixed") {
+          return true;
+        }
+        element = element.parentElement; // Move up to the parent element
+      }
+      return false; // No fixed position found
+    };
+
+    const hasFixedPos = hasFixedPosition(targetElement);
+    hasFixedPos ? setAttachedTofixedElement(true) : setAttachedTofixedElement(false);
+
+    let left;
+    if (hasFixedPos) {
+      left =
+        rect.left + rect.width - infoIconSize > document.documentElement.scrollWidth
+          ? rect.left + rect.width - infoIconSize
+          : rect.left + rect.width - infoIconSize / 2;
+    } else {
+      left =
+        rect.left + window.scrollX + rect.width - infoIconSize >
+        document.documentElement.scrollWidth
+          ? rect.left + window.scrollX + rect.width - infoIconSize
+          : rect.left + window.scrollX + rect.width - infoIconSize / 2;
+    }
+
     setInfoIconPos({
       left: left,
-      top: rect.top + window.scrollY - infoIconSize / 2,
+      top: hasFixedPos ? rect.top - infoIconSize / 2 : rect.top + window.scrollY - infoIconSize / 2,
     });
   };
 
@@ -82,11 +164,17 @@ const InfoIcon = ({ targetEl, title, body, transitionTime = 0.3, delayTime = 0 }
 
     window.addEventListener("click", handleWindowClick);
     window.addEventListener("resize", updatePositions);
+    if (!attachedTofixedElement) {
+      window.addEventListener("scroll", updatePositions);
+    }
 
     return () => {
       observer.disconnect();
       window.removeEventListener("click", handleWindowClick);
       window.removeEventListener("resize", updatePositions);
+      if (!attachedTofixedElement) {
+        window.removeEventListener("scroll", updatePositions);
+      }
     };
   }, [targetEl]);
 
@@ -114,10 +202,6 @@ const InfoIcon = ({ targetEl, title, body, transitionTime = 0.3, delayTime = 0 }
     setIsOpen((prevValue) => !prevValue);
   };
 
-  if (!targetElementFound) {
-    return null;
-  }
-
   return (
     <Box ref={iconRef} zIndex={1000000000} sx={{ pointerEvents: "all" }}>
       <CssBaseline />
@@ -126,7 +210,11 @@ const InfoIcon = ({ targetEl, title, body, transitionTime = 0.3, delayTime = 0 }
         id="info-icon"
         onClick={handleInfoIconClick}
         sx={{
-          position: "absolute",
+          position: !targetElementFound
+            ? "absolute"
+            : attachedTofixedElement
+            ? "fixed"
+            : "absolute",
           top: infoIconPos.top,
           left: infoIconPos.left,
           width: infoIconSize,
@@ -140,7 +228,11 @@ const InfoIcon = ({ targetEl, title, body, transitionTime = 0.3, delayTime = 0 }
           cursor: "pointer",
           "&:hover": { color: "#d6d6d6" },
           userSelect: "none",
-          transition: `top ${transitionTime}s ${delayTime}s ease-out, left ${transitionTime}s ${delayTime}s ease-out`,
+          transition: attachedTofixedElement
+            ? `top 0.3s 0s ease-out, left 0.3s 0s ease-out`
+            : `top ${transitionTime}s ${delayTime}s ease-out, left ${transitionTime}s ${delayTime}s ease-out`,
+          opacity: targetElementFound && visible ? 1 : 0,
+          pointerEvents: targetElementFound && visible ? "all" : "none",
         }}
       >
         ?

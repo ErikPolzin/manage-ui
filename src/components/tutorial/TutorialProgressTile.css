@@ -1,18 +1,10 @@
-@keyframes strikeThrough {
+@keyframes fontColor {
   0% {
-    opacity: 0;
-  }
-  49% {
-    opacity: 0;
-  }
-  /* Start from 50% - therefore first half of animation is the animation delay */
-  50% {
-    opacity: 1;
-    transform: translateX(-100%);
+    color: #262626;
   }
 
   100% {
-    transform: translateX(0);
+    color: #b4e5a2;
   }
 }
 
@@ -22,7 +14,7 @@
   }
 
   100% {
-    font-size: 0.9rem;
+    font-size: 1.1rem;
   }
 }
 
@@ -48,7 +40,7 @@
 
 @keyframes fontGrow {
   0% {
-    font-size: 0.9rem;
+    font-size: 1.1rem;
   }
 
   100% {
@@ -66,60 +58,35 @@
   }
 }
 
-.strike-through-animate-stage {
-  position: relative;
-  display: inline-block;
-  &::after {
-    content: "";
-    position: absolute;
-    left: 0%;
-    bottom: calc(50% - 1.5px);
-    width: 100%;
-    height: 1.5px;
-    background: #b4e5a2;
-    animation: strikeThrough 1.5s normal;
-  }
-}
-
-.strike-through {
-  position: relative;
-  display: inline-block;
-  &::after {
-    content: "";
-    position: absolute;
-    left: 0%;
-    bottom: calc(50% - 1.5px);
-    width: 100%;
-    height: 1.5px;
-    background: #b4e5a2;
-  }
-}
-
 .focus-background-move {
   position: relative;
   display: inline-block;
   &::after {
     content: "";
     position: absolute;
-    left: calc(50% - 40%);
+    left: calc(50% - 50%);
     bottom: 0;
-    width: 80%;
+    width: 100%;
     height: 44px;
     background: #f1edfd;
     border-radius: 25px;
     z-index: -1;
-    animation: focusBackgroundMove 1s 2s forwards;
+    animation: focusBackgroundMove 1s 2.2s forwards;
   }
+}
+
+.font-color {
+  animation: fontColor 0.5s 0.5s 3 alternate forwards;
 }
 
 .font-shrink {
   font-size: 1.6rem;
-  animation: fontShrink 1s 2s forwards;
+  animation: fontShrink 1s 2.2s forwards;
 }
 
 .font-grow {
-  font-size: 0.9rem;
-  animation: fontGrow 1s 2s forwards;
+  font-size: 1.1rem;
+  animation: fontGrow 1s 2.2s forwards;
 }
 
 .buttons-appear {

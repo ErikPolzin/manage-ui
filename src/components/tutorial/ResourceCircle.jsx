@@ -1,4 +1,4 @@
-import { CssBaseline, IconButton, Switch, Typography } from "@mui/material";
+import { CssBaseline, Icon, IconButton, Switch, Typography } from "@mui/material";
 import { Box } from "@mui/system";
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import ExploreIcon from "@mui/icons-material/Explore";
@@ -8,14 +8,34 @@ import CloseIcon from "@mui/icons-material/Close";
 import InteractiveGuideCard from "./InteractiveGuideCard";
 import InteractiveGuide from "./InteractiveGuide";
 import InfoIcon from "./InfoIcon";
-import { useLocation } from "react-router-dom";
-import { usePersistantState } from "../../hooks";
+import { BrowserRouter as Router, useNavigate, useLocation } from "react-router-dom";
+import { usePersistantState } from "./hooks";
 
-const ResourceCircle = ({ circleIconName, guides, infoIcons }) => {
+const ResourceCircle = ({
+  circleIconName,
+  positionX = "right",
+  positionY = "bottom",
+  circleDistFromOuter = 20,
+  guides,
+  infoIcons,
+}) => {
+  positionX = positionX !== "right" && positionX !== "left" ? "left" : positionX;
+  positionY = positionY !== "top" && positionY !== "bottom" ? "top" : positionY;
   const circleSize = 60;
-  const circlePos = { bottom: 20, right: 20 };
+  const circlePosition = {
+    left: positionX === "left" ? circleDistFromOuter : "auto",
+    top: positionY === "top" ? circleDistFromOuter : "auto",
+    right: positionX === "right" ? circleDistFromOuter : "auto",
+    bottom: positionY === "bottom" ? circleDistFromOuter : "auto",
+  };
   const circleMenuHeight = circleSize * 0.85;
   const [circleMenuWidth, setCircleMenuWidth] = useState(500);
+  const popupBoxPosition = {
+    left: positionX === "left" ? circleDistFromOuter : "auto",
+    top: positionY === "top" ? circleDistFromOuter + circleSize : "auto",
+    right: positionX === "right" ? circleDistFromOuter : "auto",
+    bottom: positionY === "bottom" ? circleDistFromOuter + circleSize : "auto",
+  };
   const popupBoxHeight = 300;
 
   const [isOpen, setIsOpen] = useState(false);
@@ -34,75 +54,14 @@ const ResourceCircle = ({ circleIconName, guides, infoIcons }) => {
   // const navigate = useNavigate();
   const { pathname: currentPath } = useLocation(); // Destructure pathname from useLocation
 
-  const [scrollHeight, setScrollHeight] = useState(document.documentElement.scrollHeight);
-  const [scrollWidth, setScrollWidth] = useState(document.documentElement.scrollHeight);
-
-  // Get height and width of entire page (including scroll)
-  useEffect(() => {
-    const setPageDimensions = () => {
-      setScrollHeight(document.documentElement.scrollHeight);
-      setScrollWidth(document.documentElement.scrollWidth);
-    };
-    setPageDimensions();
-
-    window.addEventListener("click", setPageDimensions);
-    window.addEventListener("resize", setPageDimensions);
-
-    return () => {
-      window.removeEventListener("click", setPageDimensions);
-      window.removeEventListener("resize", setPageDimensions);
-    };
-  }, []);
-
-  // to track progress of interactive guides - change to guides.map
+  // to track progress of interactive guides
   const interactiveGuides = guides.map((guide, index) => ({
     id: index,
     ...guide,
     progress: 0,
   }));
 
-  const interactiveGuidesMenuDisplay = interactiveGuides.reduce((acc, guide) => {
-    if (guide.page === currentPath) {
-      acc.push(
-        <Box
-          key={guide.name}
-          onClick={() => handleGuideClick(guide)}
-          sx={{
-            position: "relative",
-            width: "100%",
-            marginBottom: "15px",
-          }}
-        >
-          <InteractiveGuideCard
-            guideNo={acc.length + 1} // Sequential index
-            guideName={guide.name}
-            progress={guide.progress}
-          />
-        </Box>,
-      );
-    }
-    return acc;
-  }, []);
-
-  const interactiveGuidesMenuDisplayOnOtherPages = interactiveGuides
-    .filter((guide) => guide.page !== currentPath)
-    .map((guide, index) => (
-      <Box
-        key={index}
-        onClick={() => handleGuideClick(guide)}
-        sx={{
-          position: "relative",
-          width: "100%",
-          marginBottom: "15px",
-        }}
-      >
-        <InteractiveGuideCard
-          guideNo={index + 1}
-          guideName={guide.name}
-          progress={guide.progress}
-        />
-      </Box>
-    ));
+  const isGuidesOnOtherPages = interactiveGuides.some((guide) => guide.page !== currentPath);
 
   // Get the width of the circle menu
   useLayoutEffect(() => {
@@ -164,8 +123,6 @@ const ResourceCircle = ({ circleIconName, guides, infoIcons }) => {
         position: "absolute",
         top: "0px",
         left: "0px",
-        width: `${scrollWidth}px`,
-        height: `${scrollHeight}px`,
         pointerEvents: "none",
       }}
     >
@@ -178,8 +135,10 @@ const ResourceCircle = ({ circleIconName, guides, infoIcons }) => {
             onClick={() => setIsOpen(true)}
             sx={{
               position: "fixed",
-              bottom: `${circlePos.bottom}px`,
-              right: `${circlePos.right}px`,
+              top: `${circlePosition.top}${circlePosition.top !== "auto" ? "px" : ""}`,
+              left: `${circlePosition.left}${circlePosition.left !== "auto" ? "px" : ""}`,
+              bottom: `${circlePosition.bottom}${circlePosition.bottom !== "auto" ? "px" : ""}`,
+              right: `${circlePosition.right}${circlePosition.right !== "auto" ? "px" : ""}`,
               width: `${circleSize}px`,
               height: `${circleSize}px`,
               borderRadius: "50%",
@@ -191,6 +150,7 @@ const ResourceCircle = ({ circleIconName, guides, infoIcons }) => {
               alignItems: "center",
               color: "white",
               fontSize: circleSize - 20,
+              userSelect: "none",
             }}
           >
             {circleIconName && (
@@ -230,7 +190,14 @@ const ResourceCircle = ({ circleIconName, guides, infoIcons }) => {
                 sx={{
                   padding: 0,
                   margin: 0,
-                  transform: isOpen ? "rotate(0deg)" : "rotate(-45deg)",
+                  transform: isOpen
+                    ? "rotate(0deg)"
+                    : `rotate(${
+                        (circlePosition.left !== "auto" && circlePosition.top !== "auto") ||
+                        (circlePosition.right !== "auto" && circlePosition.bottom !== "auto")
+                          ? "-"
+                          : ""
+                      }45deg)`,
                   transition: "transform 0.3s ease-out",
                 }}
               ></CloseIcon>
@@ -244,11 +211,23 @@ const ResourceCircle = ({ circleIconName, guides, infoIcons }) => {
               alignItems: "center",
               justifyContent: "center",
               position: "fixed",
-              bottom: `${circlePos.bottom + (circleSize - circleMenuHeight) / 2}px`,
-              right: circlePos.right + circleSize - circleMenuHeight / Math.PI,
+              top: `${circlePosition.top + (circleSize - circleMenuHeight) / 2}${
+                circlePosition.top !== "auto" ? "px" : ""
+              }`,
+              bottom: `${circlePosition.bottom + (circleSize - circleMenuHeight) / 2}${
+                circlePosition.bottom !== "auto" ? "px" : ""
+              }`,
+              left: `${circlePosition.left + circleSize - circleMenuHeight / Math.PI}${
+                circlePosition.left !== "auto" ? "px" : ""
+              }`,
+              right: `${circlePosition.right + circleSize - circleMenuHeight / Math.PI}${
+                circlePosition.right !== "auto" ? "px" : ""
+              }`,
               height: `${circleMenuHeight}px`,
-              borderBottomLeftRadius: "100px",
-              borderTopLeftRadius: "100px",
+              borderBottomLeftRadius: circlePosition.left !== "auto" ? "0" : "100px",
+              borderTopLeftRadius: circlePosition.left !== "auto" ? "0" : "100px",
+              borderBottomRightRadius: circlePosition.left !== "auto" ? "100px" : "0",
+              borderTopRightRadius: circlePosition.left !== "auto" ? "100px" : "0",
               padding: "0",
               backgroundColor: "transparent",
               pointerEvents: "none",
@@ -267,12 +246,19 @@ const ResourceCircle = ({ circleIconName, guides, infoIcons }) => {
                 alignItems: "center",
                 justifyContent: "left",
                 position: "relative",
-                left: isOpen ? 0 : "100%",
-                transition: "left 0.3s ease-out",
+                left: positionX === "right" ? (isOpen ? 0 : "100%") : "auto",
+                right: positionX === "left" ? (isOpen ? 0 : "100%") : "auto",
+                transition: "left 0.3s ease-out, right 0.3s ease-out",
                 height: `${circleMenuHeight}px`,
-                borderBottomLeftRadius: "100px",
-                borderTopLeftRadius: "100px",
-                padding: `2px ${circleMenuHeight / Math.PI + 6}px 2px 2px`,
+                borderBottomLeftRadius: circlePosition.left !== "auto" ? "0" : "100px",
+                borderTopLeftRadius: circlePosition.left !== "auto" ? "0" : "100px",
+                borderBottomRightRadius: circlePosition.left !== "auto" ? "100px" : "0",
+                borderTopRightRadius: circlePosition.left !== "auto" ? "100px" : "0",
+                padding: `${
+                  positionX === "right"
+                    ? `2px ${circleSize / Math.PI + 6}px 2px 2px`
+                    : `2px 2px 2px ${circleSize / Math.PI + 6}px`
+                }`,
                 backgroundColor: "white",
                 pointerEvents: isOpen ? "all" : "none",
                 overflow: "hidden",
@@ -379,10 +365,10 @@ const ResourceCircle = ({ circleIconName, guides, infoIcons }) => {
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              bottom: isOpen
-                ? `${circlePos.bottom + circleSize + 10}px`
-                : `${circlePos.bottom + circleSize}px`,
-              right: circlePos.right,
+              bottom: isOpen ? popupBoxPosition.bottom + 10 : popupBoxPosition.bottom,
+              top: isOpen ? popupBoxPosition.top + 10 : popupBoxPosition.top,
+              left: popupBoxPosition.left,
+              right: popupBoxPosition.right,
               height: `${popupBoxHeight}px`,
               width: circleMenuWidth + circleSize + 20,
               borderRadius: "10px",
@@ -392,7 +378,7 @@ const ResourceCircle = ({ circleIconName, guides, infoIcons }) => {
               boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2)",
               opacity: isOpen ? 1 : 0,
               transition: isOpen
-                ? "bottom 0.25s 0.25s ease-out, opacity 0.25s 0.25s ease-out"
+                ? "bottom 0.25s 0.25s ease-out, top 0.25s 0.25s ease-out, opacity 0.25s 0.25s ease-out"
                 : "none",
             }}
           >
@@ -474,8 +460,29 @@ const ResourceCircle = ({ circleIconName, guides, infoIcons }) => {
                   },
                 }}
               >
-                {interactiveGuidesMenuDisplay}
-                {interactiveGuidesMenuDisplayOnOtherPages.length !== 0 && (
+                {interactiveGuides.reduce((acc, guide) => {
+                  if (guide.page === currentPath) {
+                    acc.push(
+                      <Box
+                        key={guide.name}
+                        onClick={() => handleGuideClick(guide)}
+                        sx={{
+                          position: "relative",
+                          width: "100%",
+                          marginBottom: "15px",
+                        }}
+                      >
+                        <InteractiveGuideCard
+                          guideNo={acc.length + 1} // Sequential index
+                          guideName={guide.name}
+                          progress={guide.progress}
+                        />
+                      </Box>,
+                    );
+                  }
+                  return acc;
+                }, [])}
+                {isGuidesOnOtherPages && (
                   <>
                     <Typography
                       variant="body1"
@@ -488,7 +495,25 @@ const ResourceCircle = ({ circleIconName, guides, infoIcons }) => {
                     >
                       Guides on other pages
                     </Typography>
-                    {interactiveGuidesMenuDisplayOnOtherPages}
+                    {interactiveGuides
+                      .filter((guide) => guide.page !== currentPath)
+                      .map((guide, index) => (
+                        <Box
+                          key={index}
+                          onClick={() => handleGuideClick(guide)}
+                          sx={{
+                            position: "relative",
+                            width: "100%",
+                            marginBottom: "15px",
+                          }}
+                        >
+                          <InteractiveGuideCard
+                            guideNo={index + 1}
+                            guideName={guide.name}
+                            progress={guide.progress}
+                          />
+                        </Box>
+                      ))}
                   </>
                 )}
               </Box>
@@ -584,17 +609,18 @@ const ResourceCircle = ({ circleIconName, guides, infoIcons }) => {
           </Box>
         </Box>
       )}
-      {helpIconsEnabled &&
-        !guideActive.active &&
-        infoIcons.map((infoIcon) => (
-          <InfoIcon
-            targetEl={infoIcon.targetElement}
-            title={infoIcon.title}
-            body={infoIcon.body}
-            transitionTime={Math.random() * (0.8 - 0.2) + 0.2}
-            delayTime={Math.random() * 0.3}
-          ></InfoIcon>
-        ))}
+      {!guideActive.active &&
+        infoIcons.map((infoIcon, index) => {
+          return (
+            <InfoIcon
+              targetEl={helpIconsEnabled ? infoIcon.targetElement : "abcdefghijklmnop"}
+              title={infoIcon.title}
+              body={infoIcon.body}
+              transitionTime={Math.random() * (0.8 - 0.2) + 0.2}
+              delayTime={Math.random() * 0.3}
+            ></InfoIcon>
+          );
+        })}
       {guideActive.active && (
         <InteractiveGuide
           guide={guideActive.guide}
