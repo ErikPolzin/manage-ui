@@ -140,6 +140,7 @@ function DeviceList({
         apiRef={apiRef}
         autoHeight
         sx={{
+          cursor: "default",
           "& .MuiDataGrid-cell:focus-within, & .MuiDataGrid-cell:focus": {
             outline: "none",
           },
