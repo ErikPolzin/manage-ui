@@ -27,6 +27,7 @@ export default function OverviewMetric({ value, total, title, ...props }) {
               transform: "translate(0px, 0px)",
             },
           }}
+          cornerRadius="30%"
           text={() => `${value} / ${total}`}
         />
       </CardContent>
