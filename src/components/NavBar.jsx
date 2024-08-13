@@ -4,6 +4,7 @@ import { AppBar, Toolbar, Button, Avatar, IconButton, Typography, useTheme } fro
 import { Menu, ChevronLeft } from "@mui/icons-material";
 import Brightness4Icon from "@mui/icons-material/Brightness4";
 import Brightness7Icon from "@mui/icons-material/Brightness7";
+import HelpIcon from "@mui/icons-material/Help";
 import { Link } from "react-router-dom";
 import { styled } from "@mui/material/styles";
 
@@ -28,7 +29,7 @@ const StyledNavBar = styled(AppBar, {
   }),
 }));
 
-const NavBar = ({ open, onMenuClick }) => {
+const NavBar = ({ open, onMenuClick, toggleResourceCircle, resourceCircleEnabled }) => {
   const { keycloak } = useKeycloak();
   const theme = useTheme();
   const { toggleColorMode } = React.useContext(ColorModeContext);
@@ -64,6 +65,12 @@ const NavBar = ({ open, onMenuClick }) => {
         </Typography>
         <IconButton onClick={toggleColorMode} color="inherit">
           {theme.palette.mode === "dark" ? <Brightness7Icon /> : <Brightness4Icon />}
+        </IconButton>
+        <IconButton
+          onClick={toggleResourceCircle}
+          color={resourceCircleEnabled ? "inherit" : "#9E9E9E"}
+        >
+          {resourceCircleEnabled ? <HelpIcon /> : <HelpIcon />}
         </IconButton>
         <Button color="inherit" onClick={handleLogout}>
           Log Out

@@ -1,7 +1,30 @@
-import { Box, Button, CssBaseline, Switch, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  CssBaseline,
+  Switch,
+  Typography,
+  MenuItem,
+  Select,
+  FormControl,
+  InputLabel,
+} from "@mui/material";
 import React, { useState } from "react";
 
-const ResourcesPage = ({ onStartTutorial, onChangeResourceCircle, resourceCircleEnabled }) => {
+const ResourcesPage = ({
+  onStartTutorial,
+  toggleResourceCircle,
+  resourceCircleEnabled,
+  onCircleReposition,
+  circlePos,
+}) => {
+  const [positionX, setPositionX] = useState(circlePos.positionX);
+  const [positionY, setPositionY] = useState(circlePos.positionY);
+
+  const handleSave = () => {
+    onCircleReposition(positionY, positionX);
+  };
+
   return (
     <Box id="resources-page" sx={{ padding: 4 }}>
       <CssBaseline id="resources-css-baseline"></CssBaseline>
@@ -68,7 +91,7 @@ const ResourcesPage = ({ onStartTutorial, onChangeResourceCircle, resourceCircle
           </Box>
           <Switch
             checked={resourceCircleEnabled}
-            onChange={onChangeResourceCircle}
+            onChange={toggleResourceCircle}
             size="large"
             sx={{
               marginTop: "5px",
@@ -87,6 +110,48 @@ const ResourcesPage = ({ onStartTutorial, onChangeResourceCircle, resourceCircle
           include interactive guides, search tools, and help icons. Enable and disable it as you
           please, but this lightweight feature is always ready to help when you need.
         </Typography>
+      </Box>
+      <Box sx={{ display: "flex", gap: "20px", margin: "20px 0 0px" }}>
+        <FormControl>
+          <InputLabel id="position-y-label" sx={{ backgroundColor: "white" }}>
+            Vertical Position
+          </InputLabel>
+          <Select
+            labelId="position-y-label"
+            value={positionY}
+            onChange={(e) => setPositionY(e.target.value)}
+            sx={{ minWidth: 120 }}
+          >
+            <MenuItem value="top">Top</MenuItem>
+            <MenuItem value="bottom">Bottom</MenuItem>
+          </Select>
+        </FormControl>
+        <FormControl>
+          <InputLabel id="position-x-label" sx={{ backgroundColor: "white" }}>
+            Horizontal Position
+          </InputLabel>
+          <Select
+            labelId="position-x-label"
+            value={positionX}
+            onChange={(e) => setPositionX(e.target.value)}
+            sx={{ minWidth: 120 }}
+          >
+            <MenuItem value="left">Left</MenuItem>
+            <MenuItem value="right">Right</MenuItem>
+          </Select>
+        </FormControl>
+        <Button
+          variant="contained"
+          onClick={handleSave}
+          disabled={circlePos.positionX === positionX && circlePos.positionY === positionY}
+          sx={{
+            alignSelf: "flex-end",
+            backgroundColor: "#3F15B1",
+            "&:hover": { backgroundColor: "#31119F" },
+          }}
+        >
+          Save Position
+        </Button>
       </Box>
     </Box>
   );

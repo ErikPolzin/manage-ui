@@ -96,7 +96,8 @@ const Tutorial = ({
   // helps to rerender tooltip for animating new tooltip appearing
   const handleTootlipChange = () => {
     setTimeout(() => {
-      // navigateToPage();
+      //       navigateToPage(tutorialContent[currentStage].tooltips[currentStep + 1].page);
+
       //setContainerHeight(document.documentElement.scrollHeight);
       setTooltipChanging(false);
     }, 0);
@@ -138,7 +139,7 @@ const Tutorial = ({
   const handleStartScreen2Next = () => {
     setStartingScreen2(false);
     setWalkthroughActive(true);
-    navigateToPage();
+    navigateToPage(tutorialContent[currentStage].tooltips[0].page);
   };
 
   const handleTakeTest = () => {
@@ -150,7 +151,7 @@ const Tutorial = ({
     setWalkthroughCompleteIntermission(false);
     setCurrentStep(0);
     setWalkthroughActive(true);
-    navigateToPage();
+    navigateToPage(tutorialContent[currentStage].tooltips[0].page);
   };
 
   const handleSkipTest = () => {
@@ -168,7 +169,7 @@ const Tutorial = ({
     setCurrentStep(0);
     setCurrentStage((prevStage) => prevStage + 1);
     setWalkthroughActive(true);
-    navigateToPage();
+    navigateToPage(tutorialContent[currentStage].tooltips[0].page);
   };
 
   const handleStageContinue1 = () => {
@@ -191,7 +192,8 @@ const Tutorial = ({
     resetTest();
     setTutorialComplete(false);
     setWalkthroughActive(true);
-    navigateToPage();
+    navigateToPage(tutorialContent[currentStage].tooltips[0].page);
+
     // and then not updating the stage
   };
 

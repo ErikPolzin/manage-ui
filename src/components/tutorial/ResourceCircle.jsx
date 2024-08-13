@@ -51,8 +51,23 @@ const ResourceCircle = ({
     guide: null,
   });
 
-  // const navigate = useNavigate();
   const { pathname: currentPath } = useLocation(); // Destructure pathname from useLocation
+  const navigate = useNavigate();
+
+  const navigateToPage = (targetPage) => {
+    if (navigate) {
+      // Only navigate if the target page is different from the current path
+      if (currentPath !== targetPage) {
+        navigate(targetPage);
+      } else {
+        //console.log("Already on the correct page:", currentPath);
+      }
+    } else {
+      console.warn(
+        "Navigate function is not available. Are you sure you wrapped your <Tutorial> component in a <Router> component?",
+      );
+    }
+  };
 
   // to track progress of interactive guides
   const interactiveGuides = guides.map((guide, index) => ({
@@ -105,6 +120,7 @@ const ResourceCircle = ({
 
   const handleGuideClick = (guide) => {
     //setIsOpen(false);
+    navigateToPage(guide.tooltips[0].page);
     setGuideActive({ active: true, guide: guide });
   };
 

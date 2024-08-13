@@ -47,6 +47,10 @@ function App() {
 
   const [tutorialActive, setTutorialActive] = React.useState(false);
   const [resourceCircleEnabled, setResourceCircleEnabled] = React.useState(true);
+  const [resourceCirclePos, setResourceCirclePos] = usePersistantState("resourceCirclePosition", {
+    positionY: "bottom",
+    positionX: "right",
+  });
 
   const toggleDrawer = () => {
     setOpen(!open);
@@ -81,7 +85,12 @@ function App() {
             <MeshContext.Provider value={{ mesh, setMesh }}>
               <Box sx={{ display: "flex" }}>
                 <CssBaseline />
-                <NavBar open={open} onMenuClick={toggleDrawer} />
+                <NavBar
+                  open={open}
+                  onMenuClick={toggleDrawer}
+                  toggleResourceCircle={() => setResourceCircleEnabled((prevValue) => !prevValue)}
+                  resourceCircleEnabled={resourceCircleEnabled}
+                />
                 <Sidebar open={open} />
                 <main
                   style={{
@@ -122,10 +131,17 @@ function App() {
                         element={
                           <ResourcesPage
                             onStartTutorial={() => setTutorialActive(true)}
-                            onChangeResourceCircle={() =>
+                            toggleResourceCircle={() =>
                               setResourceCircleEnabled((prevValue) => !prevValue)
                             }
                             resourceCircleEnabled={resourceCircleEnabled}
+                            onCircleReposition={(posY, posX) =>
+                              setResourceCirclePos({ positionY: posY, positionX: posX })
+                            }
+                            circlePos={{
+                              positionY: resourceCirclePos.positionY,
+                              positionX: resourceCirclePos.positionX,
+                            }}
                           />
                         }
                       />
@@ -143,6 +159,8 @@ function App() {
               {!tutorialActive && resourceCircleEnabled && (
                 <ResourceCircle
                   circleIconName={"/images/iNethiLogoWhite.png"}
+                  positionY={resourceCirclePos.positionY}
+                  positionX={resourceCirclePos.positionX}
                   guides={guidesData}
                   infoIcons={infoIconsData}
                 ></ResourceCircle>
