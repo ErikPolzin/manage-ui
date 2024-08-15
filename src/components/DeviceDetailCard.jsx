@@ -24,6 +24,9 @@ import MenuItem from "@mui/material/MenuItem";
 import IconButton from "@mui/material/IconButton";
 import Button from "@mui/material/Button";
 import Divider from "@mui/material/Divider";
+import FormGroup from "@mui/material/FormGroup";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Switch from "@mui/material/Switch";
 import { useTheme } from "@mui/material";
 // Experimental MUI components
 import LoadingButton from "@mui/lab/LoadingButton";
@@ -243,6 +246,42 @@ function DeviceRadioCard({ device }) {
   );
 }
 
+function DeviceAlertsCard({ device }) {
+  const [unresolvedOnly, setUnresolvedOnly] = React.useState(false);
+
+  const alerts = React.useMemo(() => {
+    if (!unresolvedOnly) return device?.latest_alerts || [];
+    return (device?.latest_alerts || []).filter((a) => a.status !== 4);
+  }, [unresolvedOnly, device]);
+
+  return (
+    <Card variant="outlined">
+      <ListItem>
+        <ListItemIcon>
+          <ErrorIcon />
+        </ListItemIcon>
+        <ListItemText
+          primary="Alert History"
+          secondary={`${alerts.length} ${alerts.length === 1 ? "alert" : "alerts"}`}
+        />
+        <FormGroup>
+          <FormControlLabel
+            control={
+              <Switch value={unresolvedOnly} onChange={() => setUnresolvedOnly(!unresolvedOnly)} />
+            }
+            labelPlacement="start"
+            label="Unresolved"
+          />
+        </FormGroup>
+      </ListItem>
+      <Divider />
+      <CardContent sx={{ paddingY: 0 }}>
+        <AlertList alerts={alerts} />
+      </CardContent>
+    </Card>
+  );
+}
+
 export default function DeviceDetailCard({ device, onUpdate, onClose, onDelete, sx, ...props }) {
   const theme = useTheme();
   const [tabValue, setTabValue] = React.useState(0);
@@ -325,12 +364,7 @@ export default function DeviceDetailCard({ device, onUpdate, onClose, onDelete, 
             </Card>
           </DeviceTabPanel>,
           <DeviceTabPanel value={tabValue} index={2}>
-            <Card variant="outlined">
-              <CardHeader subheader="Alert History" avatar={<ErrorIcon />} />
-              <CardContent sx={{ paddingY: 0 }}>
-                <AlertList alerts={device.latest_alerts} />
-              </CardContent>
-            </Card>
+            <DeviceAlertsCard device={device} />
           </DeviceTabPanel>,
         ]}
       </CardContent>
