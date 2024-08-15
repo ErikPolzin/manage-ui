@@ -84,7 +84,7 @@ export default function AccountPage() {
               label="Enable Alerts"
             />
           </Grid>
-          <Grid item xs={12}>
+          <Grid item xs={12} md={6}>
             <TextField
               type="number"
               label="CPU Warning Level"
@@ -98,7 +98,7 @@ export default function AccountPage() {
               fullWidth
             />
           </Grid>
-          <Grid item xs={12}>
+          <Grid item xs={12} md={6}>
             <TextField
               type="number"
               label="Memory Warning Level"
@@ -112,37 +112,7 @@ export default function AccountPage() {
               fullWidth
             />
           </Grid>
-          <Grid item xs={12} md={6}>
-            <TextField
-              type="number"
-              label="Min. Upload Speed"
-              name="check_upload_speed"
-              value={settingsCopy.check_upload_speed || ""}
-              onChange={handleChange}
-              disabled={!settingsCopy.alerts_enabled}
-              InputProps={{ endAdornment: <InputAdornment position="end">bits/s</InputAdornment> }}
-              error={Boolean(errors.check_upload_speed)}
-              helperText={errors.check_upload_speed ? errors.check_upload_speed.join("\n") : null}
-              fullWidth
-            />
-          </Grid>
-          <Grid item xs={12} md={6}>
-            <TextField
-              type="number"
-              label="Min. Download Speed"
-              name="check_download_speed"
-              value={settingsCopy.check_download_speed || ""}
-              onChange={handleChange}
-              disabled={!settingsCopy.alerts_enabled}
-              InputProps={{ endAdornment: <InputAdornment position="end">bits/s</InputAdornment> }}
-              error={Boolean(errors.check_download_speed)}
-              helperText={
-                errors.check_download_speed ? errors.check_download_speed.join("\n") : null
-              }
-              fullWidth
-            />
-          </Grid>
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12}>
             <TextField
               type="text"
               label="Report Timeout"
@@ -155,23 +125,6 @@ export default function AccountPage() {
                 errors.check_active
                   ? errors.check_active.join("\n")
                   : "If the server doesn't receive a report in this time, a node is considered inactive"
-              }
-              fullWidth
-            />
-          </Grid>
-          <Grid item xs={12} md={6}>
-            <TextField
-              type="text"
-              label="Ping Timeout"
-              name="check_ping"
-              value={settingsCopy.check_ping || ""}
-              onChange={handleChange}
-              disabled={!settingsCopy.alerts_enabled}
-              error={Boolean(errors.check_ping)}
-              helperText={
-                errors.check_ping
-                  ? errors.check_ping.join("\n")
-                  : "If the server can't ping a node after this time, it is offline"
               }
               fullWidth
             />
