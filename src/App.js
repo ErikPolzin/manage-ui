@@ -51,6 +51,8 @@ function App() {
     positionY: "bottom",
     positionX: "right",
   });
+  let resourceCircleInNavbar =
+    resourceCirclePos.positionY === "top" && resourceCirclePos.positionX === "right";
 
   const toggleDrawer = () => {
     setOpen(!open);
@@ -90,6 +92,7 @@ function App() {
                   onMenuClick={toggleDrawer}
                   toggleResourceCircle={() => setResourceCircleEnabled((prevValue) => !prevValue)}
                   resourceCircleEnabled={resourceCircleEnabled}
+                  resourceCircleInNavbar={resourceCircleInNavbar}
                 />
                 <Sidebar open={open} />
                 <main
@@ -161,8 +164,13 @@ function App() {
                   circleIconName={"/images/iNethiLogoWhite.png"}
                   positionY={resourceCirclePos.positionY}
                   positionX={resourceCirclePos.positionX}
+                  circleSize={resourceCircleInNavbar ? 55 : 60}
+                  circleDistFromOuter={resourceCircleInNavbar ? 5 : 20}
+                  circleBorder={resourceCircleInNavbar ? "2px solid white" : "none"}
                   guides={guidesData}
                   infoIcons={infoIconsData}
+                  resourcePageId="/resources"
+                  navigateToDocumentButtons={["open-documentation-button"]}
                 ></ResourceCircle>
               )}
             </MeshContext.Provider>

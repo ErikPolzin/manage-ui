@@ -30,13 +30,16 @@ const ResourceCircle = ({
   circleIconName,
   positionX = "right",
   positionY = "bottom",
+  circleSize = 60,
   circleDistFromOuter = 20,
+  circleBorder = "none",
   guides,
   infoIcons,
+  resourcePageId = "",
+  navigateToDocumentButtons = [],
 }) => {
   positionX = positionX !== "right" && positionX !== "left" ? "left" : positionX;
   positionY = positionY !== "top" && positionY !== "bottom" ? "top" : positionY;
-  const circleSize = 60;
   const circlePosition = {
     left: positionX === "left" ? circleDistFromOuter : "auto",
     top: positionY === "top" ? circleDistFromOuter : "auto",
@@ -155,13 +158,17 @@ const ResourceCircle = ({
   };
 
   const handleOpenDocPage = () => {
-    navigate("/resources");
+    navigate(resourcePageId);
     setTimeout(() => {
-      // *** NEED THIS ELEMENT ID TO BE PASSED IN BY USER
-      const target1 = document.getElementById("open-documentation-button");
-      if (target1) {
-        target1.click();
-      }
+      let target1;
+      navigateToDocumentButtons.forEach((buttonId) => {
+        setTimeout(() => {
+          target1 = document.getElementById(buttonId);
+          if (target1) {
+            target1.click();
+          }
+        }, 200);
+      });
       setTimeout(() => {
         const target2 = document.getElementById(focusDocumentation.pageId);
         if (target2) {
@@ -209,6 +216,7 @@ const ResourceCircle = ({
               backgroundColor: "#3F15B1",
               cursor: "pointer",
               boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2)",
+              border: circleBorder,
               display: "flex",
               justifyContent: "center",
               alignItems: "center",
