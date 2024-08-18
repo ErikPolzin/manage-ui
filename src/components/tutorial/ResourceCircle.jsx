@@ -1,15 +1,30 @@
-import { CssBaseline, Icon, IconButton, Switch, Typography } from "@mui/material";
+import {
+  Button,
+  CssBaseline,
+  Icon,
+  IconButton,
+  InputAdornment,
+  Switch,
+  TextField,
+  Typography,
+} from "@mui/material";
 import { Box } from "@mui/system";
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import ExploreIcon from "@mui/icons-material/Explore";
 import SearchIcon from "@mui/icons-material/Search";
 import HelpIcon from "@mui/icons-material/Help";
 import CloseIcon from "@mui/icons-material/Close";
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import InteractiveGuideCard from "./InteractiveGuideCard";
 import InteractiveGuide from "./InteractiveGuide";
 import InfoIcon from "./InfoIcon";
 import { BrowserRouter as Router, useNavigate, useLocation } from "react-router-dom";
 import { usePersistantState } from "./hooks";
+import DocumentationRenderer from "./DocumentationRenderer";
+import documentationData from "../../tutorialData/documentationData";
+import SearchResults from "./SearchResults";
+import guidesData from "../../tutorialData/interactiveGuidesData";
 
 const ResourceCircle = ({
   circleIconName,
@@ -42,6 +57,9 @@ const ResourceCircle = ({
   const [interactiveGuidesMenuOpen, setInteractiveGuidesMenuOpen] = useState(true);
   const [searchToolMenuOpen, setSearchToolMenuOpen] = useState(false);
   const [helpIconsMenuOpen, setHelpIconsMenuOpen] = useState(false);
+
+  const [searchValue, setSearchValue] = useState("");
+  const [focusDocumentation, setFocusDocumentation] = useState(null);
 
   const circleMenuRef = useRef(null);
 
@@ -118,7 +136,7 @@ const ResourceCircle = ({
     setHelpIconsEnabled(!helpIconsEnabled);
   };
 
-  const handleGuideClick = (guide) => {
+  const handleGuideSelection = (guide) => {
     //setIsOpen(false);
     navigateToPage(guide.tooltips[0].page);
     setGuideActive({ active: true, guide: guide });
@@ -130,6 +148,36 @@ const ResourceCircle = ({
 
   const handleGuideComplete = () => {
     setGuideActive({ active: false, guide: null });
+  };
+
+  const handleDocSelection = (docPage) => {
+    setFocusDocumentation(docPage);
+  };
+
+  const handleOpenDocPage = () => {
+    navigate("/resources");
+    setTimeout(() => {
+      // *** NEED THIS ELEMENT ID TO BE PASSED IN BY USER
+      const target1 = document.getElementById("open-documentation-button");
+      if (target1) {
+        target1.click();
+      }
+      setTimeout(() => {
+        const target2 = document.getElementById(focusDocumentation.pageId);
+        if (target2) {
+          target2.click();
+        }
+        setTimeout(() => {
+          const target3 = document.getElementById(focusDocumentation.headingId);
+          if (target3) {
+            target3.scrollIntoView({
+              behavior: "smooth",
+              block: "start",
+            });
+          }
+        }, 200);
+      }, 200);
+    }, 200);
   };
 
   return (
@@ -481,7 +529,7 @@ const ResourceCircle = ({
                     acc.push(
                       <Box
                         key={guide.name}
-                        onClick={() => handleGuideClick(guide)}
+                        onClick={() => handleGuideSelection(guide)}
                         sx={{
                           position: "relative",
                           width: "100%",
@@ -516,7 +564,7 @@ const ResourceCircle = ({
                       .map((guide, index) => (
                         <Box
                           key={index}
-                          onClick={() => handleGuideClick(guide)}
+                          onClick={() => handleGuideSelection(guide)}
                           sx={{
                             position: "relative",
                             width: "100%",
@@ -546,29 +594,167 @@ const ResourceCircle = ({
                 pointerEvents: searchToolMenuOpen && isOpen ? "all" : "none",
                 opacity: searchToolMenuOpen ? 1 : 0,
                 transition: searchToolMenuOpen ? "opacity 0.3s ease-out" : "none",
+                display: "flex",
+                flexDirection: "column",
               }}
             >
-              <Typography
-                variant="h6"
+              <Box
+                id="popup-box-search-tools-top-components-container"
+                sx={{ flexShrink: 0, backgroundColor: "white" }}
+              >
+                <TextField
+                  id="search-input-field"
+                  label="Search documentation and guides"
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <SearchIcon />
+                      </InputAdornment>
+                    ),
+                  }}
+                  size="small"
+                  variant="standard"
+                  fullWidth
+                  onChange={(value) => {
+                    setSearchValue(value.target.value);
+                  }}
+                  value={searchValue}
+                />
+              </Box>
+
+              <Box
+                id="search-results-container"
                 sx={{
-                  color: "#220B61",
-                  fontSize: "1.1rem",
-                  fontWeight: "600",
-                  marginBottom: "5px",
+                  flexGrow: 1,
+                  width: "100%",
+                  backgroundColor: "white",
+                  overflowY: "scroll",
+                  overflowX: "hidden",
+                  "&::-webkit-scrollbar": {
+                    width: "5px", // width of the scrollbar
+                  },
+                  "&::-webkit-scrollbar-track": {
+                    backgroundColor: "#f1f1f1", // track color
+                    borderRadius: "10px",
+                  },
+                  "&::-webkit-scrollbar-thumb": {
+                    backgroundColor: "#E1E3E7", // thumb color
+                    borderRadius: "10px",
+                  },
+                  "&::-webkit-scrollbar-thumb:hover": {
+                    backgroundColor: "#555", // thumb color on hover
+                  },
                 }}
               >
-                Search Tools
-              </Typography>
-              <Typography
-                variant="body1"
+                <SearchResults
+                  searchValue={searchValue}
+                  guidesData={guidesData}
+                  handleGuideSelect={handleGuideSelection}
+                  documentationData={documentationData}
+                  setFocusDocumentation={setFocusDocumentation}
+                ></SearchResults>
+              </Box>
+              <Box
+                id="popup-box-search-tools-documentation-container"
                 sx={{
-                  color: "#7F7F7F",
-                  fontSize: "0.7rem",
-                  lineHeight: "1rem",
+                  position: "absolute",
+                  height: "100%",
+                  width: "100%",
+                  top: 0,
+                  left:
+                    searchToolMenuOpen && focusDocumentation
+                      ? 0
+                      : circleMenuWidth + circleSize + 20,
+                  borderRadius: "10px",
+                  padding: "18px",
+                  backgroundColor: "white",
+                  pointerEvents:
+                    searchToolMenuOpen && isOpen && focusDocumentation ? "all" : "none",
+                  opacity: searchToolMenuOpen ? 1 : 0,
+                  transition: "left 0.3s ease-out",
+                  display: "flex",
+                  flexDirection: "column",
                 }}
               >
-                Search documentation and interactive guides
-              </Typography>
+                <Box
+                  id="search-tools-documentation-back-button"
+                  sx={{
+                    flexShrink: 0,
+                    width: "100%",
+                    backgroundColor: "white",
+                    color: "#3F15B1",
+                    display: "flex",
+                    justifyContent: "flex-start",
+                    alignItems: "center",
+                  }}
+                >
+                  <ArrowBackIcon
+                    onClick={() => {
+                      handleDocSelection(null);
+                    }}
+                    sx={{
+                      fontSize: "large",
+                      color: "#3F15B1",
+                      cursor: "pointer",
+                      "&:hover": { color: "#31119F" },
+                    }}
+                  />
+                </Box>
+                <Box
+                  id="search-tools-documentation-content"
+                  sx={{
+                    flexGrow: 1,
+                    width: "100%",
+                    backgroundColor: "white",
+                    overflowY: "scroll",
+                    overflowX: "hidden",
+                    "&::-webkit-scrollbar": {
+                      width: "10px", // width of the scrollbar
+                    },
+                    "&::-webkit-scrollbar-track": {
+                      backgroundColor: "#f1f1f1", // track color
+                      borderRadius: "10px",
+                    },
+                    "&::-webkit-scrollbar-thumb": {
+                      backgroundColor: "#c6c8cc", // thumb color
+                      borderRadius: "10px",
+                    },
+                    "&::-webkit-scrollbar-thumb:hover": {
+                      backgroundColor: "#555", // thumb color on hover
+                    },
+                  }}
+                >
+                  {focusDocumentation && (
+                    <DocumentationRenderer
+                      text={focusDocumentation.content}
+                    ></DocumentationRenderer>
+                  )}
+                </Box>
+                <Box
+                  id="search-tools-documentation-full-docs"
+                  sx={{
+                    flexShrink: 0,
+                    width: "100%",
+                    backgroundColor: "white",
+                    display: "flex",
+                    justifyContent: "flex-end",
+                    alignItems: "center",
+                  }}
+                >
+                  <Button
+                    variant="text"
+                    size="small"
+                    endIcon={<ArrowForwardIcon sx={{ fontSize: "small" }} />}
+                    onClick={() => {
+                      handleOpenDocPage();
+                      setIsOpen(false);
+                    }}
+                    sx={{ marginLeft: "auto" }}
+                  >
+                    Open full docs
+                  </Button>
+                </Box>
+              </Box>
             </Box>
             <Box
               id="popup-box-help-icons"
