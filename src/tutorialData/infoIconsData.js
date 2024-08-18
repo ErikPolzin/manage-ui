@@ -21,11 +21,21 @@ const infoIconsData = [
     title: "Registered Nodes",
     body: "Registered nodes are all the nodes that are known to us.",
   },
-  // {
-  //   targetElement: "#sidebar-devices-item",
-  //   title: "Devices menu",
-  //   body: "Click here to navigate to the devices page with detailed information about all connected nodes",
-  // },
+  {
+    targetElement: "#sidebar-dashboard-item",
+    title: "Devices menu",
+    body: "Click here to navigate to the devices page with detailed information about all connected nodes",
+  },
+  {
+    targetElement: "#sidebar-settings-item",
+    title: "Devices menu",
+    body: "Click here to navigate to the devices page with detailed information about all connected nodes",
+  },
+  {
+    targetElement: "#sidebar-devices-item-text",
+    title: "Devices menu",
+    body: "Click here to navigate to the devices page with detailed information about all connected nodes",
+  },
 ];
 
 export default infoIconsData;
