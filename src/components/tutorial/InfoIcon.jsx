@@ -93,10 +93,10 @@ const InfoIcon = ({ targetEl, title, body, transitionTime = 0.3, delayTime = 0 }
           const containerRect = element.getBoundingClientRect();
           // if the element is within the visible area of the container, continue to verify visibility in the rest of its ancestors
           if (
-            rect.bottom > containerRect.top &&
+            rect.top + infoIconSize / 2 > containerRect.top &&
             rect.top < containerRect.bottom &&
-            rect.right > containerRect.left &&
-            rect.left < containerRect.right
+            rect.right - infoIconSize / 2 > containerRect.left &&
+            rect.right + infoIconSize / 2 < containerRect.right
           ) {
           }
           // If not visible, immediately set visible to false
