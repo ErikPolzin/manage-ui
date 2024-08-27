@@ -21,7 +21,7 @@ import InteractiveGuide from "./InteractiveGuide";
 import InfoIcon from "./InfoIcon";
 import { BrowserRouter as Router, useNavigate, useLocation } from "react-router-dom";
 import { usePersistantState } from "./hooks";
-import DocumentationRenderer from "./DocumentationRenderer";
+import DocumentationRenderer from "./DocumentationMarkdownRenderer";
 import documentationData from "../../tutorialData/documentationData";
 import SearchResults from "./SearchResults";
 import guidesData from "../../tutorialData/interactiveGuidesData";
@@ -35,8 +35,7 @@ const ResourceCircle = ({
   circleBorder = "none",
   guides,
   infoIcons,
-  resourcePageId = "",
-  navigateToDocumentButtons = [],
+  openDocumentation,
 }) => {
   positionX = positionX !== "right" && positionX !== "left" ? "left" : positionX;
   positionY = positionY !== "top" && positionY !== "bottom" ? "top" : positionY;
@@ -158,17 +157,12 @@ const ResourceCircle = ({
   };
 
   const handleOpenDocPage = () => {
-    navigate(resourcePageId);
     setTimeout(() => {
-      let target1;
-      navigateToDocumentButtons.forEach((buttonId) => {
-        setTimeout(() => {
-          target1 = document.getElementById(buttonId);
-          if (target1) {
-            target1.click();
-          }
-        }, 200);
-      });
+      setTimeout(() => {
+        if (openDocumentation) {
+          openDocumentation();
+        }
+      }, 500);
       setTimeout(() => {
         const target2 = document.getElementById(focusDocumentation.pageId);
         if (target2) {
@@ -182,9 +176,9 @@ const ResourceCircle = ({
               block: "start",
             });
           }
-        }, 200);
-      }, 200);
-    }, 200);
+        }, 500);
+      }, 500);
+    }, 0);
   };
 
   return (
@@ -199,7 +193,7 @@ const ResourceCircle = ({
     >
       <CssBaseline />
       {!guideActive.active && (
-        <Box id="circle-resources" sx={{ pointerEvents: "all" }}>
+        <Box id="circle-resources" zIndex={1000000003} sx={{ pointerEvents: "all" }}>
           <Box
             id="circle"
             zIndex={1000000003}
@@ -431,7 +425,7 @@ const ResourceCircle = ({
           </Box>
           <Box
             id="popup-box-container"
-            zIndex={1000000002}
+            zIndex={1000000003}
             sx={{
               position: "fixed",
               display: "flex",
@@ -456,6 +450,7 @@ const ResourceCircle = ({
           >
             <Box
               id="popup-box-interactive-guides"
+              zIndex={1000000003}
               sx={{
                 position: interactiveGuidesMenuOpen ? "relative" : "absolute",
                 display: "flex",
@@ -495,6 +490,7 @@ const ResourceCircle = ({
               </Typography>
               <Box
                 id="interactive-guides-container"
+                zIndex={1000000003}
                 sx={{
                   flexGrow: 1,
                   display: "flex",
@@ -823,11 +819,9 @@ const ResourceCircle = ({
         infoIcons.map((infoIcon, index) => {
           return (
             <InfoIcon
-              targetEl={helpIconsEnabled ? infoIcon.targetElement : "abcdefghijklmnop"}
+              targetEl={helpIconsEnabled ? infoIcon.targetElement : "acegikmoqsuwyz"}
               title={infoIcon.title}
               body={infoIcon.body}
-              transitionTime={Math.random() * (0.8 - 0.2) + 0.2}
-              delayTime={Math.random() * 0.3}
             ></InfoIcon>
           );
         })}
