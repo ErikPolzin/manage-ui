@@ -6,7 +6,7 @@ import ExploreIcon from "@mui/icons-material/Explore";
 
 const searchGuides = (searchValue, guidesData) => {
   const results = [];
-  if (searchValue === "") {
+  if (searchValue === "" || !guidesData) {
     return;
   }
 
@@ -22,7 +22,7 @@ const searchGuides = (searchValue, guidesData) => {
 
 const searchDocumentation = (searchValue, documentationData) => {
   const results = [];
-  if (searchValue === "") {
+  if (searchValue === "" || !documentationData) {
     return;
   }
 
@@ -59,7 +59,7 @@ const searchDocumentation = (searchValue, documentationData) => {
 };
 
 const SearchResults = ({
-  searchValue,
+  searchValue = "",
   guidesData,
   handleGuideSelect,
   documentationData,

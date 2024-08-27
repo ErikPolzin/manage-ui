@@ -18,16 +18,7 @@ const parseDocumentation = (text) => {
 
       switch (type) {
         case "pageHeading":
-          parts.push(
-            <Typography
-              key={index + "-" + id}
-              id={id}
-              variant="h3"
-              sx={{ marginTop: "30px", color: "#1A1A1A", fontWeight: "bold" }}
-            >
-              {content}
-            </Typography>,
-          );
+          parts.push(null);
           break;
         case "heading1":
           parts.push(
@@ -111,9 +102,9 @@ const parseDocumentation = (text) => {
   });
 };
 
-// Example component using the parser
-const DocumentationRenderer = ({ text }) => {
+// Component using the parser
+const DocumentationMarkdownRenderer = ({ text }) => {
   return <Box>{parseDocumentation(text)}</Box>;
 };
 
-export default DocumentationRenderer;
+export default DocumentationMarkdownRenderer;
