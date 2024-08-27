@@ -26,6 +26,8 @@ import ResourceCircle from "./components/tutorial/ResourceCircle";
 import guidesData from "./tutorialData/interactiveGuidesData";
 import infoIconsData from "./tutorialData/infoIconsData";
 import { MeshContext, UserContext, ApiSocketContext, ColorModeContext } from "./context";
+import Documentation from "./components/tutorial/Documentation";
+import documentationData from "./tutorialData/documentationData";
 
 function App() {
   const { keycloak, initialized } = useKeycloak();
@@ -46,6 +48,8 @@ function App() {
   };
 
   const [tutorialActive, setTutorialActive] = React.useState(false);
+  const [documentationOpen, setDocumentationOpen] = React.useState(false);
+  const [documentationSideToolEnabled, setDocumentationSideToolEnabled] = React.useState(false);
   const [resourceCircleEnabled, setResourceCircleEnabled] = React.useState(true);
   const [resourceCirclePos, setResourceCirclePos] = usePersistantState("resourceCirclePosition", {
     positionY: "bottom",
@@ -56,6 +60,10 @@ function App() {
 
   const toggleDrawer = () => {
     setOpen(!open);
+  };
+
+  const toggleDocumentationOpen = () => {
+    setDocumentationOpen(!documentationOpen);
   };
 
   React.useEffect(() => {
@@ -145,6 +153,13 @@ function App() {
                               positionY: resourceCirclePos.positionY,
                               positionX: resourceCirclePos.positionX,
                             }}
+                            openDocumentation={() => {
+                              setDocumentationOpen(!documentationOpen);
+                            }}
+                            documentationSideToolEnabled={documentationSideToolEnabled}
+                            toggleDocumentationSideTool={() => {
+                              setDocumentationSideToolEnabled(!documentationSideToolEnabled);
+                            }}
                           />
                         }
                       />
@@ -159,6 +174,12 @@ function App() {
                   onExit={handleExitTutorial}
                 ></Tutorial>
               )}
+              <Documentation
+                documentationData={documentationData}
+                isOpen={documentationOpen}
+                toggleIsOpen={toggleDocumentationOpen}
+                canSlideOut={documentationSideToolEnabled}
+              ></Documentation>
               {!tutorialActive && resourceCircleEnabled && (
                 <ResourceCircle
                   circleIconName={"/images/iNethiLogoWhite.png"}
@@ -169,8 +190,7 @@ function App() {
                   circleBorder={resourceCircleInNavbar ? "2px solid white" : "none"}
                   guides={guidesData}
                   infoIcons={infoIconsData}
-                  resourcePageId="/resources"
-                  navigateToDocumentButtons={["open-documentation-button"]}
+                  openDocumentation={() => setDocumentationOpen(true)}
                 ></ResourceCircle>
               )}
             </MeshContext.Provider>
