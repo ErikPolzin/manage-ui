@@ -2,9 +2,11 @@ import { CssBaseline, Typography } from "@mui/material";
 import { Box } from "@mui/system";
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 
-const InfoIcon = ({ targetEl, title, body, transitionTime = 0.3, delayTime = 0 }) => {
+const InfoIcon = ({ targetEl, title, body }) => {
   const infoIconSize = 15;
   const infoBoxWidth = 150;
+  const transitionTime = Math.random() * (0.8 - 0.2) + 0.2;
+  const delayTime = Math.random() * 0.3;
   const [isOpen, setIsOpen] = useState(false);
   const [infoIconPos, setInfoIconPos] = useState({
     top: document.documentElement.clientHeight + window.scrollY - infoIconSize,
@@ -22,6 +24,7 @@ const InfoIcon = ({ targetEl, title, body, transitionTime = 0.3, delayTime = 0 }
   const [refreshInterval, setRefreshInterval] = useState(new Date());
   const [refreshIntervalValue, setRefreshIntervalValue] = useState(500);
 
+  // Set interval refresh
   useEffect(() => {
     const interval = setInterval(() => {
       setRefreshInterval(new Date());
@@ -30,6 +33,7 @@ const InfoIcon = ({ targetEl, title, body, transitionTime = 0.3, delayTime = 0 }
     return () => clearInterval(interval);
   }, []);
 
+  // Update icon position on interval if attached to a fixed element
   useEffect(() => {
     if (attachedTofixedElement) {
       console.log("updating node");
@@ -203,10 +207,10 @@ const InfoIcon = ({ targetEl, title, body, transitionTime = 0.3, delayTime = 0 }
   };
 
   return (
-    <Box ref={iconRef} zIndex={1000000000} sx={{ pointerEvents: "all" }}>
+    <Box ref={iconRef} zIndex={999999999} sx={{ pointerEvents: "all" }}>
       <CssBaseline />
       <Box
-        zIndex={1000000001}
+        zIndex={999999999}
         id="info-icon"
         onClick={handleInfoIconClick}
         sx={{
@@ -239,7 +243,7 @@ const InfoIcon = ({ targetEl, title, body, transitionTime = 0.3, delayTime = 0 }
       </Box>
       {isOpen && (
         <Box
-          zIndex={1000000008}
+          zIndex={999999999}
           id="info-box"
           sx={{
             position: "absolute",

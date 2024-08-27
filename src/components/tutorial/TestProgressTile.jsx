@@ -25,7 +25,6 @@ const TestProgressTile = ({
   currentTaskNo,
   currentTask,
   onNext,
-  onExit,
   onSkipTest,
 }) => {
   const [confirmationPopupOpen, setConfirmationPopupOpen] = useState(false);
@@ -174,7 +173,7 @@ const TestProgressTile = ({
   const handleCloseConfirmationPopup = (confirmed) => {
     setConfirmationPopupOpen(false);
     if (confirmed && confirmationAction) {
-      confirmationAction === "Exit" ? onExit() : onSkipTest();
+      onSkipTest();
     }
     setConfirmationAction(null);
   };
@@ -374,12 +373,7 @@ const TestProgressTile = ({
       {confirmationPopupOpen && (
         <ConfirmationPopup
           title={`Confirm ${confirmationAction}`}
-          description={`Are you sure you want to 
-      ${
-        confirmationAction === "Exit"
-          ? "exit the tutorial?"
-          : "skip the test and move to the next stage in the tutorial?"
-      }`}
+          description={`Are you sure you want to skip the test and move to the next stage in the tutorial?`}
           cancelBtnText={"Cancel"}
           confirmBtnText={"Confirm"}
           onCancel={() => handleCloseConfirmationPopup(false)}

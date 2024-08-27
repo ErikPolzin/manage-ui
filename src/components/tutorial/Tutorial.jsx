@@ -93,16 +93,6 @@ const Tutorial = ({
     }
   };
 
-  // helps to rerender tooltip for animating new tooltip appearing
-  const handleTootlipChange = () => {
-    setTimeout(() => {
-      //       navigateToPage(tutorialContent[currentStage].tooltips[currentStep + 1].page);
-
-      //setContainerHeight(document.documentElement.scrollHeight);
-      setTooltipChanging(false);
-    }, 0);
-  };
-
   const nextTestStep = () => {
     const currentTasks = tutorial[currentStage].test;
 
@@ -122,13 +112,6 @@ const Tutorial = ({
         setTutorialComplete(true);
       }
     }
-  };
-
-  // helps to rerender test progress tile for animating when a task is completed
-  const handleTaskChange = () => {
-    setTimeout(() => {
-      setTaskChanging(false);
-    }, 5);
   };
 
   const handleStartScreen1Next = () => {
@@ -308,7 +291,6 @@ const Tutorial = ({
           currentTaskNo={currentTask}
           currentTask={tutorial[currentStage].test[currentTask]}
           onNext={nextTestStep}
-          onExit={handleExitTutorial}
           onSkipTest={handleSkipTest}
         ></TestProgressTile>
       )}

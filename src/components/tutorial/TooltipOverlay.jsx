@@ -20,6 +20,7 @@ const TooltipOverlay = ({ targetAreaEl, areaClickable = true, willScroll = true 
     return () => clearInterval(interval);
   }, []);
 
+  // Target area positioning
   useLayoutEffect(() => {
     const updateTargetAreaPosition = () => {
       const targetAreaElement = document.querySelector(targetAreaEl);

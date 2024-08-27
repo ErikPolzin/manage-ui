@@ -47,6 +47,7 @@ const Tooltip = ({
   const [refreshIntervalValue, setRefreshIntervalValue] = useState(500);
   const [tooltipChanging, setTooltipChanging] = useState(false);
 
+  // Set refresh interval
   useEffect(() => {
     const interval = setInterval(() => {
       if (!tooltipChanging) {
@@ -244,6 +245,7 @@ const Tooltip = ({
       window.removeEventListener("click", updateTargetAreaPosition);
     };
   }, [targetEl, targetAreaEl, type, onNext, onBack, tooltipNo, refreshInterval]);
+  // ***** I think try to remove all these and just leave one like the targetEl to prevent so many refreshes. And do the same with all useEffects and stuff
 
   // Scroll to tooltip automatically
   useLayoutEffect(() => {
@@ -320,13 +322,6 @@ const Tooltip = ({
     const timer = setTimeout(() => setIsVisible(true), 10);
     return () => clearTimeout(timer);
   }, [tooltipNo]);
-
-  const handleAwaitRefresh = () => {
-    // setAwaitRefresh(true);
-    // setTimeout(() => {
-    //   setAwaitRefresh(false);
-    // }, 500);
-  };
 
   const handleTooltipChanging = () => {
     console.log("Tooltip changing:", true);
