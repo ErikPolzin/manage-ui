@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useState } from "react";
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Box } from "@mui/material";
 
 const TooltipOverlay = ({ targetAreaEl, areaClickable = true, willScroll = true }) => {
@@ -8,9 +8,10 @@ const TooltipOverlay = ({ targetAreaEl, areaClickable = true, willScroll = true 
     width: 0,
     height: 0,
   });
+  const prevRectPositionRef = useRef({ top: 0, left: 0, height: 0, width: 0 });
   const [targetElementFound, setTargetElementFound] = useState(false);
 
-  // Refresh tooltip position at regular intervals
+  // Refresh overlay position at regular intervals
   const [refreshInterval, setRefreshInterval] = useState(new Date());
   useEffect(() => {
     const interval = setInterval(() => {
@@ -21,44 +22,61 @@ const TooltipOverlay = ({ targetAreaEl, areaClickable = true, willScroll = true 
   }, []);
 
   // Target area positioning
+  const updateTargetAreaPosition = (rect) => {
+    // converting these values to the svg viewBox dimensions you are working in
+    setTargetAreaPos({
+      left: rect.left,
+      top: rect.top,
+      width: rect.width,
+      height: rect.height,
+    });
+  };
+
   useLayoutEffect(() => {
-    const updateTargetAreaPosition = () => {
-      const targetAreaElement = document.querySelector(targetAreaEl);
-      if (!targetAreaElement) {
-        setTargetElementFound(false);
-        return;
+    const targetAreaElement = document.querySelector(targetAreaEl);
+    if (!targetAreaElement) {
+      setTargetElementFound(false);
+      return;
+    }
+
+    setTargetElementFound(true);
+    const rect = targetAreaElement.getBoundingClientRect();
+
+    const handlePositioning = () => {
+      // Only change positions if target element has changed
+      if (
+        prevRectPositionRef.current.top !== rect.top ||
+        prevRectPositionRef.current.left !== rect.left ||
+        prevRectPositionRef.current.height !== rect.height ||
+        prevRectPositionRef.current.width !== rect.width
+      ) {
+        requestAnimationFrame(() => {
+          updateTargetAreaPosition(rect);
+        });
+        prevRectPositionRef.current = {
+          top: rect.top,
+          left: rect.left,
+          height: rect.height,
+          width: rect.width,
+        };
       }
-      setTargetElementFound(true);
-
-      // Position the target area highlight
-      const rect = targetAreaElement.getBoundingClientRect();
-
-      // converting these values to the svg viewBox dimensions you are working in
-      setTargetAreaPos({
-        left: rect.left,
-        top: rect.top,
-        width: rect.width,
-        height: rect.height,
-      });
     };
+    handlePositioning(); // Interval update
 
-    const handleResizeOrScroll = () => {
-      requestAnimationFrame(() => {
-        updateTargetAreaPosition();
-      });
-    };
+    // Use MutationObserver to detect changes in the DOM
+    const observer = new MutationObserver(() => {
+      handlePositioning();
+    });
 
-    updateTargetAreaPosition(); // Initial update
-    window.addEventListener("resize", handleResizeOrScroll);
-    window.addEventListener("scroll", handleResizeOrScroll);
-    window.addEventListener("click", handleResizeOrScroll);
-    window.addEventListener("orientationchange", handleResizeOrScroll);
+    // Observe changes to the entire document
+    observer.observe(document.body, { childList: true, subtree: true });
+    window.addEventListener("resize", handlePositioning);
+    window.addEventListener("click", handlePositioning);
 
     return () => {
-      window.removeEventListener("resize", handleResizeOrScroll);
-      window.removeEventListener("scroll", handleResizeOrScroll);
-      window.removeEventListener("click", handleResizeOrScroll);
-      window.removeEventListener("orientationchange", handleResizeOrScroll);
+      observer.disconnect();
+      window.removeEventListener("resize", handlePositioning);
+      window.removeEventListener("click", handlePositioning);
     };
   }, [targetAreaEl, refreshInterval]);
 
