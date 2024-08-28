@@ -27,8 +27,6 @@ const Tooltip = ({
   });
   const tooltipWidth = 270;
   const arrowSize = 30;
-  console.log((tooltipNo - 1 / totalTooltips) * 100);
-  console.log(totalTooltips);
   const [progressBarWidth, setProgressBarWidth] = useState(0);
 
   const [targetAreaPos, setTargetAreaPos] = useState({
@@ -41,10 +39,11 @@ const Tooltip = ({
   const tooltipRef = useRef(null);
   const [willScroll, setWillScroll] = useState(true);
   const [changedTooltipSince, setChangedTooltipSince] = useState(true);
+  const prevRectPositionRef = useRef({ top: 0, left: 0, height: 0, width: 0 });
 
   // Refresh tooltip position at regular intervals
   const [refreshInterval, setRefreshInterval] = useState(new Date());
-  const [refreshIntervalValue, setRefreshIntervalValue] = useState(500);
+  const refreshIntervalValue = 500;
   const [tooltipChanging, setTooltipChanging] = useState(false);
 
   // Set refresh interval
@@ -53,15 +52,123 @@ const Tooltip = ({
       if (!tooltipChanging) {
         setRefreshInterval(new Date());
         setProgressBarWidth((tooltipNo / totalTooltips) * 100);
-        console.log("Refreshing");
       }
     }, refreshIntervalValue);
 
     return () => clearInterval(interval);
   }, [tooltipChanging]);
 
+  // Positioning the target area highlight
+  const updateTargetAreaPosition = (rect) => {
+    setTargetAreaPos({
+      left: rect.left + window.scrollX,
+      top: rect.top + window.scrollY,
+      width: rect.width,
+      height: rect.height,
+    });
+  };
+
+  // Positioning the tooltip (and tooltip arrow)
+  const updateTooltipPosition = (rect) => {
+    const tooltipWidth = 270;
+    const offset = 20; // Offset from the target area
+    const offsetOuter = 20; // Offset from outer screen border
+    const tooltipHeight = tooltipRef.current.offsetHeight;
+    let position = "right";
+
+    // Default tooltip positioning: right of the target area and vertically centered
+    let top = rect.top + window.scrollY + rect.height / 2 - tooltipHeight / 2;
+    let left = rect.left + window.scrollX + rect.width + offset;
+    let minSpaceOver = {
+      side: "right",
+      amount: left + tooltipWidth - document.documentElement.clientWidth,
+    };
+
+    // Default arrow positioning: pointing left, centered vertically
+    let arrowTop = top + tooltipHeight / 2 - arrowSize / 2;
+    let arrowLeft = left - arrowSize / 2;
+
+    // Check if tooltip goes out of viewport on the right
+    if (left + tooltipWidth > document.documentElement.clientWidth) {
+      position = "left";
+      left = rect.left + window.scrollX - tooltipWidth - offset; // Reposition to the left of the target area
+      arrowLeft = left + tooltipWidth - arrowSize / 2; // Arrow pointing right
+
+      if (minSpaceOver.amount > Math.abs(left)) {
+        minSpaceOver.amount = Math.abs(left);
+        minSpaceOver.side = "left";
+      }
+    }
+
+    // Check if tooltip goes out of viewport on the left
+    if (left < 0) {
+      left = (2 * (rect.left + window.scrollX) + rect.width) / 2 - tooltipWidth / 2; // Adjust to fit within the viewport
+      arrowLeft = left + tooltipWidth / 2 - arrowSize / 2; // Arrow centered horizontally
+
+      position = "top";
+      top = rect.top + window.scrollY - tooltipHeight - offset; // If tooltip cannot fit on both the left and right, try it on top
+      arrowTop = top + tooltipHeight - arrowSize / 2; // Arrow pointing down
+    }
+
+    // Check if tooltip goes out of viewport vertically above
+    if (top < offsetOuter) {
+      // If its positioned right or left
+      if (position === "right" || position === "left") {
+        top = rect.top + window.scrollY - offset / 2;
+        arrowTop = rect.top + rect.height / 2 + window.scrollY - offset / 2;
+        if (
+          top + tooltipHeight + offsetOuter + 40 >
+          window.scrollY + document.documentElement.clientHeight
+        ) {
+          top = window.scrollY + document.documentElement.clientHeight - offset - tooltipHeight;
+        }
+      } // else if its positioned directly above
+      else {
+        // If cannot fit on bottom neither (i.e. cannot fit anywhere on the page)
+        if (
+          rect.top + window.scrollY + rect.height + offset + tooltipHeight >
+          window.scrollY + document.documentElement.clientHeight
+        ) {
+          if (minSpaceOver.side === "right") {
+            // Tooltip positioning: right side of the page area and vertically centered
+            top = rect.top + window.scrollY + rect.height / 2 - tooltipHeight / 2;
+            left = window.scrollX - rect.width - offset;
+
+            // Arrow positioning: pointing left, centered vertically
+            arrowTop = top + tooltipHeight / 2 - arrowSize / 2;
+            arrowLeft = left - arrowSize / 2;
+          } else if (minSpaceOver.side === "left") {
+            // Tooltip positioning: left side of the page area and vertically centered
+            top = rect.top + window.scrollY + rect.height / 2 - tooltipHeight / 2;
+            left = offset;
+
+            // Arrow positioning: pointing right, centered vertically
+            arrowTop = top + tooltipHeight / 2 - arrowSize / 2;
+            arrowLeft = tooltipWidth + offset - arrowSize / 2;
+          }
+        } // else if we can position directly below
+        else {
+          top = rect.top + window.scrollY + rect.height + offset;
+          arrowTop = top - arrowSize / 2; // Arrow pointing up
+        }
+      }
+    }
+
+    // If it goes out vertically below after final positioning
+    if (
+      top + tooltipHeight + offsetOuter >
+      window.scrollY + document.documentElement.clientHeight
+    ) {
+      top = window.scrollY + document.documentElement.clientHeight - offset - tooltipHeight;
+      arrowTop = rect.top + rect.height / 2 + window.scrollY - offset / 2;
+    }
+
+    setTooltipPosition({ top, left });
+    setTooltipArrowPosition({ top: arrowTop, left: arrowLeft });
+  };
+
   // Positioning the tooltip
-  useLayoutEffect(() => {
+  useEffect(() => {
     const targetElement = document.querySelector(targetEl);
     const targetAreaElement = document.querySelector(targetAreaEl);
 
@@ -69,7 +176,7 @@ const Tooltip = ({
       return;
     }
 
-    // If target element not found, display it in the center
+    // If target element not found, display tooltip in the center
     if (!targetElement || !targetAreaElement) {
       console.log("The provided target or area element is not found");
       setTooltipPosition({
@@ -88,137 +195,42 @@ const Tooltip = ({
     }
 
     const rect = targetAreaElement.getBoundingClientRect(); // more reliable than using targetAreaElement directly
+
     // Scroll the target element into view
     targetAreaElement.scrollIntoView({
       behavior: "smooth",
       block: "center",
     });
 
-    // Position the target area highlight
-    const updateTargetAreaPosition = () => {
-      setTargetAreaPos({
-        left: rect.left + window.scrollX,
-        top: rect.top + window.scrollY,
-        width: rect.width,
-        height: rect.height,
-      });
-    };
-
-    // Position the tooltip (and tooltip arrow)
-    const updateTooltipPosition = () => {
-      const tooltipWidth = 270;
-      const offset = 20; // Offset from the target area
-      const offsetOuter = 20; // Offset from outer screen border
-      const tooltipHeight = tooltipRef.current.offsetHeight;
-      let position = "right";
-
-      // Default tooltip positioning: right of the target area and vertically centered
-      let top = rect.top + window.scrollY + rect.height / 2 - tooltipHeight / 2;
-      let left = rect.left + window.scrollX + rect.width + offset;
-      let minSpaceOver = {
-        side: "right",
-        amount: left + tooltipWidth - document.documentElement.clientWidth,
-      };
-
-      // Default arrow positioning: pointing left, centered vertically
-      let arrowTop = top + tooltipHeight / 2 - arrowSize / 2;
-      let arrowLeft = left - arrowSize / 2;
-
-      // Check if tooltip goes out of viewport on the right
-      if (left + tooltipWidth > document.documentElement.clientWidth) {
-        position = "left";
-        left = rect.left + window.scrollX - tooltipWidth - offset; // Reposition to the left of the target area
-        arrowLeft = left + tooltipWidth - arrowSize / 2; // Arrow pointing right
-
-        if (minSpaceOver.amount > Math.abs(left)) {
-          minSpaceOver.amount = Math.abs(left);
-          minSpaceOver.side = "left";
-        }
-      }
-
-      // Check if tooltip goes out of viewport on the left
-      if (left < 0) {
-        left = (2 * (rect.left + window.scrollX) + rect.width) / 2 - tooltipWidth / 2; // Adjust to fit within the viewport
-        arrowLeft = left + tooltipWidth / 2 - arrowSize / 2; // Arrow centered horizontally
-
-        position = "top";
-        top = rect.top + window.scrollY - tooltipHeight - offset; // If tooltip cannot fit on both the left and right, try it on top
-        arrowTop = top + tooltipHeight - arrowSize / 2; // Arrow pointing down
-      }
-
-      // Check if tooltip goes out of viewport vertically above
-      if (top < offsetOuter) {
-        // if its positioned right or left
-        if (position === "right" || position === "left") {
-          top = rect.top + window.scrollY - offset / 2;
-          arrowTop = rect.top + rect.height / 2 + window.scrollY - offset / 2;
-          if (
-            top + tooltipHeight + offsetOuter + 40 >
-            window.scrollY + document.documentElement.clientHeight
-          ) {
-            top = window.scrollY + document.documentElement.clientHeight - offset - tooltipHeight;
-          }
-        } // else if its positioned directly above
-        else {
-          // if it can't fit on bottom neither (i.e. can't fit anywhere on the page)
-          if (
-            rect.top + window.scrollY + rect.height + offset + tooltipHeight >
-            window.scrollY + document.documentElement.clientHeight
-          ) {
-            if (minSpaceOver.side === "right") {
-              // Tooltip positioning: right side of the page area and vertically centered
-              top = rect.top + window.scrollY + rect.height / 2 - tooltipHeight / 2;
-              left = window.scrollX - rect.width - offset;
-
-              // Arrow positioning: pointing left, centered vertically
-              arrowTop = top + tooltipHeight / 2 - arrowSize / 2;
-              arrowLeft = left - arrowSize / 2;
-            } else if (minSpaceOver.side === "left") {
-              // Tooltip positioning: left side of the page area and vertically centered
-              top = rect.top + window.scrollY + rect.height / 2 - tooltipHeight / 2;
-              left = offset;
-
-              // Arrow positioning: pointing right, centered vertically
-              arrowTop = top + tooltipHeight / 2 - arrowSize / 2;
-              arrowLeft = tooltipWidth + offset - arrowSize / 2;
-            }
-          } // else if we can position directly below
-          else {
-            top = rect.top + window.scrollY + rect.height + offset;
-            arrowTop = top - arrowSize / 2; // Arrow pointing up
-          }
-        }
-      }
-
-      // if it goes out vertically below after final positioning
+    const handlePositioning = () => {
+      // Only change positions if target element has changed
       if (
-        top + tooltipHeight + offsetOuter >
-        window.scrollY + document.documentElement.clientHeight
+        prevRectPositionRef.current.top !== rect.top ||
+        prevRectPositionRef.current.left !== rect.left ||
+        prevRectPositionRef.current.height !== rect.height ||
+        prevRectPositionRef.current.width !== rect.width
       ) {
-        top = window.scrollY + document.documentElement.clientHeight - offset - tooltipHeight;
-        arrowTop = rect.top + rect.height / 2 + window.scrollY - offset / 2;
+        updateTooltipPosition(rect);
+        updateTargetAreaPosition(rect);
+        prevRectPositionRef.current = {
+          top: rect.top,
+          left: rect.left,
+          height: rect.height,
+          width: rect.width,
+        };
       }
-
-      // if the tooltip is busy changing, don't allow refresh interval to interfere - just leave final if statement if you get rid of the interval updates
-      // if (tooltipChanging) {
-      //   setTooltipPosition({ top, left });
-      //   setTooltipArrowPosition({ top: arrowTop, left: arrowLeft });
-      //   setTimeout(() => {
-      //     setTooltipChanging(false);
-      //   }, 600);
-      // } else {
-      setTooltipPosition({ top, left });
-      setTooltipArrowPosition({ top: arrowTop, left: arrowLeft });
-      // }
     };
+    handlePositioning();
 
-    updateTooltipPosition();
-    updateTargetAreaPosition();
+    // Use MutationObserver to detect changes in the DOM
+    const observer = new MutationObserver(() => {
+      handlePositioning();
+    });
 
-    window.addEventListener("resize", updateTooltipPosition);
-    window.addEventListener("resize", updateTooltipPosition);
-    window.addEventListener("click", updateTargetAreaPosition);
-    window.addEventListener("click", updateTargetAreaPosition);
+    // Observe changes to the entire document
+    observer.observe(document.body, { childList: true, subtree: true });
+    window.addEventListener("resize", handlePositioning);
+    window.addEventListener("click", handlePositioning);
 
     const handleAction = () => {
       if (type === "action") {
@@ -239,13 +251,11 @@ const Tooltip = ({
       if (type === "action") {
         targetElement.removeEventListener("click", handleAction);
       }
-      window.removeEventListener("resize", updateTooltipPosition);
-      window.removeEventListener("resize", updateTooltipPosition);
-      window.removeEventListener("click", updateTargetAreaPosition);
-      window.removeEventListener("click", updateTargetAreaPosition);
+      observer.disconnect();
+      window.removeEventListener("resize", handlePositioning);
+      window.removeEventListener("click", handlePositioning);
     };
-  }, [targetEl, targetAreaEl, type, onNext, onBack, tooltipNo, refreshInterval]);
-  // ***** I think try to remove all these and just leave one like the targetEl to prevent so many refreshes. And do the same with all useEffects and stuff
+  }, [targetEl, refreshInterval]);
 
   // Scroll to tooltip automatically
   useLayoutEffect(() => {
@@ -324,10 +334,8 @@ const Tooltip = ({
   }, [tooltipNo]);
 
   const handleTooltipChanging = () => {
-    console.log("Tooltip changing:", true);
     setTooltipChanging(true);
     setTimeout(() => {
-      console.log("Tooltip changing:", false);
       setTooltipChanging(false);
     }, 0);
   };
