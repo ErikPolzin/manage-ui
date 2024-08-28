@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Box, Button, InputAdornment, TextField, Typography } from "@mui/material";
 import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
@@ -9,15 +9,31 @@ import DocumentationMarkdownRenderer from "./DocumentationMarkdownRenderer";
 import SearchResults from "./SearchResults";
 
 const Documentation = ({ documentationData, isOpen, toggleIsOpen, canSlideOut = true }) => {
+  console.log("Rerendering documentation");
   const [selectedPage, setSelectedPage] = useState(null);
   const [searchValue, setSearchValue] = useState("");
+  const [loadedDocPages, setLoadedDocPages] = useState([]);
+
+  // Render all the documentation once in the beginning to increase performance
+  useEffect(() => {
+    const docPages = documentationData.map((docPage) => {
+      return {
+        data: docPage,
+        component: (
+          <DocumentationMarkdownRenderer text={docPage.content}></DocumentationMarkdownRenderer>
+        ),
+      };
+    });
+    console.log(docPages);
+    setLoadedDocPages(docPages);
+  }, []);
 
   const toggleSlideOut = () => {
     toggleIsOpen();
   };
 
-  const handlePageSelection = (docPage) => {
-    setSelectedPage(docPage);
+  const handlePageSelection = (pageNo) => {
+    setSelectedPage(pageNo);
   };
 
   const handleSelectSearchResult = (focusDocumentation) => {
@@ -152,7 +168,7 @@ const Documentation = ({ documentationData, isOpen, toggleIsOpen, canSlideOut = 
           }}
         >
           <Typography variant="h4" sx={{ color: "white" }}>
-            {selectedPage ? selectedPage.pageName : "Pages"}
+            {selectedPage !== null ? loadedDocPages[selectedPage].data.pageName : "Pages"}
           </Typography>
           <TextField
             id="search-input-field"
@@ -209,7 +225,9 @@ const Documentation = ({ documentationData, isOpen, toggleIsOpen, canSlideOut = 
         >
           <SearchResults
             searchValue={searchValue}
-            documentationData={selectedPage ? [{ ...selectedPage }] : documentationData}
+            documentationData={
+              selectedPage !== null ? [{ ...loadedDocPages[selectedPage].data }] : documentationData
+            }
             setFocusDocumentation={(focusDoc) => {
               handleSelectSearchResult(focusDoc);
             }}
@@ -229,22 +247,22 @@ const Documentation = ({ documentationData, isOpen, toggleIsOpen, canSlideOut = 
             id="doc-container"
             sx={{ width: "100%", height: "100%", backgroundColor: "#F7F7F7" }}
           >
-            {!selectedPage && (
+            {selectedPage === null && (
               <Box id="doc-main-page-container">
-                {documentationData.map((docPage) => (
+                {documentationData.map((docPage, index) => (
                   <Button
                     key={docPage.pageId}
                     id={docPage.pageId}
                     variant="outlined"
                     sx={{ display: "block", margin: "10px 0" }}
-                    onClick={() => handlePageSelection(docPage)}
+                    onClick={() => handlePageSelection(index)}
                   >
                     {docPage.pageName}
                   </Button>
                 ))}
               </Box>
             )}
-            {selectedPage && (
+            {selectedPage !== null && (
               <Box
                 id={"documentation-page-container"}
                 sx={{
@@ -309,9 +327,7 @@ const Documentation = ({ documentationData, isOpen, toggleIsOpen, canSlideOut = 
                     },
                   }}
                 >
-                  <DocumentationMarkdownRenderer
-                    text={selectedPage.content}
-                  ></DocumentationMarkdownRenderer>
+                  {loadedDocPages[selectedPage].component}
                 </Box>
               </Box>
             )}

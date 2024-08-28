@@ -4,9 +4,6 @@ import { BrowserRouter as Router, useNavigate, useLocation } from "react-router-
 
 const InteractiveGuide = ({ guide, onExit, onComplete }) => {
   const [currentStep, setCurrentStep] = useState(0);
-  const [tooltipChanging, setTooltipChanging] = useState(true);
-  const [walkthroughActive, setWalkthroughActive] = useState(true);
-
   const navigate = useNavigate();
   const { pathname: currentPath } = useLocation(); // Destructure pathname from useLocation
 
@@ -42,14 +39,6 @@ const InteractiveGuide = ({ guide, onExit, onComplete }) => {
       setCurrentStep((prevStep) => prevStep - 1);
     }
     console.log("previous step called");
-  };
-
-  // helps to rerender tooltip for animating new tooltip appearing
-  const handleTootlipChange = () => {
-    setTimeout(() => {
-      navigateToPage();
-      setTooltipChanging(false);
-    }, 5);
   };
 
   return (

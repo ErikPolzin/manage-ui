@@ -728,7 +728,7 @@ const ResourceCircle = ({
                     },
                   }}
                 >
-                  {focusDocumentation && (
+                  {isOpen && searchToolMenuOpen && focusDocumentation && (
                     <DocumentationRenderer
                       text={focusDocumentation.content}
                     ></DocumentationRenderer>
