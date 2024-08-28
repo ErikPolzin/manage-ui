@@ -220,7 +220,7 @@ const Tooltip = ({
         };
       }
     };
-    handlePositioning(); // Interval update
+    handlePositioning();
 
     // Use MutationObserver to detect changes in the DOM
     const observer = new MutationObserver(() => {

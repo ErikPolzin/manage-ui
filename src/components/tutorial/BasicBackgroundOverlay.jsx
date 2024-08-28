@@ -5,6 +5,7 @@ const BasicBackgroundOverlay = ({ focusElement }) => {
   return (
     <Box
       id="completion-screen-overlay"
+      data-testid="completion-screen-overlay"
       position="fixed"
       display="flex"
       justifyContent="center"

@@ -84,6 +84,7 @@ const TooltipOverlay = ({ targetAreaEl, areaClickable = true, willScroll = true 
 
   return (
     <Box
+      role="tooltip-overlay"
       sx={{
         position: "fixed",
         top: 0,
@@ -102,6 +103,7 @@ const TooltipOverlay = ({ targetAreaEl, areaClickable = true, willScroll = true 
         <>
           <Box
             id="topRect"
+            data-testid="topRect"
             sx={{
               position: "absolute",
               left: 0,
@@ -111,12 +113,13 @@ const TooltipOverlay = ({ targetAreaEl, areaClickable = true, willScroll = true 
               backgroundColor: "rgba(0, 0, 0, 0.2)",
               pointerEvents: "all", // elements behind overlay not clickable
               transition: !willScroll
-                ? "width 0.5s ease-in-out, height 0.5s ease-in-out, left 0.5s ease-in-out, top 0.5s ease-in-out"
+                ? "width 0.5s ease-in-out,height 0.5s ease-in-out,left 0.5s ease-in-out,top 0.5s ease-in-out"
                 : "none",
             }}
           />
           <Box
             id="leftRect"
+            data-testid="leftRect"
             sx={{
               position: "absolute",
               left: 0,
@@ -133,6 +136,7 @@ const TooltipOverlay = ({ targetAreaEl, areaClickable = true, willScroll = true 
 
           <Box
             id="rightRect"
+            data-testid="rightRect"
             sx={{
               position: "absolute",
               left: `${targetAreaPos.left + targetAreaPos.width + areaOffset}px`,
@@ -149,6 +153,7 @@ const TooltipOverlay = ({ targetAreaEl, areaClickable = true, willScroll = true 
 
           <Box
             id="bottomRect"
+            data-testid="bottomRect"
             sx={{
               position: "absolute",
               left: `0px`,

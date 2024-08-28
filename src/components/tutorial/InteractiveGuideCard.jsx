@@ -103,6 +103,7 @@ const InteractiveGuideCard = ({ guideNo, guideName, progress }) => {
           ></Box>
           <Box
             id="guide-progressbar"
+            data-testid="guide-progressbar"
             height="100%"
             width={`${progress}%`}
             sx={{

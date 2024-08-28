@@ -88,6 +88,7 @@ const parseDocumentation = (text) => {
                 title={content}
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
+                role="iframe"
               ></iframe>
             </Box>,
           );

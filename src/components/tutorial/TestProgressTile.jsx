@@ -9,7 +9,6 @@ import {
   ListItemText,
   ListItemIcon,
 } from "@mui/material";
-import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 import FastForwardIcon from "@mui/icons-material/FastForward";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
@@ -267,11 +266,12 @@ const TestProgressTile = ({
               onClick={() => setIsExpanded(!isExpanded)}
               sx={{ color: "white", padding: 0, margin: 0 }}
               size="medium"
+              aria-label={isExpanded ? "expand more" : "expand less"}
             >
               {isExpanded ? (
-                <ExpandMoreIcon fontSize="medium" />
+                <ExpandMoreIcon aria-label="expand more" fontSize="medium" />
               ) : (
-                <ExpandLessIcon fontSize="medium" />
+                <ExpandLessIcon aria-label="expand less" fontSize="medium" />
               )}
             </IconButton>
           </Box>
@@ -312,6 +312,7 @@ const TestProgressTile = ({
             >
               <Box
                 id="progress-bar-inner"
+                data-testid="progress-bar-inner"
                 sx={{
                   opacity: isExpanded ? 1 : 0,
                   width: isExpanded ? progressBarWidth : 0,

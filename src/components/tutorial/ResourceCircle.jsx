@@ -22,9 +22,9 @@ import InfoIcon from "./InfoIcon";
 import { BrowserRouter as Router, useNavigate, useLocation } from "react-router-dom";
 import { usePersistantState } from "./hooks";
 import DocumentationRenderer from "./DocumentationMarkdownRenderer";
-import documentationData from "../../tutorialData/documentationData";
+import documentationData from "./tutorialData/documentationData";
 import SearchResults from "./SearchResults";
-import guidesData from "../../tutorialData/interactiveGuidesData";
+import guidesData from "./tutorialData/interactiveGuidesData";
 
 const ResourceCircle = ({
   circleIconName,

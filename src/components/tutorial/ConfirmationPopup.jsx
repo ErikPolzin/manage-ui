@@ -1,5 +1,5 @@
 import { Box, Button, Typography } from "@mui/material";
-import React, { useState } from "react";
+import React from "react";
 
 const ConfirmationPopup = ({
   title,
@@ -11,6 +11,7 @@ const ConfirmationPopup = ({
 }) => {
   return (
     <Box
+      data-testid="confirmation-popup"
       position="fixed"
       display="flex"
       justifyContent="center"

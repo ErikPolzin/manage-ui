@@ -163,6 +163,7 @@ const TutorialMenu = ({
         <MenuIcon fontSize="small" />
         <Box
           id="circle-exit-overlay"
+          data-testid="circle-exit-overlay"
           onClick={(e) => {
             e.stopPropagation();
             setIsOpen(false);
@@ -204,6 +205,7 @@ const TutorialMenu = ({
       </Box>
       <Box
         id="menu-rectangle-header"
+        data-testid="menu-rectangle-header"
         zIndex={1000000005}
         onClick={(e) => {
           e.stopPropagation();
@@ -258,6 +260,7 @@ const TutorialMenu = ({
       </Box>
       <Box
         id="popup-box-container"
+        data-testid="popup-box-container"
         zIndex={1000000005}
         sx={{
           position: "fixed",
@@ -356,8 +359,9 @@ const TutorialMenu = ({
               return (
                 <Box
                   ref={index === stageNo ? focusedStageRef : null} // Assign ref to the focused stage
+                  id={index === stageNo ? `typo-stage-index-focus` : `typo-stage-index${index}`}
+                  data-testid={index === stageNo ? "focused-stage" : ``}
                   sx={{
-                    id: index === stageNo ? `typo-stage-index-focus` : `typo-stage-index${index}`,
                     display: "flex",
                     justifyContent: "left",
                     alignItems: "center",
@@ -453,6 +457,8 @@ const TutorialMenu = ({
         >
           <Button
             //variant="contained"
+            id="exit-button"
+            data-testid="exit-button"
             size="small"
             height={"100%"}
             endIcon={<ExitToAppIcon />}
