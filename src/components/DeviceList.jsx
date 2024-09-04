@@ -19,6 +19,8 @@ import { alpha, useTheme } from "@mui/material";
 import humanizeDuration from "humanize-duration";
 import DeviceDialog from "./dialogs/DeviceDialog";
 import ConnectedClientsList from "./ConnectedClientsList";
+import { fetchAPI } from "../keycloak";
+import { MeshContext } from "../context";
 
 function DeviceList({
   devices,
@@ -36,6 +38,7 @@ function DeviceList({
   const [deviceToEdit, setDeviceToEdit] = React.useState(null);
   const apiRef = useGridApiRef();
   const theme = useTheme();
+  const { mesh } = React.useContext(MeshContext);
 
   function isExpanded(pid) {
     return expandedIds.indexOf(pid) !== -1;
@@ -108,6 +111,12 @@ function DeviceList({
     setDeviceToEdit(device);
     setOpenDeviceDialog(true);
   };
+
+  const adoptDevice = (device) => {
+    if (!mesh) return;
+    device.mesh = mesh.name;
+    fetchAPI(`/monitoring/devices/${device.mac}/`, "PUT", device);
+  }
 
   function DataGridTitle() {
     return (
@@ -212,7 +221,7 @@ function DeviceList({
                   variant="contained"
                   fullWidth
                   size="small"
-                  onClick={() => handleEditClick(findDevice(params.row.mac))}
+                  onClick={() => adoptDevice(findDevice(params.row.mac))}
                 >
                   Adopt
                 </Button>
