@@ -19,7 +19,7 @@ import DeviceDetailCard from "../components/DeviceDetailCard";
 import { MS_IN } from "../components/graphs/utils";
 import { useQueryState } from "../hooks";
 import { fetchAPI } from "../keycloak";
-import { ApiSocketContext } from "../context";
+import { ApiSocketContext, MeshContext } from "../context";
 
 function GraphTabPanel({ children, value, index, ...other }) {
   return (
@@ -53,6 +53,7 @@ function DevicePage() {
   const [showDays, setShowDays] = React.useState("month");
   const [tabValue, setTabValue] = React.useState(0);
   const { lastJsonMessage } = React.useContext(ApiSocketContext);
+  const { mesh } = React.useContext(MeshContext);
 
   // Run when a new WebSocket message is received (lastJsonMessage)
   React.useEffect(() => {
@@ -71,8 +72,9 @@ function DevicePage() {
   React.useEffect(() => setMinTime(new Date() - MS_IN[showDays]), [showDays]);
 
   React.useEffect(() => {
-    fetchDevices();
-  }, []);
+    if (!mesh) return;
+    fetchDevices(mesh.name);
+  }, [mesh]);
 
   const selectedDevice = React.useMemo(() => {
     for (let device of devices) {
@@ -85,11 +87,11 @@ function DevicePage() {
     setAlert({ show: false, message: "", type: "success" });
   };
 
-  const fetchDevices = () => {
+  const fetchDevices = (meshName) => {
     setError(null); // Clear any existing errors
     // Fetch list of mesh nodes
     setLoading(true);
-    fetchAPI("/monitoring/devices/")
+    fetchAPI(`/monitoring/devices/?mesh=${meshName}`)
       .then((data) => {
         setDevices(data);
       })
