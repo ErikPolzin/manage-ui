@@ -32,6 +32,7 @@ const WalkthroughCompleteTile = ({ stageNo, onTakeTest, onRedoWalkthrough, onSki
   return (
     <>
       <Box
+        id="walkthrough-complete-tile"
         sx={{
           position: "absolute",
           zIndex: 1000000000,

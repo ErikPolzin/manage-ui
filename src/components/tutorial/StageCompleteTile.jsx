@@ -89,7 +89,10 @@ const StageCompleteCard = ({ stageNo, stageName, onContinue }) => {
       >
         {`Stage ${stageNo} - ${stageName}`}
       </Typography>
-      <Box display="flex" justifyContent="center" alignItems="center">
+      <Box
+        id="stage-complete-card-continue-button"
+        sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}
+      >
         <Button
           variant="contained"
           size="small"

@@ -42,10 +42,20 @@ const ConfirmationPopup = ({
           justifyContent="flex-end"
           marginTop="20px"
         >
-          <Button onClick={onCancel} color="primary" sx={{ padding: 0, marginRight: "20px" }}>
+          <Button
+            id="confirmation-popup-cancel-button"
+            onClick={onCancel}
+            color="primary"
+            sx={{ padding: 0, marginRight: "20px" }}
+          >
             {cancelBtnText}
           </Button>
-          <Button onClick={onConfirm} color="primary" sx={{ padding: 0 }}>
+          <Button
+            id="confirmation-popup-confirm-button"
+            onClick={onConfirm}
+            color="primary"
+            sx={{ padding: 0 }}
+          >
             {confirmBtnText}
           </Button>
         </Box>

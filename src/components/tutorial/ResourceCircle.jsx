@@ -22,9 +22,7 @@ import InfoIcon from "./InfoIcon";
 import { BrowserRouter as Router, useNavigate, useLocation } from "react-router-dom";
 import { usePersistantState } from "./hooks";
 import DocumentationRenderer from "./DocumentationMarkdownRenderer";
-import documentationData from "./tutorialData/documentationData";
 import SearchResults from "./SearchResults";
-import guidesData from "./tutorialData/interactiveGuidesData";
 
 const ResourceCircle = ({
   circleIconName,
@@ -35,6 +33,7 @@ const ResourceCircle = ({
   circleBorder = "none",
   guides,
   infoIcons,
+  documentationData,
   openDocumentation,
 }) => {
   positionX = positionX !== "right" && positionX !== "left" ? "left" : positionX;
@@ -60,6 +59,7 @@ const ResourceCircle = ({
   const [searchToolMenuOpen, setSearchToolMenuOpen] = useState(false);
   const [helpIconsMenuOpen, setHelpIconsMenuOpen] = useState(false);
 
+  const [interactiveGuides, setInteractiveGuides] = useState([]);
   const [searchValue, setSearchValue] = useState("");
   const [focusDocumentation, setFocusDocumentation] = useState(null);
 
@@ -74,13 +74,12 @@ const ResourceCircle = ({
   const { pathname: currentPath } = useLocation(); // Destructure pathname from useLocation
   const navigate = useNavigate();
 
+  // Interactive guides start on a particular page
   const navigateToPage = (targetPage) => {
     if (navigate) {
       // Only navigate if the target page is different from the current path
       if (currentPath !== targetPage) {
         navigate(targetPage);
-      } else {
-        //console.log("Already on the correct page:", currentPath);
       }
     } else {
       console.warn(
@@ -89,14 +88,12 @@ const ResourceCircle = ({
     }
   };
 
-  // to track progress of interactive guides
-  const interactiveGuides = guides.map((guide, index) => ({
-    id: index,
-    ...guide,
-    progress: 0,
-  }));
-
-  const isGuidesOnOtherPages = interactiveGuides.some((guide) => guide.page !== currentPath);
+  // Are there guides on other pages
+  const [isGuidesOnOtherPages, setIsGuidesOnOtherPage] = useState(false);
+  useEffect(() => {
+    setInteractiveGuides(guides);
+    setIsGuidesOnOtherPage(guides.some((guide) => guide.starting_page !== currentPath));
+  }, [guides]);
 
   // Get the width of the circle menu
   useLayoutEffect(() => {
@@ -529,7 +526,7 @@ const ResourceCircle = ({
                 }}
               >
                 {interactiveGuides.reduce((acc, guide) => {
-                  if (guide.page === currentPath) {
+                  if (guide.starting_page === currentPath) {
                     acc.push(
                       <Box
                         key={guide.name}
@@ -543,7 +540,7 @@ const ResourceCircle = ({
                         <InteractiveGuideCard
                           guideNo={acc.length + 1} // Sequential index
                           guideName={guide.name}
-                          progress={guide.progress}
+                          progress={0}
                         />
                       </Box>,
                     );
@@ -564,7 +561,7 @@ const ResourceCircle = ({
                       Guides on other pages
                     </Typography>
                     {interactiveGuides
-                      .filter((guide) => guide.page !== currentPath)
+                      .filter((guide) => guide.starting_page !== currentPath)
                       .map((guide, index) => (
                         <Box
                           key={index}
@@ -578,7 +575,7 @@ const ResourceCircle = ({
                           <InteractiveGuideCard
                             guideNo={index + 1}
                             guideName={guide.name}
-                            progress={guide.progress}
+                            progress={0}
                           />
                         </Box>
                       ))}
@@ -652,7 +649,7 @@ const ResourceCircle = ({
               >
                 <SearchResults
                   searchValue={searchValue}
-                  guidesData={guidesData}
+                  guidesData={interactiveGuides}
                   handleGuideSelect={handleGuideSelection}
                   documentationData={documentationData}
                   setFocusDocumentation={setFocusDocumentation}
@@ -746,6 +743,7 @@ const ResourceCircle = ({
                   }}
                 >
                   <Button
+                    id="open-full-docs-button"
                     variant="text"
                     size="small"
                     endIcon={<ArrowForwardIcon sx={{ fontSize: "small" }} />}
@@ -819,7 +817,7 @@ const ResourceCircle = ({
         infoIcons.map((infoIcon, index) => {
           return (
             <InfoIcon
-              targetEl={helpIconsEnabled ? infoIcon.targetElement : "acegikmoqsuwyz"}
+              targetEl={helpIconsEnabled ? infoIcon.target_element_id : "acegikmoqsuwyz"}
               title={infoIcon.title}
               body={infoIcon.body}
             ></InfoIcon>

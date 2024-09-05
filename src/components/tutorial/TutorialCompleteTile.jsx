@@ -48,7 +48,7 @@ const TutorialCompleteTile = ({
 
   return (
     <>
-      <Paper style={style} elevation={3}>
+      <Paper style={style} elevation={3} id="tutorial-complete-tile">
         <Typography
           sx={{
             width: "100%",
@@ -90,6 +90,7 @@ const TutorialCompleteTile = ({
         </Box>
         <Box display="flex" justifyContent="center" alignItems="center">
           <Button
+            id="finish-tutorial-button"
             variant="contained"
             size="small"
             onClick={onExit}

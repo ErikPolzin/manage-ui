@@ -169,8 +169,8 @@ const Tooltip = ({
 
   // Positioning the tooltip
   useEffect(() => {
-    const targetElement = document.querySelector(targetEl);
-    const targetAreaElement = document.querySelector(targetAreaEl);
+    const targetElement = document.getElementById(targetEl);
+    const targetAreaElement = document.getElementById(targetAreaEl);
 
     if (!tooltipRef.current) {
       return;
@@ -393,6 +393,8 @@ const Tooltip = ({
         <Paper id="tooltip" ref={tooltipRef} style={tooltipStyle} elevation={3}>
           {canExit && (
             <CloseIcon
+              id="tooltip-exit-button"
+              data-testid="tooltip-exit-button"
               onClick={onExit}
               sx={{
                 position: "absolute",
@@ -422,6 +424,7 @@ const Tooltip = ({
                 {canGoBack && (
                   <IconButton
                     id="tooltip-back-button"
+                    data-testid="tooltip-back-button"
                     onClick={() => {
                       setChangedTooltipSince(true);
                       handleTooltipChanging();

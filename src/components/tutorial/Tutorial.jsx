@@ -61,19 +61,19 @@ const Tutorial = ({
     const currentTooltips = tutorial[currentStage].tooltips;
     if (currentStep < currentTooltips.length - 1) {
       // Move to next tooltip
-      navigateToPage(tutorialContent[currentStage].tooltips[currentStep + 1].page);
+      navigateToPage(tutorial[currentStage].tooltips[currentStep + 1].page);
       setCurrentStep((prevStep) => prevStep + 1);
     } else {
       if (currentStage < tutorial.length - 1) {
         // Stage complete - Move to test
         setWalkthroughActive(false);
-        tutorial[currentStage].test.length > 0
+        tutorial[currentStage].test_tasks.length > 0
           ? setWalkthroughCompleteIntermission(true)
           : setStageCompleteIntermission1(true);
       } else {
         setWalkthroughActive(false);
 
-        if (tutorial[currentStage].test.length > 0) {
+        if (tutorial[currentStage].test_tasks.length > 0) {
           // if there is a test for your last stage
           setWalkthroughCompleteIntermission(true);
         } else {
@@ -88,13 +88,13 @@ const Tutorial = ({
 
   const prevStep = () => {
     if (currentStep > 0) {
-      navigateToPage(tutorialContent[currentStage].tooltips[currentStep - 1].page);
+      navigateToPage(tutorial[currentStage].tooltips[currentStep - 1].page);
       setCurrentStep((prevStep) => prevStep - 1);
     }
   };
 
   const nextTestStep = () => {
-    const currentTasks = tutorial[currentStage].test;
+    const currentTasks = tutorial[currentStage].test_tasks;
 
     if (currentTask < currentTasks.length - 1) {
       // All click elements complete - Move to next task
@@ -122,7 +122,7 @@ const Tutorial = ({
   const handleStartScreen2Next = () => {
     setStartingScreen2(false);
     setWalkthroughActive(true);
-    navigateToPage(tutorialContent[currentStage].tooltips[0].page);
+    navigateToPage(tutorial[currentStage].tooltips[0].page);
   };
 
   const handleTakeTest = () => {
@@ -134,7 +134,7 @@ const Tutorial = ({
     setWalkthroughCompleteIntermission(false);
     setCurrentStep(0);
     setWalkthroughActive(true);
-    navigateToPage(tutorialContent[currentStage].tooltips[0].page);
+    navigateToPage(tutorial[currentStage].tooltips[0].page);
   };
 
   const handleSkipTest = () => {
@@ -152,7 +152,7 @@ const Tutorial = ({
     setCurrentStep(0);
     setCurrentStage((prevStage) => prevStage + 1);
     setWalkthroughActive(true);
-    navigateToPage(tutorialContent[currentStage].tooltips[0].page);
+    navigateToPage(tutorial[currentStage].tooltips[0].page);
   };
 
   const handleStageContinue1 = () => {
@@ -175,7 +175,7 @@ const Tutorial = ({
     resetTest();
     setTutorialComplete(false);
     setWalkthroughActive(true);
-    navigateToPage(tutorialContent[currentStage].tooltips[0].page);
+    navigateToPage(tutorial[currentStage].tooltips[0].page);
 
     // and then not updating the stage
   };
@@ -233,7 +233,7 @@ const Tutorial = ({
         positionY="top"
         positionX="right"
         tutorialName={tutorialName}
-        stages={tutorial.map((stage) => stage.stageName)}
+        stages={tutorial.map((stage) => stage.name)}
         stageNo={currentStage}
         onExit={handleExitTutorial}
         onRedoStage={handleRedoStage}
@@ -260,7 +260,7 @@ const Tutorial = ({
           focusElement={
             <IntroTile2
               logoSrc={logoSrc}
-              stages={tutorial.map((stage) => stage.stageName)}
+              stages={tutorial.map((stage) => stage.name)}
               onNext={handleStartScreen2Next}
               onExit={handleExitTutorial}
             />
@@ -271,8 +271,8 @@ const Tutorial = ({
       {walkthroughActive && (
         <Tooltip
           type={tutorial[currentStage].tooltips[currentStep].type}
-          targetEl={tutorial[currentStage].tooltips[currentStep].targetElement}
-          targetAreaEl={tutorial[currentStage].tooltips[currentStep].targetAreaElement}
+          targetEl={tutorial[currentStage].tooltips[currentStep].target_element_id}
+          targetAreaEl={tutorial[currentStage].tooltips[currentStep].target_area_element_id}
           title={tutorial[currentStage].tooltips[currentStep].title}
           content={tutorial[currentStage].tooltips[currentStep].content}
           canGoBack={currentStep !== 0}
@@ -285,11 +285,11 @@ const Tutorial = ({
 
       {testActive && (
         <TestProgressTile
-          stageName={tutorial[currentStage].stageName}
+          stageName={tutorial[currentStage].name}
           stageNo={currentStage}
-          taskNames={tutorial[currentStage].test.map((task) => task.text)}
+          taskNames={tutorial[currentStage].test_tasks.map((task) => task.description)}
           currentTaskNo={currentTask}
-          currentTask={tutorial[currentStage].test[currentTask]}
+          currentTask={tutorial[currentStage].test_tasks[currentTask]}
           onNext={nextTestStep}
           onSkipTest={handleSkipTest}
         ></TestProgressTile>
@@ -313,7 +313,7 @@ const Tutorial = ({
           focusElement={
             <StageCompleteCard
               stageNo={currentStage + 1}
-              stageName={tutorial[currentStage].stageName}
+              stageName={tutorial[currentStage].name}
               onContinue={handleStageContinue1}
             />
           }
@@ -324,7 +324,7 @@ const Tutorial = ({
           focusElement={
             <TutorialProgressTile
               tutorialName={tutorialName}
-              stages={tutorial.map((stage) => stage.stageName)}
+              stages={tutorial.map((stage) => stage.name)}
               nextStageNo={currentStage + 1}
               onExit={handleExitTutorial}
               onContinue={handleStageContinue2}
@@ -341,7 +341,7 @@ const Tutorial = ({
             <TutorialCompleteTile
               tutorialName={tutorialName}
               prevStageNo={currentStage + 1}
-              prevStageName={tutorial[currentStage].stageName}
+              prevStageName={tutorial[currentStage].name}
               onExit={handleExitTutorial}
               onRedoStage={handleRedoStage}
               onRestartTutorial={handleRestartTutorial}

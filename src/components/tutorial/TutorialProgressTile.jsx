@@ -225,7 +225,14 @@ const TutorialProgressTile = ({
           alignItems="center"
           marginBottom="3px"
         >
-          <Box display="flex" justifyContent="center" alignItems="center" marginBottom={"5px"}>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              marginBottom: "5px",
+            }}
+          >
             <Button
               variant="contained"
               className="buttons-appear"
@@ -266,6 +273,7 @@ const TutorialProgressTile = ({
               Redo stage
             </Button>
             <Button
+              id="skip-stage-button"
               className="buttons-appear"
               size="small"
               endIcon={<FastForwardIcon fontSize="0.7rem" />}

@@ -33,7 +33,7 @@ const TooltipOverlay = ({ targetAreaEl, areaClickable = true, willScroll = true 
   };
 
   useLayoutEffect(() => {
-    const targetAreaElement = document.querySelector(targetAreaEl);
+    const targetAreaElement = document.getElementById(targetAreaEl);
     if (!targetAreaElement) {
       setTargetElementFound(false);
       return;

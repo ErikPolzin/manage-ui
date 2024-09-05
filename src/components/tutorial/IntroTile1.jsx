@@ -15,6 +15,7 @@ const IntroTile1 = ({ logoSrc, tutorialName, description, onNext }) => {
 
   return (
     <Box
+      id="intro-tile-1"
       sx={{
         position: "absolute",
         zIndex: 1000000000,
@@ -102,6 +103,7 @@ const IntroTile1 = ({ logoSrc, tutorialName, description, onNext }) => {
       </Typography>
 
       <Button
+        id="intro-tile-1-next-button"
         variant="contained"
         onClick={onNext}
         sx={{

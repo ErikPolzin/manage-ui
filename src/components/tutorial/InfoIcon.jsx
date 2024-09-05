@@ -1,6 +1,6 @@
 import { CssBaseline, Typography } from "@mui/material";
 import { Box } from "@mui/system";
-import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 const InfoIcon = ({ targetEl, title, body }) => {
   const infoIconSize = 15;
@@ -105,34 +105,52 @@ const InfoIcon = ({ targetEl, title, body }) => {
   // Icon positioning logic
   const updatePositions = (targetElement, hasFixedPos) => {
     const rect = targetElement.getBoundingClientRect();
-    let left;
-    let top;
+
+    // Position the icon
+    let iconLeft;
+    let iconTop;
 
     // If fixed positioning, do not use window.scroll for positioning
     if (hasFixedPos) {
-      left =
+      iconLeft =
         rect.left + rect.width - infoIconSize > document.documentElement.scrollWidth
           ? rect.left + rect.width - infoIconSize
           : rect.left + rect.width - infoIconSize / 2;
-      top = rect.top - infoIconSize / 2;
+      iconTop = rect.top - infoIconSize / 2;
     } else {
-      left =
+      iconLeft =
         rect.left + window.scrollX + rect.width - infoIconSize >
         document.documentElement.scrollWidth
           ? rect.left + window.scrollX + rect.width - infoIconSize
           : rect.left + window.scrollX + rect.width - infoIconSize / 2;
-      top = rect.top + window.scrollY - infoIconSize / 2;
+      iconTop = rect.top + window.scrollY - infoIconSize / 2;
+    }
+
+    // Position the popup box
+    let popupLeft;
+    let popupTop;
+
+    if (iconLeft + (infoBoxWidth + 5) < document.documentElement.clientWidth) {
+      popupLeft = iconLeft + infoIconSize + 5;
+      popupTop = iconTop;
+    } else {
+      popupLeft = iconLeft - (infoBoxWidth + 5);
+      popupTop = iconTop + infoIconSize + 5;
     }
 
     // Only update position and visibility if it has changed
     if (iconRef.current) {
       if (
-        Math.round(left) !== iconRef.current.offsetLeft ||
-        Math.round(top) !== iconRef.current.offsetTop
+        Math.round(iconLeft) !== iconRef.current.offsetLeft ||
+        Math.round(iconTop) !== iconRef.current.offsetTop
       ) {
         setInfoIconPos({
-          left: left,
-          top: top,
+          left: iconLeft,
+          top: iconTop,
+        });
+        setInfoBoxPos({
+          left: popupLeft,
+          top: popupTop,
         });
         setVisible(hiddenByScrollableContainer(targetElement));
       }
@@ -142,7 +160,7 @@ const InfoIcon = ({ targetEl, title, body }) => {
   // Logic for when to update icon positions
   useEffect(() => {
     const handleUpdateInfoIcon = () => {
-      const targetElement = document.querySelector(targetEl);
+      const targetElement = document.getElementById(targetEl);
 
       // If target element not found
       if (!targetElement) {
@@ -194,24 +212,6 @@ const InfoIcon = ({ targetEl, title, body }) => {
     };
   }, [targetEl]);
 
-  // Position the popup box
-  useLayoutEffect(() => {
-    const updateInfoBoxPos = () => {
-      if (infoIconPos.left + (infoBoxWidth + 5) < document.documentElement.clientWidth) {
-        setInfoBoxPos({
-          left: infoIconPos.left + infoIconSize + 5,
-          top: infoIconPos.top,
-        });
-      } else {
-        setInfoBoxPos({
-          left: infoIconPos.left - (infoBoxWidth + 5),
-          top: infoIconPos.top + infoIconSize + 5,
-        });
-      }
-    };
-    updateInfoBoxPos();
-  }, [infoIconPos]);
-
   // Clicking on an info icon
   const handleInfoIconClick = (event) => {
     if (isOpen) {
@@ -227,6 +227,7 @@ const InfoIcon = ({ targetEl, title, body }) => {
         <Box
           zIndex={999999999}
           id="info-icon"
+          data-testid="info-icon"
           onClick={handleInfoIconClick}
           ref={iconRef}
           sx={{

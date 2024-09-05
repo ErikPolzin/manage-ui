@@ -18,6 +18,7 @@ const IntroTile2 = ({ logoSrc = null, stages = [], onNext, onExit }) => {
 
   return (
     <Box
+      id="intro-tile-2"
       ref={tileRef}
       sx={{
         position: "absolute",
@@ -133,6 +134,7 @@ const IntroTile2 = ({ logoSrc = null, stages = [], onNext, onExit }) => {
       <Button
         variant="contained"
         onClick={onNext}
+        id="intro-tile-2-next-button"
         sx={{
           display: "block",
           width: "60%",

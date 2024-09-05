@@ -9,7 +9,6 @@ import DocumentationMarkdownRenderer from "./DocumentationMarkdownRenderer";
 import SearchResults from "./SearchResults";
 
 const Documentation = ({ documentationData, isOpen, toggleIsOpen, canSlideOut = true }) => {
-  console.log("Rerendering documentation");
   const [selectedPage, setSelectedPage] = useState(null);
   const [searchValue, setSearchValue] = useState("");
   const [loadedDocPages, setLoadedDocPages] = useState([]);
@@ -24,9 +23,8 @@ const Documentation = ({ documentationData, isOpen, toggleIsOpen, canSlideOut = 
         ),
       };
     });
-    console.log(docPages);
     setLoadedDocPages(docPages);
-  }, []);
+  }, [documentationData]);
 
   const toggleSlideOut = () => {
     toggleIsOpen();
@@ -135,6 +133,7 @@ const Documentation = ({ documentationData, isOpen, toggleIsOpen, canSlideOut = 
           }}
         >
           <CloseIcon
+            id="documentation-close-icon"
             size="extra-large"
             onClick={() => {
               toggleIsOpen();
@@ -168,10 +167,10 @@ const Documentation = ({ documentationData, isOpen, toggleIsOpen, canSlideOut = 
           }}
         >
           <Typography variant="h4" sx={{ color: "white" }}>
-            {selectedPage !== null ? loadedDocPages[selectedPage].data.pageName : "Pages"}
+            {selectedPage !== null ? loadedDocPages[selectedPage].data.page_name : "Pages"}
           </Typography>
           <TextField
-            id="search-input-field"
+            id="doc-search-input-field"
             placeholder="Search"
             InputProps={{
               startAdornment: (
@@ -190,7 +189,7 @@ const Documentation = ({ documentationData, isOpen, toggleIsOpen, canSlideOut = 
           />
         </Box>
         <Box
-          id="search-results-container"
+          id="document-search-results-container"
           zIndex={1000000001}
           sx={{
             position: "absolute",
@@ -251,13 +250,13 @@ const Documentation = ({ documentationData, isOpen, toggleIsOpen, canSlideOut = 
               <Box id="doc-main-page-container">
                 {documentationData.map((docPage, index) => (
                   <Button
-                    key={docPage.pageId}
-                    id={docPage.pageId}
+                    key={docPage.page_id}
+                    id={docPage.page_id}
                     variant="outlined"
                     sx={{ display: "block", margin: "10px 0" }}
                     onClick={() => handlePageSelection(index)}
                   >
-                    {docPage.pageName}
+                    {docPage.page_name}
                   </Button>
                 ))}
               </Box>

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { ThemeProvider } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
@@ -28,6 +28,7 @@ import infoIconsData from "./tutorialData/infoIconsData";
 import { MeshContext, UserContext, ApiSocketContext, ColorModeContext } from "./context";
 import Documentation from "./components/tutorial/Documentation";
 import documentationData from "./tutorialData/documentationData";
+import InteractiveAppTutor from "./components/tutorial/InteractiveAppTutor";
 
 function App() {
   const { keycloak, initialized } = useKeycloak();
@@ -51,8 +52,12 @@ function App() {
   const [documentationOpen, setDocumentationOpen] = React.useState(false);
   const [documentationSideToolEnabled, setDocumentationSideToolEnabled] = React.useState(false);
   const [resourceCircleEnabled, setResourceCircleEnabled] = React.useState(true);
-  const [resourceCirclePos, setResourceCirclePos] = usePersistantState("resourceCirclePosition", {
-    positionY: "bottom",
+  // const [resourceCirclePos, setResourceCirclePos] = usePersistantState("resourceCirclePosition", {
+  //   positionY: "top",
+  //   positionX: "right",
+  // });
+  const [resourceCirclePos, setResourceCirclePos] = useState({
+    positionY: "top",
     positionX: "right",
   });
   let resourceCircleInNavbar =
@@ -167,7 +172,22 @@ function App() {
                   )}
                 </main>
               </Box>
-              {tutorialActive && (
+              <InteractiveAppTutor
+                tutorialActive={tutorialActive}
+                exitTutorial={() => setTutorialActive(false)}
+                tutorialLogoSrc="/images/iNethiLogoWhite.png"
+                documentationOpen={documentationOpen}
+                toggleDocumentationOpen={toggleDocumentationOpen}
+                documentationSideToolEnabled={documentationSideToolEnabled}
+                resourceCircleEnabled={resourceCircleEnabled}
+                resourceCircleIconSrc="/images/iNethiLogoWhite.png"
+                resourceCirclePos={resourceCirclePos}
+                resourceCircleSize={resourceCircleInNavbar ? 55 : 60}
+                resourceCircleDistFromOuter={resourceCircleInNavbar ? 5 : 20}
+                resourceCircleBorder={resourceCircleInNavbar ? "2px solid white" : "none"}
+                openDocumentation={() => setDocumentationOpen(true)}
+              />
+              {/* {tutorialActive && (
                 <Tutorial
                   logoSrc={"/images/iNethiLogoWhite.png"}
                   tutorialContent={tutorialData}
@@ -192,7 +212,7 @@ function App() {
                   infoIcons={infoIconsData}
                   openDocumentation={() => setDocumentationOpen(true)}
                 ></ResourceCircle>
-              )}
+              )} */}
             </MeshContext.Provider>
           </UserContext.Provider>
         </ApiSocketContext.Provider>

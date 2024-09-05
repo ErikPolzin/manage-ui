@@ -44,8 +44,8 @@ const InteractiveGuide = ({ guide, onExit, onComplete }) => {
   return (
     <Tooltip
       type={guide.tooltips[currentStep].type}
-      targetEl={guide.tooltips[currentStep].targetElement}
-      targetAreaEl={guide.tooltips[currentStep].targetAreaElement}
+      targetEl={guide.tooltips[currentStep].target_element_id}
+      targetAreaEl={guide.tooltips[currentStep].target_area_element_id}
       title={guide.tooltips[currentStep].title}
       content={guide.tooltips[currentStep].content}
       onNext={nextStep}
