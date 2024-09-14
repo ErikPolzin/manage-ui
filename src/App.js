@@ -25,10 +25,11 @@ import InteractiveAppTutor from "./components/tutorial/InteractiveAppTutor";
 
 function App() {
   const { keycloak, initialized } = useKeycloak();
+  const [socketUrl, setSocketUrl] = React.useState(null);
   const [open, setOpen] = usePersistantState("drawerOpen", true);
   const [mesh, setMesh] = React.useState(null);
   const [user, setUser] = React.useState(null);
-  const apiSocket = useWebSocket(`${process.env.REACT_APP_WS_URL}/ws/updates/`, {
+  const apiSocket = useWebSocket(socketUrl, {
     share: true,
     shouldReconnect: () => true,
   });
@@ -68,7 +69,12 @@ function App() {
   }, [keycloak.authenticated, keycloak.idTokenParsed]);
 
   React.useEffect(() => {
-    if (mesh) console.log("Selected mesh", mesh.name);
+    if (mesh) {
+      setSocketUrl(`${process.env.REACT_APP_WS_URL}/ws/updates/${mesh.name}/`);
+      console.log("Selected mesh", mesh.name);
+    } else {
+      setSocketUrl(null);
+    }
   }, [mesh]);
 
   React.useEffect(() => {

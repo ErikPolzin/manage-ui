@@ -9,21 +9,36 @@ import { MeshContext } from "../context";
 
 import icon from "leaflet/dist/images/marker-icon.png";
 import iconShadow from "leaflet/dist/images/marker-shadow.png";
-import apIconUrl from "../images/ap.png";
-import meshIconUrl from "../images/meshnode.png";
+import apOnlineIconUrl from "../images/ap_online.png";
+import apOfflineIconUrl from "../images/ap_offline.png";
+import nodeOnlineIconUrl from "../images/node_online.png";
+import nodeOfflineIconUrl from "../images/node_offline.png";
 
 // Map Icons
 let DefaultIcon = L.icon({
   iconUrl: icon,
   shadowUrl: iconShadow,
 });
+// Set the default icon
 L.Marker.prototype.options.icon = DefaultIcon;
-const createNodeIcon = (type, isOnline) => {
+const MARKER_URLS = {
+  AP: {
+    online: apOnlineIconUrl,
+    offline: apOfflineIconUrl,
+  },
+  Node: {
+    online: nodeOnlineIconUrl,
+    offline: nodeOfflineIconUrl,
+  }
+}
+
+const createNodeIcon = (type, status) => {
+  console.log(type, status, MARKER_URLS[type][status]);
   return (
     new L.Icon({
-      iconUrl: type === "AP" ? apIconUrl : meshIconUrl,
+      iconUrl: MARKER_URLS[type][status],
       iconSize: [41, 41],
-      className: isOnline ? `${type.toLowerCase()}-online` : `${type.toLowerCase()}-offline`,
+      className: `${type.toLowerCase()}-${status}`,
     }) || DefaultIcon
   );
 };
@@ -92,7 +107,7 @@ function DraggableMarker({ node, handlePositionChange, handleMarkerClick }) {
     [node, handlePositionChange, handleMarkerClick],
   );
 
-  const icon = createNodeIcon(node.is_ap ? "AP" : "Node", node.status === "online");
+  const icon = createNodeIcon(node.is_ap ? "AP" : "Node", node.status);
 
   return (
     <Marker
@@ -149,7 +164,7 @@ const NetworkMap = ({ nodes, center, handlePositionChange, style, handleMarkerCl
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
-        <Polyline pathOptions={{ color: "red" }} positions={neighbouringConnections()} />
+        <Polyline pathOptions={{ color: "#1d7cdb" }} positions={neighbouringConnections()} />
         {nodes.map((node) => (
           <DraggableMarker
             key={node.mac}

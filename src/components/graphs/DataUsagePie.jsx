@@ -61,7 +61,7 @@ function DataUsagePie({ accounts, selectedAccount, selectedGroup }) {
     () =>
       accounts.map((u) => ({
         id: u.radacctid,
-        value: u.acctinputoctets,
+        value: u.acctoutputoctets,
         label: u.username,
         color: colorForUser(u.username, u.radacctid),
       })),
@@ -73,7 +73,7 @@ function DataUsagePie({ accounts, selectedAccount, selectedGroup }) {
         id: u,
         value: accounts
           .filter((ra) => ra.username === u)
-          .reduce((x, y) => x + y.acctinputoctets, 0),
+          .reduce((x, y) => x + y.acctoutputoctets, 0),
         label: u,
         color: colorForUser(u),
       })),
@@ -83,7 +83,7 @@ function DataUsagePie({ accounts, selectedAccount, selectedGroup }) {
     () =>
       accounts.map((u) => ({
         id: u.radacctid,
-        value: u.acctoutputoctets,
+        value: u.acctinputoctets,
         label: u.username,
         color: colorForUser(u.username, u.radacctid),
       })),
@@ -95,12 +95,20 @@ function DataUsagePie({ accounts, selectedAccount, selectedGroup }) {
         id: u,
         value: accounts
           .filter((ra) => ra.username === u)
-          .reduce((x, y) => x + y.acctoutputoctets, 0),
+          .reduce((x, y) => x + y.acctinputoctets, 0),
         label: u,
         color: colorForUser(u),
       })),
     [accounts, usernames, colorForUser],
   );
+  const dataUsageFor = React.useCallback((username) => {
+    let recvIdx = recvDataGrouped.map(d => d.id).indexOf(username);
+    let sendIdx = sendDataGrouped.map(d => d.id).indexOf(username);
+    let recvData = recvIdx > -1 ? formatDataSize(recvDataGrouped[recvIdx].value) : "--";
+    let sendData = sendIdx > -1 ? formatDataSize(sendDataGrouped[sendIdx].value) : "--";
+    return `${recvData}↓  / ${sendData}↑`
+  }, [recvDataGrouped, sendDataGrouped])
+
   React.useEffect(() => setHighlightGroup(true), [selectedGroup]);
   React.useEffect(() => setHighlightGroup(false), [selectedAccount]);
 
@@ -212,15 +220,15 @@ function DataUsagePie({ accounts, selectedAccount, selectedGroup }) {
           sx={{ height: 55, display: "flex", alignItems: "center", justifyContent: "center" }}
         ></Box>
         <Divider />
-        <List dense sx={{ maxHeight: 300, overflowY: "auto" }}>
+        <List sx={{ maxHeight: 300, overflowY: "auto" }}>
           {usernames.map((u) => (
-            <ListItem key={u}>
+            <ListItem key={u} dense>
               <ListItemIcon>
                 <Box
                   sx={{ width: 20, height: 20, borderRadius: "50%", bgcolor: colorForUser(u) }}
                 />
               </ListItemIcon>
-              <ListItemText primary={u} />
+              <ListItemText primary={u} secondary={dataUsageFor(u)} />
             </ListItem>
           ))}
         </List>

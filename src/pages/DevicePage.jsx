@@ -1,12 +1,14 @@
 import React from "react";
 import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
-import Grid from "@mui/material/Unstable_Grid2"; // Grid version 2
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import ToggleButton from "@mui/material/ToggleButton";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Container from "@mui/material/Container";
+import Slide from "@mui/material/Slide";
+import Stack from "@mui/material/Stack";
+import { useTheme } from "@mui/material";
 
 import DeviceList from "../components/DeviceList";
 import DataUsageGraph from "../components/graphs/DataUsageGraph";
@@ -17,7 +19,7 @@ import DeviceDetailCard from "../components/DeviceDetailCard";
 import { MS_IN } from "../components/graphs/utils";
 import { useQueryState } from "../hooks";
 import { fetchAPI } from "../keycloak";
-import { ApiSocketContext } from "../context";
+import { ApiSocketContext, MeshContext } from "../context";
 
 function GraphTabPanel({ children, value, index, ...other }) {
   return (
@@ -41,6 +43,7 @@ function a11yProps(index) {
 }
 
 function DevicePage() {
+  const theme = useTheme();
   const [devices, setDevices] = React.useState([]);
   const [selectedDeviceMac, setSelectedDeviceMac] = useQueryState("selected");
   const [alert, setAlert] = React.useState({ show: false, message: "", type: "error" });
@@ -50,6 +53,7 @@ function DevicePage() {
   const [showDays, setShowDays] = React.useState("month");
   const [tabValue, setTabValue] = React.useState(0);
   const { lastJsonMessage } = React.useContext(ApiSocketContext);
+  const { mesh } = React.useContext(MeshContext);
 
   // Run when a new WebSocket message is received (lastJsonMessage)
   React.useEffect(() => {
@@ -68,25 +72,26 @@ function DevicePage() {
   React.useEffect(() => setMinTime(new Date() - MS_IN[showDays]), [showDays]);
 
   React.useEffect(() => {
-    fetchDevices();
-  }, []);
+    if (!mesh) return;
+    fetchDevices(mesh.name);
+  }, [mesh]);
 
-  const selectedDevice = () => {
+  const selectedDevice = React.useMemo(() => {
     for (let device of devices) {
       if (device.mac === selectedDeviceMac) return device;
     }
     return null;
-  };
+  }, [devices, selectedDeviceMac]);
 
   const handleCloseAlert = () => {
     setAlert({ show: false, message: "", type: "success" });
   };
 
-  const fetchDevices = () => {
+  const fetchDevices = (meshName) => {
     setError(null); // Clear any existing errors
     // Fetch list of mesh nodes
     setLoading(true);
-    fetchAPI("/monitoring/devices/")
+    fetchAPI(`/monitoring/devices/?mesh=${meshName}`)
       .then((data) => {
         setDevices(data);
       })
@@ -114,13 +119,21 @@ function DevicePage() {
   const handleUpdate = (newDevice) => {
     // For some stupid reason django returns MAC addresses in a slightly different
     // format, so I can't check for exact equality here.
-    newDevice.mac = newDevice.mac.replaceAll("-", ":")
+    newDevice.mac = newDevice.mac.replaceAll("-", ":");
     setDevices(devices.map((d) => (d.mac === newDevice.mac ? newDevice : d)));
   };
 
   return (
-    <Grid container spacing={2}>
-      <Grid xs={12} lg={selectedDeviceMac ? 8 : 12} xl={selectedDeviceMac ? 9 : 12}>
+    <Stack direction={{ xs: "column", md: "row" }}>
+      <Box
+        sx={{
+          flexGrow: 1,
+          [theme.breakpoints.up("md")]: {
+            maxHeight: "calc(100vh - 64px)",
+            overflowY: "auto",
+          },
+        }}
+      >
         <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
           <Tabs value={tabValue} onChange={(e, v) => setTabValue(v)} centered>
             <Tab label="Data Usage" {...a11yProps(0)} />
@@ -176,7 +189,7 @@ function DevicePage() {
             }}
             isLoading={loading}
             devices={devices}
-            selectedDevice={selectedDevice()}
+            selectedDevice={selectedDevice}
             minTime={minTime}
             onSelect={setSelectedDeviceMac}
             onUpdate={handleUpdate}
@@ -184,21 +197,26 @@ function DevicePage() {
             onDelete={handleDelete}
           />
         </Container>
-      </Grid>
-      {selectedDeviceMac ? (
-        <Grid xs={12} lg={4} xl={3} id="detail-cell">
+      </Box>
+      <Slide direction="left" in={!!selectedDevice} mountOnEnter unmountOnExit>
+        <Box
+          sx={{
+            margin: 1,
+            overflowX: "hidden",
+            [theme.breakpoints.up("md")]: {
+              width: "400px",
+            },
+          }}
+        >
           <DeviceDetailCard
-            device={selectedDevice()}
+            device={selectedDevice}
             onUpdate={handleUpdate}
             onClose={() => setSelectedDeviceMac(null)}
             onDelete={handleDelete}
-            sx={{
-              margin: 1,
-            }}
           />
-        </Grid>
-      ) : null}
-    </Grid>
+        </Box>
+      </Slide>
+    </Stack>
   );
 }
 
