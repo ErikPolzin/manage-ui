@@ -189,7 +189,7 @@ const InfoIcon = ({ targetEl, title, body }) => {
       updatePositions(targetElement, hasFixedPos);
     };
 
-    // Use MutationObserver to detect changes in the DOM
+    // MutationObserver detects changes in the DOM
     const observer = new MutationObserver(() => {
       handleUpdateInfoIcon();
     });
@@ -254,7 +254,7 @@ const InfoIcon = ({ targetEl, title, body }) => {
         >
           ?
         </Box>
-        {isOpen && (
+        {isOpen && visible && (
           <Box
             zIndex={999999999}
             id="info-box"

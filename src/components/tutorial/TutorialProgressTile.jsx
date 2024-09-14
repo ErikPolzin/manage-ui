@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Box, Button, Typography, Paper } from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 import ReplayIcon from "@mui/icons-material/Replay";

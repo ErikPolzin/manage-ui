@@ -29,6 +29,7 @@ const Tooltip = ({
   const arrowSize = 30;
   const [progressBarWidth, setProgressBarWidth] = useState(0);
 
+  const [targetElementFound, setTargetElementFound] = useState(true);
   const [targetAreaPos, setTargetAreaPos] = useState({
     left: 0,
     top: 0,
@@ -179,6 +180,7 @@ const Tooltip = ({
     // If target element not found, display tooltip in the center
     if (!targetElement || !targetAreaElement) {
       console.log("The provided target or area element is not found");
+      setTargetElementFound(false);
       setTooltipPosition({
         top: `calc(${document.documentElement.clientHeight / 2}px - ${
           tooltipRef.current.offsetHeight / 2
@@ -194,6 +196,7 @@ const Tooltip = ({
       return;
     }
 
+    setTargetElementFound(true);
     const rect = targetAreaElement.getBoundingClientRect(); // more reliable than using targetAreaElement directly
 
     // Scroll the target element into view
@@ -459,15 +462,47 @@ const Tooltip = ({
               </Box>
             </>
           ) : (
-            <Typography
-              id="tooltip-action-content"
-              variant="body2"
-              fontSize={"1.3rem"}
-              fontWeight={550}
-              textAlign={"center"}
-            >
-              {formattedContent}
-            </Typography>
+            <>
+              <Typography
+                id="tooltip-action-content"
+                variant="body2"
+                fontSize={"1.3rem"}
+                fontWeight={550}
+                textAlign={"center"}
+              >
+                {formattedContent}
+              </Typography>
+              {!targetElementFound && (
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    width: "100%",
+                  }}
+                >
+                  <Button
+                    id="tooltip-next-button"
+                    variant="contained"
+                    size="small"
+                    endIcon={<ArrowForwardIcon fontSize="small" />}
+                    onClick={() => {
+                      setChangedTooltipSince(true);
+                      handleTooltipChanging();
+                      if (tooltipNo === totalTooltips) {
+                        setProgressBarWidth(0);
+                      }
+                      onNext();
+                    }}
+                    sx={{
+                      backgroundColor: "#3F15B1",
+                      "&:hover": { backgroundColor: "#31119F" },
+                    }}
+                  >
+                    {tooltipNo === totalTooltips ? "Finish" : "Next"}
+                  </Button>
+                </Box>
+              )}
+            </>
           )}
           <Box
             id="tooltip-progress-container"

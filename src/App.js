@@ -20,14 +20,7 @@ import makeTheme from "./theme";
 import useWebSocket from "react-use-websocket";
 import { usePersistantState } from "./hooks";
 import ResourcesPage from "./pages/ResourcesPage";
-import Tutorial from "./components/tutorial/Tutorial";
-import tutorialData from "./tutorialData/tutorialData";
-import ResourceCircle from "./components/tutorial/ResourceCircle";
-import guidesData from "./tutorialData/interactiveGuidesData";
-import infoIconsData from "./tutorialData/infoIconsData";
 import { MeshContext, UserContext, ApiSocketContext, ColorModeContext } from "./context";
-import Documentation from "./components/tutorial/Documentation";
-import documentationData from "./tutorialData/documentationData";
 import InteractiveAppTutor from "./components/tutorial/InteractiveAppTutor";
 
 function App() {
@@ -52,11 +45,7 @@ function App() {
   const [documentationOpen, setDocumentationOpen] = React.useState(false);
   const [documentationSideToolEnabled, setDocumentationSideToolEnabled] = React.useState(false);
   const [resourceCircleEnabled, setResourceCircleEnabled] = React.useState(true);
-  // const [resourceCirclePos, setResourceCirclePos] = usePersistantState("resourceCirclePosition", {
-  //   positionY: "top",
-  //   positionX: "right",
-  // });
-  const [resourceCirclePos, setResourceCirclePos] = useState({
+  const [resourceCirclePos, setResourceCirclePos] = usePersistantState("resourceCirclePosition", {
     positionY: "top",
     positionX: "right",
   });
@@ -186,33 +175,8 @@ function App() {
                 resourceCircleDistFromOuter={resourceCircleInNavbar ? 5 : 20}
                 resourceCircleBorder={resourceCircleInNavbar ? "2px solid white" : "none"}
                 openDocumentation={() => setDocumentationOpen(true)}
+                demoMode={false}
               />
-              {/* {tutorialActive && (
-                <Tutorial
-                  logoSrc={"/images/iNethiLogoWhite.png"}
-                  tutorialContent={tutorialData}
-                  onExit={handleExitTutorial}
-                ></Tutorial>
-              )}
-              <Documentation
-                documentationData={documentationData}
-                isOpen={documentationOpen}
-                toggleIsOpen={toggleDocumentationOpen}
-                canSlideOut={documentationSideToolEnabled}
-              ></Documentation>
-              {!tutorialActive && resourceCircleEnabled && (
-                <ResourceCircle
-                  circleIconName={"/images/iNethiLogoWhite.png"}
-                  positionY={resourceCirclePos.positionY}
-                  positionX={resourceCirclePos.positionX}
-                  circleSize={resourceCircleInNavbar ? 55 : 60}
-                  circleDistFromOuter={resourceCircleInNavbar ? 5 : 20}
-                  circleBorder={resourceCircleInNavbar ? "2px solid white" : "none"}
-                  guides={guidesData}
-                  infoIcons={infoIconsData}
-                  openDocumentation={() => setDocumentationOpen(true)}
-                ></ResourceCircle>
-              )} */}
             </MeshContext.Provider>
           </UserContext.Provider>
         </ApiSocketContext.Provider>

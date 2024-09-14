@@ -38,7 +38,7 @@ const TestProgressTile = ({
   const testProgressTileRef = useRef(null);
 
   const [clickElementNo, setClickElementNo] = useState(0);
-  const clickElements = currentTask.clickElements; // the element objects that need to be clicked to complete the round
+  const clickElements = currentTask.click_elements; // the element objects that need to be clicked to complete the round
   const [windowClickCount, setWindowClickCount] = useState(0);
 
   const progressBarWidth = `calc(${(currentTaskNo / taskNames.length) * 100}% - 4px)`;
@@ -77,9 +77,9 @@ const TestProgressTile = ({
   // Test logic
   useLayoutEffect(() => {
     const elementToClickObject = clickElements[clickElementNo]; // the current element (JS object) that needs to be clicked next in the task
-    const targetElementId = elementToClickObject.elementId;
-    const targetElementToClick = document.querySelector(targetElementId); // the actual DOM element
-    const textInputElements = elementToClickObject.textInputElements;
+    const targetElementId = elementToClickObject.element_id;
+    const targetElementToClick = document.getElementById(targetElementId); // the actual DOM element
+    const textInputElements = elementToClickObject.text_input_elements;
 
     // If target element not yet on page
     if (!targetElementToClick) {
@@ -92,11 +92,11 @@ const TestProgressTile = ({
     const handleClick = () => {
       // Check to see if every input element has the correct input
       for (const textInputElement of textInputElements) {
-        const inputElement = document.querySelector(textInputElement.elementId);
+        const inputElement = document.getElementById(textInputElement.element_id);
 
         if (!textInputElement) {
-          console.log(`Input field "${textInputElement.elementId}" not found - ignoring`);
-        } else if (inputElement.value !== textInputElement.requiredInput) {
+          console.log(`Input field "${textInputElement.element_id}" not found - ignoring`);
+        } else if (inputElement.value !== textInputElement.required_input) {
           console.log("Not all required text inputs are correct");
           return;
         }
@@ -120,31 +120,8 @@ const TestProgressTile = ({
     };
   }, [currentTaskNo, clickElementNo, windowClickCount]);
 
-  const textRef = useRef(null);
-  const [lineCount, setLineCount] = useState(0);
-
-  // Some formatting logic
+  // Tile positioning
   useEffect(() => {
-    const measureLines = () => {
-      if (textRef.current) {
-        const textElement = textRef.current;
-        const lineHeight = parseFloat(getComputedStyle(textElement).lineHeight);
-        const totalHeight = textElement.offsetHeight;
-        const lines = Math.round(totalHeight / lineHeight);
-        setLineCount(lines);
-        // console.log(
-        //   "Single line height for " +
-        //     textElement.textContent +
-        //     ": " +
-        //     lineHeight
-        // );
-        // console.log("Total line height: " + totalHeight);
-        // console.log("Therefore line count is " + lines);
-      }
-    };
-    measureLines();
-    window.addEventListener("resize", measureLines); // Re-measure on window resize if need be
-
     const updateTilePosition = () => {
       setTilePosition({
         top: isExpanded
@@ -158,7 +135,6 @@ const TestProgressTile = ({
     window.addEventListener("click", updateTilePosition);
 
     return () => {
-      window.removeEventListener("resize", measureLines);
       window.removeEventListener("resize", updateTilePosition);
       window.removeEventListener("click", updateTilePosition);
     };
@@ -218,7 +194,6 @@ const TestProgressTile = ({
           sx={{ overflow: "hidden" }}
           primary={
             <Typography
-              ref={index === currentTaskNo - 1 ? textRef : null}
               sx={{
                 fontSize: "0.95rem",
                 color: index < currentTaskNo ? "rgba(0, 0, 0, 0.54)" : "inherit",

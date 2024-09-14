@@ -5,7 +5,7 @@ import { Typography, Box, Link } from "@mui/material";
 const parseDocumentation = (text) => {
   // Regular expression to match the symbolic notation
   const regex =
-    /\$(pageHeading|heading1|heading2|heading3|body1|body2|link|video)\{([^}]*)\}\{([^}]*)\}(?:\{([^}]*)\})?/g;
+    /\$(pageHeading|heading1|heading2|heading3|body1|body2|link|image|video)\{([^}]*)\}\{([^}]*)\}(?:\{([^}]*)\})?/g;
 
   // Replace the notation with the corresponding UI elements
   return text.split("\n").map((line, index) => {
@@ -14,7 +14,7 @@ const parseDocumentation = (text) => {
 
     // Loop through all matches
     while ((match = regex.exec(line)) !== null) {
-      const [fullMatch, type, id, content, videoUrl] = match;
+      const [fullMatch, type, id, content, url] = match;
 
       switch (type) {
         case "pageHeading":
@@ -72,9 +72,17 @@ const parseDocumentation = (text) => {
           break;
         case "link":
           parts.push(
-            <Link key={index + "-" + id} href={id}>
+            <Link key={index + "-" + id} href={id} target="_blank" rel="noopener noreferrer">
               {content}
             </Link>,
+          );
+          break;
+        case "image":
+          parts.push(
+            <Box key={index + "-" + id} id={id} sx={{ margin: "20px 0", textAlign: "center" }}>
+              <img src={url} alt={content} style={{ maxWidth: "100%" }} />
+              <Typography variant="caption">{content}</Typography>
+            </Box>,
           );
           break;
         case "video":
@@ -84,7 +92,7 @@ const parseDocumentation = (text) => {
               <iframe
                 width="560"
                 height="315"
-                src={`https://www.youtube.com/embed/${videoUrl}`}
+                src={`https://www.youtube.com/embed/${url}`}
                 title={content}
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
@@ -103,7 +111,6 @@ const parseDocumentation = (text) => {
   });
 };
 
-// Component using the parser
 const DocumentationMarkdownRenderer = ({ text }) => {
   return <>{parseDocumentation(text)}</>;
 };

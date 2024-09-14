@@ -117,6 +117,8 @@ const WalkthroughCompleteTile = ({ stageNo, onTakeTest, onRedoWalkthrough, onSki
           </Button>
           <Button
             size="small"
+            id="skip-test-button"
+            data-testid="skip-test-button"
             endIcon={<FastForwardIcon fontSize="0.6rem" />}
             onClick={() => handleOpenConfirmationPopup("Skip")}
             sx={{

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useState } from "react";
 import Tooltip from "./Tooltip";
 import { CssBaseline, Box } from "@mui/material";
 import StageCompleteCard from "./StageCompleteTile";
@@ -30,12 +30,10 @@ const Tutorial = ({
 
   const [walkthroughActive, setWalkthroughActive] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
-  const [tooltipChanging, setTooltipChanging] = useState(false);
   const [walkthroughCompleteIntermission, setWalkthroughCompleteIntermission] = useState(false);
 
   const [testActive, setTestActive] = useState(false);
   const [currentTask, setCurrentTask] = useState(0);
-  const [taskChanging, setTaskChanging] = useState(false);
 
   const [stageCompleteIntermission1, setStageCompleteIntermission1] = useState(false);
   const [stageCompleteIntermission2, setStageCompleteIntermission2] = useState(false);
@@ -98,14 +96,13 @@ const Tutorial = ({
 
     if (currentTask < currentTasks.length - 1) {
       // All click elements complete - Move to next task
-      //setTaskChanging(true);
       setCurrentTask((prevTask) => prevTask + 1);
     } else {
       // Finished all tasks - Test and stage completed
       console.log("Test completed!");
       resetTest();
       if (currentStage < tutorial.length - 1) {
-        // if not last test of last stage
+        // If not last test of last stage
         setStageCompleteIntermission1(true);
       } else {
         console.log("Tutorial completed!");
@@ -176,7 +173,6 @@ const Tutorial = ({
     setTutorialComplete(false);
     setWalkthroughActive(true);
     navigateToPage(tutorial[currentStage].tooltips[0].page);
-
     // and then not updating the stage
   };
 
@@ -282,7 +278,6 @@ const Tutorial = ({
           totalTooltips={tutorial[currentStage].tooltips.length}
         />
       )}
-
       {testActive && (
         <TestProgressTile
           stageName={tutorial[currentStage].name}

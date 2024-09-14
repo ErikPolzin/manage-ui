@@ -1,7 +1,6 @@
 import {
   Button,
   CssBaseline,
-  Icon,
   IconButton,
   InputAdornment,
   Switch,
