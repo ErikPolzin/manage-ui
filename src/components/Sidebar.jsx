@@ -150,6 +150,15 @@ export default function Sidebar({ open }) {
       });
   };
 
+  /**
+   * Select a mesh immediately after adding it
+   * @param {Object} mesh 
+   */
+  const selectMeshOnAdd = (mesh) => {
+    meshes.push(mesh);
+    setMesh(mesh);
+  }
+
   // Fatch meshes as soon as keycloak sorts its stuff out
   React.useEffect(() => {
     if (initialized && keycloak.authenticated) {
@@ -172,7 +181,7 @@ export default function Sidebar({ open }) {
         )}
       </DrawerHeader>
       <Divider />
-      <MeshDialog open={meshOpen} onClose={() => setMeshOpen(false)}></MeshDialog>
+      <MeshDialog open={meshOpen} onAdd={selectMeshOnAdd} onClose={() => setMeshOpen(false)} />
       {/* Not sure why setting overflowY seems to reset overflowX as well, manually override */}
       <List sx={{ overflowY: "auto", overflowX: "hidden" }}>
         <ListItemButton
