@@ -34,6 +34,7 @@ export default function ServiceDialog({ open, service, onClose, onAdd, onUpdate 
 
   return (
     <GenericDialog
+      id="add-service-dialog"
       open={open}
       onClose={onClose}
       onReset={handleReset}
@@ -46,6 +47,7 @@ export default function ServiceDialog({ open, service, onClose, onAdd, onUpdate 
       onError={setErrors}
     >
       <TextField
+        id="add-service-dialog-service-name"
         autoFocus
         margin="dense"
         name="name"

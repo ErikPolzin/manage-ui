@@ -29,8 +29,8 @@ const MARKER_URLS = {
   Node: {
     online: nodeOnlineIconUrl,
     offline: nodeOfflineIconUrl,
-  }
-}
+  },
+};
 
 const createNodeIcon = (type, status) => {
   console.log(type, status, MARKER_URLS[type][status]);

@@ -70,6 +70,7 @@ function ServicesPage() {
         onAdd={onAddService}
       />
       <Fab
+        id="add-service-plus-button"
         onClick={() => setOpenAddServiceDialog(true)}
         aria-label="add"
         color="secondary"
