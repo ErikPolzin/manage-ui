@@ -344,7 +344,7 @@ const Tooltip = ({
   };
 
   // Replace \n with <br> for line breaks
-  const formattedContent = content.split("\n").map((line, index) => (
+  const formattedContent = content.split("\\n").map((line, index) => (
     <React.Fragment key={index}>
       {line}
       <br />
