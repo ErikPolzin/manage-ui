@@ -36,8 +36,14 @@ export default function GenericDialog({
     setLoading(true);
     let url = originalData ? `${baseUrl}${data[idField]}/` : baseUrl;
     (originalData
-      ? fetchAPI(url, "PUT", data).then((response) => onUpdate(response) || onClose())
-      : fetchAPI(url, "POST", data).then((response) => onAdd(response) || onClose())
+      ? fetchAPI(url, "PUT", data).then((response) => {
+          if (onUpdate) onUpdate(response);
+          onClose();
+        })
+      : fetchAPI(url, "POST", data).then((response) => {
+          if (onAdd) onAdd(response);
+          onClose();
+        })
     )
       .catch((error) => onError(error))
       .finally(() => setLoading(false));
