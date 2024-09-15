@@ -25,18 +25,19 @@ const MARKER_URLS = {
   AP: {
     online: apOnlineIconUrl,
     offline: apOfflineIconUrl,
+    unknown: apOfflineIconUrl,
   },
   Node: {
     online: nodeOnlineIconUrl,
     offline: nodeOfflineIconUrl,
+    unknown: nodeOfflineIconUrl,
   }
 }
 
 const createNodeIcon = (type, status) => {
-  console.log(type, status, MARKER_URLS[type][status]);
   return (
     new L.Icon({
-      iconUrl: MARKER_URLS[type][status],
+      iconUrl: MARKER_URLS[type][status || "offline"],
       iconSize: [41, 41],
       className: `${type.toLowerCase()}-${status}`,
     }) || DefaultIcon
