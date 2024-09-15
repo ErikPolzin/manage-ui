@@ -197,6 +197,7 @@ function DeviceList({
             getActions: (params) => [
               <GridActionsCellItem
                 icon={isExpanded(params.id) ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+                disabled={params.row.client_sessions.length === 0}
                 onClick={() => setExpandedIds(isExpanded(params.id) ? [] : [params.id])}
                 label="expand"
               />,
