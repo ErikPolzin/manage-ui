@@ -23,6 +23,7 @@ const DataUsageGraph = ({ showDays, selectedDevice }) => {
       min_time: Math.round((new Date() - new Date(MS_IN[showDays])) / 1000),
       granularity: GRANULARITY[showDays],
       mac: selectedDevice,
+      mesh: mesh?.name,
     };
     fetchAPI(`/metrics/data_usage/?${qs.stringify(params)}`)
       .then((data) => {
@@ -44,7 +45,7 @@ const DataUsageGraph = ({ showDays, selectedDevice }) => {
       .finally(() => {
         setLoading(false);
       });
-  }, [showDays, selectedDevice]);
+  }, [showDays, selectedDevice, mesh]);
 
   return (
     <ResponsiveChartContainer

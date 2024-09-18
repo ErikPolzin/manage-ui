@@ -40,6 +40,7 @@ const UptimeGraph = ({ showDays, selectedDevice }) => {
       min_time: Math.round((new Date() - new Date(MS_IN[showDays])) / 1000),
       granularity: GRANULARITY[showDays],
       mac: selectedDevice,
+      mesh: mesh?.name,
     };
     fetchAPI(`/metrics/uptime/?${qs.stringify(params)}`)
       .then((data) => {
@@ -61,7 +62,7 @@ const UptimeGraph = ({ showDays, selectedDevice }) => {
       .finally(() => {
         setLoading(false);
       });
-  }, [showDays, selectedDevice]);
+  }, [showDays, selectedDevice, mesh]);
 
   return (
     <ResponsiveChartContainer

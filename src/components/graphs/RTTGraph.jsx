@@ -20,6 +20,7 @@ const RTTGraph = ({ showDays, selectedDevice }) => {
       min_time: Math.round((new Date() - new Date(MS_IN[showDays])) / 1000),
       granularity: GRANULARITY[showDays],
       mac: selectedDevice,
+      mesh: mesh?.name,
     };
     fetchAPI(`/metrics/rtt/?${qs.stringify(params)}`)
       .then((data) => {
@@ -43,7 +44,7 @@ const RTTGraph = ({ showDays, selectedDevice }) => {
       .finally(() => {
         setLoading(false);
       });
-  }, [showDays, selectedDevice]);
+  }, [showDays, selectedDevice, mesh]);
 
   return (
     <ResponsiveChartContainer

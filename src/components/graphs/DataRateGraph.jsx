@@ -23,6 +23,7 @@ const DataRateGraph = ({ showDays, selectedDevice }) => {
       min_time: Math.round((new Date() - new Date(MS_IN[showDays])) / 1000),
       granularity: GRANULARITY[showDays],
       mac: selectedDevice,
+      mesh: mesh?.name,
     };
     fetchAPI(`/metrics/data_rate/?${qs.stringify(params)}`)
       .then((data) => {
@@ -45,7 +46,7 @@ const DataRateGraph = ({ showDays, selectedDevice }) => {
       .finally(() => {
         setLoading(false);
       });
-  }, [showDays, selectedDevice]);
+  }, [showDays, selectedDevice, mesh]);
 
   return (
     <ResponsiveChartContainer
