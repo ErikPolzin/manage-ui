@@ -68,12 +68,24 @@ export default function MeshDialog({ open, mesh, onClose, onAdd, onUpdate }) {
     setData({...data});
   };
 
+  const secureSSIDName = React.useMemo(() => {
+    if (data.secure_ssid) return data.secure_ssid;
+    if (data.name) return `${data.name} Staff`;
+    return "";
+  }, [data.secure_ssid, data.name])
+
+  const guestSSIDName = React.useMemo(() => {
+    if (data.guest_ssid) return data.guest_ssid;
+    if (data.name) return `${data.name} Guest`;
+    return "";
+  }, [data.guest_ssid, data.name])
+
   return (
     <GenericDialog
       open={open}
       onClose={onClose}
       onReset={handleReset}
-      data={data}
+      data={{...data, guest_ssid: guestSSIDName, secure_ssid: secureSSIDName}}
       baseUrl="/monitoring/meshes/"
       originalData={mesh}
       typeName="Mesh"
@@ -131,7 +143,7 @@ export default function MeshDialog({ open, mesh, onClose, onAdd, onUpdate }) {
             label="Secure SSID"
             type="text"
             fullWidth
-            value={data.secure_ssid}
+            value={secureSSIDName}
             onChange={handleChange}
             helperText="The name of the staff wifi radio"
           />
@@ -143,7 +155,7 @@ export default function MeshDialog({ open, mesh, onClose, onAdd, onUpdate }) {
             label="Guest SSID"
             type="text"
             fullWidth
-            value={data.guest_ssid}
+            value={guestSSIDName}
             onChange={handleChange}
             helperText="The name of the guest wifi radio"
           />
