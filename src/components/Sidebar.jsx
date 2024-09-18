@@ -107,11 +107,11 @@ function stringAvatar(first_name, last_name) {
 }
 
 const CONNECTION_STATUSES = {
-  [ReadyState.CONNECTING]: "Connecting to API",
-  [ReadyState.OPEN]: "Connected to API",
-  [ReadyState.CLOSING]: "Closing connection",
-  [ReadyState.CLOSED]: "Closed connection",
-  [ReadyState.UNINSTANTIATED]: "Uninstantiated",
+  [ReadyState.CONNECTING]: "Connecting...",
+  [ReadyState.OPEN]: "Connected",
+  [ReadyState.CLOSING]: "Closing...",
+  [ReadyState.CLOSED]: "Closed",
+  [ReadyState.UNINSTANTIATED]: "Waiting",
 };
 
 export default function Sidebar({ open }) {
