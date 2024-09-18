@@ -49,7 +49,7 @@ export default function MeshDialog({ open, mesh, onClose, onAdd, onUpdate }) {
   };
 
   const handleLocationChange = (loc) => {
-    setData({ ...data, lat: loc.lat, lon: loc.lng });
+    setData({ ...data, lat: loc.lat(), lon: loc.lng() });
   };
 
   const handleReset = () => {
