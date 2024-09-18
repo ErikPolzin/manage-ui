@@ -30,7 +30,7 @@ const HomePage = () => {
   React.useEffect(() => {
     fetchOverview();
     fetchNodes();
-  }, []);
+  }, [mesh]);
 
   React.useEffect(() => {
     //
@@ -48,8 +48,9 @@ const HomePage = () => {
   }, [clickedNode]);
 
   const fetchOverview = () => {
+    if (!mesh) return;
     setLoading(true);
-    fetchAPI("/monitoring/overview/")
+    fetchAPI(`/monitoring/overview/?${qs.stringify({ mesh: mesh.name })}`)
       .then((data) => {
         setNNodes(data.n_nodes);
         setNPositionedNodes(data.n_positioned_nodes);
@@ -96,8 +97,9 @@ const HomePage = () => {
   };
 
   const fetchNodes = () => {
+    if (!mesh) return;
     const fields = ["lat", "lon", "mac", "is_ap", "status", "neighbours"];
-    fetchAPI(`/monitoring/devices/?${qs.stringify({ fields })}`)
+    fetchAPI(`/monitoring/devices/?${qs.stringify({ fields, mesh: mesh.name })}`)
       .then((data) => {
         setNodes(data);
         // We want to center the screen at the average position of the nodes.
