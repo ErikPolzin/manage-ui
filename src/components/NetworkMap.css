@@ -3,7 +3,7 @@
 }
 
 .leaflet-marker-icon.dirty {
-  filter: hue-rotate(100deg);
+  filter: grayscale(100%);
 }
 
 .leaflet-marker-icon.unpositioned {
