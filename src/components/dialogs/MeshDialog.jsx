@@ -37,9 +37,13 @@ export default function MeshDialog({ open, mesh, onClose, onAdd, onUpdate }) {
 
   React.useEffect(() => {
     if (keycloak.authenticated) {
-      fetchAPI("/accounts/users/").then((data) => {
-        setUsers(data);
-      });
+      fetchAPI("/accounts/users/")
+        .then((data) => {
+          setUsers(data);
+        })
+        .catch((error) => {
+          console.error("Error fetching users:", error);
+        });
     }
   }, [keycloak.authenticated]);
 
@@ -65,27 +69,27 @@ export default function MeshDialog({ open, mesh, onClose, onAdd, onUpdate }) {
     } else {
       data.maintainers.splice(idx, 1);
     }
-    setData({...data});
+    setData({ ...data });
   };
 
   const secureSSIDName = React.useMemo(() => {
     if (data.secure_ssid) return data.secure_ssid;
     if (data.name) return `${data.name} Staff`;
     return "";
-  }, [data.secure_ssid, data.name])
+  }, [data.secure_ssid, data.name]);
 
   const guestSSIDName = React.useMemo(() => {
     if (data.guest_ssid) return data.guest_ssid;
     if (data.name) return `${data.name} Guest`;
     return "";
-  }, [data.guest_ssid, data.name])
+  }, [data.guest_ssid, data.name]);
 
   return (
     <GenericDialog
       open={open}
       onClose={onClose}
       onReset={handleReset}
-      data={{...data, guest_ssid: guestSSIDName, secure_ssid: secureSSIDName}}
+      data={{ ...data, guest_ssid: guestSSIDName, secure_ssid: secureSSIDName }}
       baseUrl="/monitoring/meshes/"
       originalData={mesh}
       typeName="Mesh"
