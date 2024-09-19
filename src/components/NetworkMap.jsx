@@ -31,8 +31,8 @@ const MARKER_URLS = {
     online: nodeOnlineIconUrl,
     offline: nodeOfflineIconUrl,
     unknown: nodeOfflineIconUrl,
-  }
-}
+  },
+};
 
 const createNodeIcon = (type, status) => {
   return (
@@ -124,6 +124,7 @@ function DraggableMarker({ node, handlePositionChange, handleMarkerClick }) {
 const NetworkMap = ({ nodes, center, handlePositionChange, style, handleMarkerClick, id }) => {
   const mapRef = useRef(null);
   const theme = useTheme();
+  const { mesh } = React.useContext(MeshContext);
   const [zoom, setZoom] = React.useState(13);
 
   /**
@@ -141,8 +142,8 @@ const NetworkMap = ({ nodes, center, handlePositionChange, style, handleMarkerCl
         if (seenMacs.has(n)) continue;
         let nobj = nodes[nodeMacs.indexOf(n)];
         latlngs.push([
-          [node.lat, node.lon],
-          [nobj.lat, nobj.lon],
+          [node.lat || mesh?.lat, node.lon || mesh?.lon],
+          [nobj.lat || mesh?.lat, nobj.lon || mesh?.lon],
         ]);
         seenMacs.add(node.mac);
       }
