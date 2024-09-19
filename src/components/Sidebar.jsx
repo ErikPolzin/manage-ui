@@ -256,18 +256,6 @@ export default function Sidebar({ open }) {
           </ListItemIcon>
           <ListItemText primary="Resources" />
         </ListItemButton>
-        <ListItemButton
-          id="sidebar-settings-item"
-          key="6"
-          component={Link}
-          to="/settings"
-          selected={location.pathname.startsWith("/settings")}
-        >
-          <ListItemIcon>
-            <SettingsIcon />
-          </ListItemIcon>
-          <ListItemText primary="Settings" />
-        </ListItemButton>
       </List>
       <Box sx={{ flexGrow: 1}} />
       <List>
@@ -279,6 +267,18 @@ export default function Sidebar({ open }) {
           </ListItemIcon>
           <ListItemText primary={connectionStatus} />
         </ListItem>
+        <ListItemButton
+          id="sidebar-settings-item"
+          key="6"
+          component={Link}
+          to="/settings"
+          selected={location.pathname.startsWith("/settings")}
+        >
+          <ListItemIcon>
+            <SettingsIcon />
+          </ListItemIcon>
+          <ListItemText primary="Mesh Settings" />
+        </ListItemButton>
         {/* Only display mesh picker is sidebar is expanded, looks weird otherwise */}
         {open && <ListItem>
           <FormControl fullWidth size="small">
