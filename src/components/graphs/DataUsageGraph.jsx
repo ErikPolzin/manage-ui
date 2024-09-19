@@ -1,5 +1,6 @@
 import * as React from "react";
 import { ResponsiveChartContainer } from "@mui/x-charts/ResponsiveChartContainer";
+import { ChartsLegend } from "@mui/x-charts/ChartsLegend";
 import { BarPlot } from "@mui/x-charts/BarChart";
 import { ChartsXAxis } from "@mui/x-charts/ChartsXAxis";
 import { ChartsYAxis } from "@mui/x-charts/ChartsYAxis";
@@ -114,6 +115,11 @@ const DataUsageGraph = ({ showDays, selectedDevice }) => {
         labelFontSize={18}
       />
       <ChartsYAxis axisId="data_usage" label={"Usage (Mb)"} />
+      <ChartsLegend
+        axisDirection="x"
+        position={{ vertical: "top", horizontal: "right" }}
+        direction="column"
+      />
     </ResponsiveChartContainer>
   );
 };

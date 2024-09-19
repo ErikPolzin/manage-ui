@@ -1,5 +1,6 @@
 import * as React from "react";
 import { ResponsiveChartContainer } from "@mui/x-charts/ResponsiveChartContainer";
+import { ChartsLegend } from "@mui/x-charts/ChartsLegend";
 import { AreaPlot } from "@mui/x-charts/LineChart";
 import { ChartsXAxis } from "@mui/x-charts/ChartsXAxis";
 import { ChartsYAxis } from "@mui/x-charts/ChartsYAxis";
@@ -111,6 +112,11 @@ const DataRateGraph = ({ showDays, selectedDevice }) => {
         labelFontSize={18}
       />
       <ChartsYAxis axisId="data_rate" label={"Speed (KiB/s)"} />
+      <ChartsLegend
+        axisDirection="x"
+        position={{ vertical: "top", horizontal: "right" }}
+        direction="column"
+      />
     </ResponsiveChartContainer>
   );
 };
